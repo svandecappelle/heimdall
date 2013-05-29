@@ -185,7 +185,7 @@ class ReplicationFactory:
 		except socket.error,e: # be carefull of NO ROUTE TO HOST exception
 			logger.log(e, Constants.ERROR)
 		except Exception, e:
-			logger.log("Not catched error on replication: ",e, Constants.ERROR)
+			logger.log("Not catched error on replication: " str(e) , Constants.ERROR)
 				 
 		client.close()	
 		self.notify(server,userName,userhost, True)
