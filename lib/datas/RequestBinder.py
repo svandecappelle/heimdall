@@ -23,7 +23,7 @@ Authors:
 
 # Name:         RequestBinder.py
 # Author:       Vandecappelle Steeve & Sobczak Arnaud
-# Copyright:    (C) 2009-2010 Vandecappelle Steeve & Sobczak Arnaud
+# Copyright:    (C) 2013-2014 Vandecappelle Steeve & Sobczak Arnaud
 # Licence:      GNU General Public Licence version 3
 # Website:      http://vekia.github.io/heimdall/
 # Email:        svandecappelle at vekia.fr
