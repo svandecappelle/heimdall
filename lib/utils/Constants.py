@@ -20,7 +20,7 @@ DEPOT=config.get("folders", "deposit_dir")
 DB_FILE=config.get("folders", "sqlite_database")
 
 """The ssh service port"""
-SSH_PORT=config.get("sshd", "port")
+SSH_PORT=config.getint("sshd", "port")
 """Configuration to send file when access is open or close to admin"""
 notifyAdminByMail=config.get("notifications", "notify_admin_by_mail") == "yes"
 """Configuration to send file when access is open or close to affected user"""
