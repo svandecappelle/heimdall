@@ -30,6 +30,6 @@ heimdallEmail=config.get("notifications", "heimdall_email")
 """Admin notification email"""
 administratorEmail=config.get("notifications", "administrator_email")
 """Admin notification email"""
-ccAdmins=config.get("notifications", "cc_administrators")
+ccAdmins=config.get("notifications", "cc_administrators").split(',')
 """Not used for the moment. In future version."""
 heimdallHost=config.get("notifications", "heimdall_host")
