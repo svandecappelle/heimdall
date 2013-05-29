@@ -92,7 +92,7 @@ class ReplicationFactory:
 				key_rsa = file_rsa.readline()				
 			
 				### Insert key RSA_ID_PUB to db file for remove access
-				insertRsa = RequestBinder.Request("RSA_ID")
+				insertRsa = Request("RSA_ID")
 				insertRsa.setMode("INSERT")
 				insertRsa.addSelect("USER_NAME")
 				insertRsa.addSelect("RSA")
@@ -100,8 +100,8 @@ class ReplicationFactory:
 				insertRsa.addValues(str(userName.upper()))
 				insertRsa.addValues(str(key_rsa))
 			
-				connector = DataBaseConnector.DataBaseConnector(Constants.DB_FILE)
-				insertRsaQuery = RequestBinder.RequestBinder(connector)
+				connector = DataBaseConnector(Constants.DB_FILE)
+				insertRsaQuery = RequestBinder(connector)
 				insertRsaQuery.execQuery(insertRsa);
 				logger.log("Permission added to datafile",Constants.DEBUG)		
 			
