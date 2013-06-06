@@ -1,0 +1,25 @@
+{% extends "layout-page.html" %}
+ 	{% block content %}
+      
+        <h1>Liste des utilisateurs enregistrés sur Heimdall</h1>
+        
+        
+      <table id="rounded-corner">
+      	<thead>
+      	<tr>
+      	<th>Username</th>
+      	<th>Firstname</th>
+      	<th>LastName</th>
+      </tr>
+      </thead>
+        {% for user in list_users %}
+        <tr>
+        	<td>{{ user.username }}</td>
+        	<td>{{ user.firstname }}</td>
+        	<td>{{ user.lastname }}</td>
+        </tr>
+      {% endfor %}
+      </table>
+        
+      <!-- End of Content -->
+ 	{% endblock %}

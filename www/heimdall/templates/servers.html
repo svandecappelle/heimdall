@@ -1,0 +1,21 @@
+{% extends "layout-page.html" %}
+        {% block content %}
+        <h1>Liste des seveurs enregistrés sur Heimdall</h1>
+        
+        
+      <table id="rounded-corner">
+      	<thead>
+      	<tr>
+      	<th>Host</th>
+      	<th>Description</th>
+      </tr>
+      </thead>
+        {% for server in list_servers %}
+        <tr>
+        	<td>{{ server.hostname }}</td>
+        	<td>{{ server.description }}</td>
+        </tr>
+      {% endfor %}
+      </table>
+        
+ 	{% endblock %}

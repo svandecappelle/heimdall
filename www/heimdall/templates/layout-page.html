@@ -1,0 +1,122 @@
+{# Minimum HTML5 template #}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    {% block head %}
+      <title>{{ PAGE_TITLE }} - {{ APP_TITLE }}</title>
+      {% load staticfiles %}
+      <script src="{% static "js/jquery-1.9.1.js" %}" type="text/javascript"></script>
+      <script src="{% static "js/header.js" %}" type="text/javascript"></script>
+       
+      <link href="{% static "css/heimdall-default.css" %}" rel="stylesheet"/>
+      <link href="{% static "css/tables.css" %}" rel="stylesheet"/>
+      <meta charset="utf-8">
+      {% block head-medias %}{% endblock %}
+    {% endblock %}
+  </head>
+
+  <body>
+    {% block body %}
+
+      <!-- Header -->
+        <header>
+          {% block header %}
+                      <div class="GCHESSFBJJ">
+                      	<div class="GCHESSFBMJ">
+                      		{{APP_TITLE}}
+                      		<img class="gwt-Image" src="{% static "images/logo.png"%}">
+                      	</div>
+                      <div class="GCHESSFBKJ">
+                      	<div class="GCHESSFBNJ">
+                      		<div>
+                      			<!--messages-->
+                      			<div class="GCHESSFBML GCHESSFBLL">
+                      			<div>
+                      			{% if user.is_authenticated %}
+					    <span>Welcome, {{ user.username }}.</span>
+					    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNpiXLVm/X8GCgATA4WABYvYAijGBhKgGKsBH4BYAKrgQFhI4EJkhUCvxiNphqlF8YIDVALsCqgGZM0LkDQ7YIQB0MaLWAzJB2F0zVC1mIGIxZAJUIxVM9ZYgCowAIUDkjCIbYCuGVcsgAx5CKQcgc6XR+ITHY3oBhGXDshNkRSnRIAAAwCEDDi73FPsUgAAAABJRU5ErkJggg==" class="GCHESSFBNL">
+					    <span class="GCHESSFBOL">Messages : 0 </span>
+					{% else %}
+					    <span id="connect">Welcome, new user. Please log in or register.</span>
+					{% endif %}
+					</div>
+					</div>
+                      			
+                      		</div>
+                      	</div>
+                      	
+                      	 </div>
+                      	<!-- Connection form-->
+                      	
+                      	
+                      	<div id="connection-form">
+                      	<div class="header-connection-container">
+                      	
+			    <div class="connect">
+				    <h2>Connexion</h2>
+				    <form>
+					<table>
+					<tr>
+						<td><label>Utilisateur: </label></td>
+						<td><input type="text"/></td>
+					</tr>
+					<tr>
+						<td><label>Mot de passe: </label></td>
+						<td><input type="text"/></td>
+					</tr>
+					<tr>
+						<td><button>Connexion</button></td>
+					</tr>
+					</table>
+				    </form>
+			    </div>
+			    
+			    <div class="register">
+				    <h2>Enregistrement</h2>
+				    <span>S'enregister</span>
+			    </div>
+			</div>
+			</div>
+                      {% endblock %}
+        </header>
+      <!-- End of Header -->
+
+      <!-- Navigation -->
+      <nav>
+        {% block navigation %}
+          <div id="tabs">
+          	<ul>
+          		<li><a href="home"><img src="{% static "img/icons/home-32x32.png" %}" title="Acceuil"/></a></li>
+          		<li><a href="users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/></a></li>
+          		<li><a href="servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/></a></li>
+          		<li><a href="permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/></a></li>
+          		<li><a href="deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/></a></li>
+          	</ul>
+          </div>
+        {% endblock %}
+      </nav>
+      <!-- End of Navigation -->
+
+      {% block maincontent %}
+
+      <!-- Content -->
+      <section id="main-content">
+        {% block content %}
+        
+        {% endblock %}
+      </section>
+      {% endblock %}
+      
+      
+      <!-- Footer -->
+      <footer>
+        {% block footer %}
+          <p>&copy 2013 - Steeve Vandecappelle</p>
+        {% endblock %}
+      </footer>
+      <!-- End of Footer -->
+    {% endblock %}
+
+    {% block extra-medias %}{% endblock %}
+  </body>
+</html>
