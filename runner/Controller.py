@@ -176,7 +176,7 @@ def showUsers():
 	connector = DataBaseConnector(Constants.DB_FILE)
         showUsersQuery = RequestBinder(connector)
 	
-	selectUser = Request("USER")
+	selectUser = Request("heimdall_user")
         showUsersQuery.execQuery(selectUser)
         connector.database.close()
 
