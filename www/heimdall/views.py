@@ -11,22 +11,22 @@ def index(request):
 	
 def users(request):
 	list_users = User.objects.all()
-	return render_to_response('users.html', { 'list_users': list_users , 'PAGE_TITLE': 'Utilisateurs', 'APP_TITLE' : "Heimdall" })
+	return render_to_response('users.html', { 'list_users': list_users , 'PAGE_TITLE': 'Utilisateurs', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
 	
 def servers(request):
 	list_servers = Server.objects.all()
-	return render_to_response('servers.html', { 'list_servers': list_servers , 'PAGE_TITLE': 'Serveurs', 'APP_TITLE' : "Heimdall" })
+	return render_to_response('servers.html', { 'list_servers': list_servers , 'PAGE_TITLE': 'Serveurs', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
 	
 def permissions(request):
 	list_users = User.objects.all()
-	return render_to_response('permissions.html', { 'list_users': list_users , 'PAGE_TITLE': 'Permissions', 'APP_TITLE' : "Heimdall" })
+	return render_to_response('permissions.html', { 'list_users': list_users , 'PAGE_TITLE': 'Permissions', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
 	
 def deposite(request):
 	list_users = User.objects.all()
-	return render_to_response('deposite.html', { 'list_users': list_users , 'PAGE_TITLE': 'Depot', 'APP_TITLE' : "Heimdall" })
+	return render_to_response('deposite.html', { 'list_users': list_users , 'PAGE_TITLE': 'Depot', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
 	
 def connect(request):
-	return render_to_response('connect.html', {'PAGE_TITLE': 'Connect', 'APP_TITLE' : "Heimdall" })
+	return render_to_response('connect.html', {'PAGE_TITLE': 'Connect', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
 	
 	
 

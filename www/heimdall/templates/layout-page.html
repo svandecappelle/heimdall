@@ -5,9 +5,6 @@
     {% block head %}
       <title>{{ PAGE_TITLE }} - {{ APP_TITLE }}</title>
       {% load staticfiles %}
-      <script src="{% static "js/jquery-1.9.1.js" %}" type="text/javascript"></script>
-      <script src="{% static "js/header.js" %}" type="text/javascript"></script>
-       
       <link href="{% static "css/heimdall-default.css" %}" rel="stylesheet"/>
       <link href="{% static "css/tables.css" %}" rel="stylesheet"/>
       <meta charset="utf-8">
@@ -47,7 +44,7 @@
                       	
                       	 </div>
                       	<!-- Connection form-->
-                      	
+                      	{% if not user.is_authenticated %}
                       	
                       	<div id="connection-form">
                       	<div class="header-connection-container">
@@ -77,6 +74,7 @@
 			    </div>
 			</div>
 			</div>
+			{% endif %}
                       {% endblock %}
         </header>
       <!-- End of Header -->
@@ -86,11 +84,11 @@
         {% block navigation %}
           <div id="tabs">
           	<ul>
-          		<li><a href="home"><img src="{% static "img/icons/home-32x32.png" %}" title="Acceuil"/></a></li>
-          		<li><a href="users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/></a></li>
-          		<li><a href="servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/></a></li>
-          		<li><a href="permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/></a></li>
-          		<li><a href="deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/></a></li>
+          		<li><a href="home"><img src="{% static "img/icons/home-32x32.png" %}" title="Acceuil"/> Accueil</a></li>
+          		<li><a href="users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/> Utilisateurs</a></li>
+          		<li><a href="servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/> Serveurs</a></li>
+          		<li><a href="permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/> Permissions</a></li>
+          		<li><a href="deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/> Dépot</a></li>
           	</ul>
           </div>
         {% endblock %}
