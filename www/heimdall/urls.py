@@ -13,4 +13,6 @@ urlpatterns = patterns('',
     url(r'^deposite$', views.deposite, name='deposite'),
     url(r'^connect$', views.connect, name='connect'),
     url(r'^connect$', 'django.contrib.auth.views.login', {'template_name': 'heimdall/connect.html'}),
+    url(r'^login$', views.mylogin),
+    url(r'^logout$', views.mylogout),
 )

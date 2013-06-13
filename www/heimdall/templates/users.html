@@ -1,7 +1,7 @@
 {% extends "layout-page.html" %}
  	{% block content %}
       
-        <h1>Liste des utilisateurs enregistrés sur Heimdall</h1>
+        <h2>Liste des utilisateurs enregistrés sur Heimdall</h2>
         
         
       <table id="rounded-corner">
@@ -22,4 +22,23 @@
       </table>
         
       <!-- End of Content -->
+      
+      {% if user.is_authenticated %}
+      	
+      	
+      	{% for group in user.groups.all %}
+      		{% if group.name == 'heimdall-admin' %}
+      			
+      			<div>
+      			<div>
+      				<h2>Ajouter un utilisateur</h2>
+      			</div>
+      			</div>
+      			
+      		{% endif %}
+      	{% endfor %}
+      	
+      		
+      {%endif%}
+      
  	{% endblock %}

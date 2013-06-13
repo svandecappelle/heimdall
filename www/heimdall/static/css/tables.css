@@ -10,7 +10,6 @@ body
 
 #hor-minimalist-a
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	background: #fff;
 	margin: 45px;
@@ -39,7 +38,6 @@ body
 
 #hor-minimalist-b
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	background: #fff;
 	margin: 45px;
@@ -69,7 +67,6 @@ body
 
 #ver-minimalist
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -97,7 +94,6 @@ body
 
 #box-table-a
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -131,7 +127,6 @@ body
 
 #box-table-b
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -162,7 +157,6 @@ body
 
 #hor-zebra
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -189,7 +183,6 @@ body
 
 #ver-zebra
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -234,7 +227,6 @@ body
 
 #one-column-emphasis
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -269,7 +261,6 @@ body
 
 #newspaper-a
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -299,7 +290,6 @@ body
 
 #newspaper-b
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -333,7 +323,6 @@ body
 
 #newspaper-c
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -361,22 +350,36 @@ body
 }
 
 
+table thead tr:last-child th:first-child {
+	-moz-border-radius-topleft:10px;
+	-webkit-border-top-left-radius:10px;
+	border-top-left-radius:10px
+}
+table tr:last-child th:last-child {
+	-moz-border-radius-topright:10px;
+	-webkit-border-top-right-radius:10px;
+	border-top-right-radius:10px
+}
+
+
+table tr:last-child td:first-child {
+	-moz-border-radius-bottomleft:10px;
+	-webkit-border-bottom-left-radius:10px;
+	border-bottom-left-radius:10px
+}
+table tr:last-child td:last-child {
+	-moz-border-radius-bottomright:10px;
+	-webkit-border-bottom-right-radius:10px;
+	border-bottom-right-radius:10px
+}
+
 #rounded-corner
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
 	text-align: left;
 	border-collapse: collapse;
-}
-#rounded-corner thead th.rounded-company
-{
-	background: #b9c9fe url('table-images/left.png') left -1px no-repeat;
-}
-#rounded-corner thead th.rounded-q4
-{
-	background: #b9c9fe url('table-images/right.png') right -1px no-repeat;
 }
 #rounded-corner th
 {
@@ -395,11 +398,11 @@ body
 }
 #rounded-corner tfoot td.rounded-foot-left
 {
-	background: #e8edff url('table-images/botleft.png') left bottom no-repeat;
+	background: #e8edff url('../img/table-images/botleft.png') left bottom no-repeat;
 }
 #rounded-corner tfoot td.rounded-foot-right
 {
-	background: #e8edff url('table-images/botright.png') right bottom no-repeat;
+	background: #e8edff url('../img/table-images/botright.png') right bottom no-repeat;
 }
 #rounded-corner tbody tr:hover td
 {
@@ -409,13 +412,12 @@ body
 
 #background-image
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
 	text-align: left;
 	border-collapse: collapse;
-	background: url('table-images/blurry.jpg') 330px 59px no-repeat;
+	background: url('../img/table-images/blurry.jpg') 330px 59px no-repeat;
 }
 #background-image th
 {
@@ -436,7 +438,7 @@ body
 }
 #background-image tbody td
 {
-	background: url('table-images/back.png');
+	background: url('../img/table-images/back.png');
 }
 * html #background-image tbody td
 {
@@ -459,7 +461,6 @@ body
 
 #gradient-style
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
@@ -471,7 +472,7 @@ body
 	font-size: 13px;
 	font-weight: normal;
 	padding: 8px;
-	background: #b9c9fe url('table-images/gradhead.png') repeat-x;
+	background: #b9c9fe url('../img/table-images/gradhead.png') repeat-x;
 	border-top: 2px solid #d3ddff;
 	border-bottom: 1px solid #fff;
 	color: #039;
@@ -482,7 +483,7 @@ body
 	border-bottom: 1px solid #fff;
 	color: #669;
 	border-top: 1px solid #fff;
-	background: #e8edff url('table-images/gradback.png') repeat-x;
+	background: #e8edff url('../img/table-images/gradback.png') repeat-x;
 }
 #gradient-style tfoot tr td
 {
@@ -492,24 +493,23 @@ body
 }
 #gradient-style tbody tr:hover td
 {
-	background: #d0dafd url('table-images/gradhover.png') repeat-x;
+	background: #d0dafd url('../img/table-images/gradhover.png') repeat-x;
 	color: #339;
 }
 
 
 #pattern-style-a
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
 	text-align: left;
 	border-collapse: collapse;
-	background: url('table-images/pattern.png');
+	background: url('../img/table-images/pattern.png');
 }
 #pattern-style-a thead tr
 {
-	background: url('table-images/pattern-head.png');
+	background: url('../img/table-images/pattern-head.png');
 }
 #pattern-style-a th
 {
@@ -535,17 +535,16 @@ body
 
 #pattern-style-b
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
 	width: 480px;
 	text-align: left;
 	border-collapse: collapse;
-	background: url('table-images/patternb.png');
+	background: url('../img/table-images/patternb.png');
 }
 #pattern-style-b thead tr
 {
-	background: url('table-images/patternb-head.png');
+	background: url('../img/table-images/patternb-head.png');
 }
 #pattern-style-b th
 {

@@ -18,9 +18,9 @@
       <!-- Header -->
         <header>
           {% block header %}
-                      <div class="GCHESSFBJJ">
-                      	<div class="GCHESSFBMJ">
-                      		<h2>{{APP_TITLE}}</h2>
+                      <div class="header">
+                      	<div class="app">
+                      		<h1>{{APP_TITLE}}</h1>
                       		<img class="gwt-Image" src="{% static "images/logo.png"%}">
                       	</div>
                       <div class="GCHESSFBKJ">
@@ -33,6 +33,10 @@
 					    <span>Welcome, {{ user.username }}.</span>
 					    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNpiXLVm/X8GCgATA4WABYvYAijGBhKgGKsBH4BYAKrgQFhI4EJkhUCvxiNphqlF8YIDVALsCqgGZM0LkDQ7YIQB0MaLWAzJB2F0zVC1mIGIxZAJUIxVM9ZYgCowAIUDkjCIbYCuGVcsgAx5CKQcgc6XR+ITHY3oBhGXDshNkRSnRIAAAwCEDDi73FPsUgAAAABJRU5ErkJggg==" class="GCHESSFBNL">
 					    <span class="GCHESSFBOL">Messages : 0 </span>
+					    <form action="logout" method="post">
+					    {% csrf_token %}
+					    <input type="submit" value="Disconect →">
+					    </form>
 					{% else %}
 					    <span id="connect">Welcome, new user. Please log in or register.</span>
 					{% endif %}
@@ -51,7 +55,7 @@
                       	
 			    <div class="connect">
 				    <h2>Connexion</h2>
-				    <form>
+				    <!--<form>
 					<table>
 					<tr>
 						<td><label>Utilisateur: </label></td>
@@ -66,6 +70,16 @@
 					</tr>
 					</table>
 				    </form>
+				    -->
+				    
+				    <form action="login" method="post" accept-charset="utf-8">
+				    	{% csrf_token %}
+					<label for="username">Username</label><input type="text" name="username" value="" id="username" />
+					<label for="password">Password</label><input type="password" name="password" value="" id="password" />
+					<p><input type="submit" value="Login →"></p>
+				    </form>
+				    
+				    
 			    </div>
 			    
 			    <div class="register">
