@@ -7,6 +7,13 @@
       {% load staticfiles %}
       <link href="{% static "css/heimdall-default.css" %}" rel="stylesheet"/>
       <link href="{% static "css/tables.css" %}" rel="stylesheet"/>
+      <script src="{% static "js/jquery/jquery.min.js" %}" type="text/javascript"></script>
+      <script src="{% static "js/arbor/arbor.js" %}" ></script>
+      <script src="{% static "js/arbor/renderer.js" %}" ></script>
+      <script src="{% static "js/arbor/graphics.js" %}" ></script>
+       {% block import %}
+       {% endblock %}
+      
       <meta charset="utf-8">
       {% block head-medias %}{% endblock %}
     {% endblock %}

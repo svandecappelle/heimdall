@@ -1,3 +1,41 @@
 {% extends "layout-page.html" %}
- 	{% block maincontent %}
+
+ {% block import %}
+  <script type="text/javascript">
+
+(function($){
+  $(document).ready(function(){
+   var sys = arbor.ParticleSystem(1000, 400,0.8);
+   sys.parameters({gravity:true});
+    sys.renderer = Renderer("#viewport") ;
+    
+    // central repository
+    var heimdall = sys.addNode('Heimdall',{'color':'red','shape':'dot','label':'Heimdall'});
+     
+    
+    
+    {% for permission in permissions %}
+    	var serverName = '{{permission.server.hostname}}';
+    	var server = sys.addNode(serverName,{'color':'blue','shape':'dot','label':serverName});
+    	sys.addEdge(heimdall, server);
+    	
+    	var userName = '{{permission.user.username}}';	
+    	var user = sys.addNode(userName,{'color':'orange','shape':'dot','label':userName});
+    	sys.addEdge(server, user);
+    
+    {% endfor %}
+  })
+
+})(this.jQuery)
+  
+  </script>
+  
+ {% endblock %}
+ 
+ 	{% block content %}
+ 	
+ 	<h2>Permissions on heimdall</h2>
+ 	<div style="margin:auto; width:800px; border: 1px solid #cacaca;">
+ 	  <canvas id="viewport" width="800" height="650"></canvas>
+ 	</div>
  	{% endblock %}
