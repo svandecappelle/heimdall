@@ -376,8 +376,7 @@ table tr:last-child td:last-child {
 #rounded-corner
 {
 	font-size: 12px;
-	margin: 45px;
-	width: 480px;
+	min-width: 480px;
 	text-align: left;
 	border-collapse: collapse;
 }

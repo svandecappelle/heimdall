@@ -5,7 +5,7 @@
 
 (function($){
   $(document).ready(function(){
-   var sys = arbor.ParticleSystem(1000, 400,0.8);
+   var sys = arbor.ParticleSystem(2600, 512,0.5);
    sys.parameters({gravity:true});
     sys.renderer = Renderer("#viewport") ;
     
@@ -19,9 +19,14 @@
     	var server = sys.addNode(serverName,{'color':'blue','shape':'dot','label':serverName});
     	sys.addEdge(heimdall, server);
     	
+    	{% if permission.user.username == user.username %}
+    		var color = "green";
+    	{%else%}
+    		var color = "orange";
+    	{% endif %}
     	var userName = '{{permission.user.username}}';	
-    	var user = sys.addNode(userName,{'color':'orange','shape':'dot','label':userName});
-    	sys.addEdge(server, user);
+    	var user = sys.addNode(userName,{'color':color,'label':userName});
+    	sys.addEdge(user,server);
     
     {% endfor %}
   })
@@ -34,8 +39,8 @@
  
  	{% block content %}
  	
- 	<h2>Permissions on heimdall</h2>
- 	<div style="margin:auto; width:800px; border: 1px solid #cacaca;">
- 	  <canvas id="viewport" width="800" height="650"></canvas>
- 	</div>
+ 	<h2 style="position:absolute;">Permissions on heimdall</h2>
+ 	<!--<div style="margin:auto; width:800px; border: 1px solid #cacaca;">-->
+ 	  <canvas id="viewport" width="800" height="650" style="overflow:hidden;"></canvas>
+ 	<!--</div>-->
  	{% endblock %}
