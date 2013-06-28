@@ -108,8 +108,10 @@
           		<li><a href="home"><img src="{% static "img/icons/home-32x32.png" %}" title="Acceuil"/> Accueil</a></li>
           		<li><a href="users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/> Utilisateurs</a></li>
           		<li><a href="servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/> Serveurs</a></li>
+          		{% if user.is_authenticated %}
           		<li><a href="permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/> Permissions</a></li>
           		<li><a href="deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/> Dépot</a></li>
+          		{% endif %}
           	</ul>
           </div>
         {% endblock %}

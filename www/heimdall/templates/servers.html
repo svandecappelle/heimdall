@@ -1,21 +1,87 @@
 {% extends "layout-page.html" %}
-        {% block content %}
+
+{% block import %}
+	<script type="text/javascript">
+		function showForm(hostname){
+			$("#form-server").slideDown();
+			$("#server-target-input").val(hostname);
+		}
+		function hideForm(){
+			$("#form-server").slideUp();
+		}
+	</script> 
+{% endblock %}
+
+{% block content %}
+      
+        <div style="float:left;display: block; margin-top:10px; margin-right:20px; width:50%;">
+        
         <h1>Liste des seveurs enregistrés sur Heimdall</h1>
         
-        
+      
       <table id="rounded-corner">
       	<thead>
-      	<tr>
-      	<th>Host</th>
-      	<th>Description</th>
-      </tr>
-      </thead>
+      		<tr>
+			<th>Host</th>
+			<th>Description</th>
+			{% if user.is_authenticated %}
+				<th>Action</th>
+			{% endif %}
+		</tr>
+	</thead>
         {% for server in list_servers %}
-        <tr>
-        	<td>{{ server.hostname }}</td>
-        	<td>{{ server.description }}</td>
-        </tr>
+        <tbody>
+		<tr>
+			<td>{{ server.hostname }}</td>
+			<td>{{ server.description }}</td>
+			{% if user.is_authenticated %}
+				<td><button onClick="showForm('{{ server.hostname }}')">Faire une demande d'accès</button></td>
+			{% endif %}
+		</tr>
+        </tbody>
       {% endfor %}
       </table>
+      
+      </div>
+      {% if user.is_authenticated %}
+      <div style="float:left;display: block; margin-top:40px; margin-right:20px; width:40%;">
+	      <form id="form-server" style="display:none;" action="require_access" method="post" accept-charset="utf-8">
+	      {% csrf_token %}
+	      		<table id="rounded-corner">
+		       	      <thead>
+		       	      	<tr>
+		       	      	<th colspan="2">Formulaire de demande d'accès</th>
+		       	      	</tr>
+		       	      </thead>
+		       	      <tbody>
+			      <tr>
+				      <td>Priorité</td>
+				      <td><select name="priority"><option value="HIGH">Mineure</option><option value="NORMAL">Normal</option><option value="HIGHT">Haute</option><</select></td>
+			      </tr>
+			      <tr>
+				      <td>Serveur cible</td>
+				      <td><input name="server" type="text" id="server-target-input"/></td>
+			      </tr>
+			      <tr>
+				      <td>User cible</td>
+				      <td><input name="user" type="text"/></td>
+			      </tr>
+			      <tr>
+				      <td>Commentaire</td>
+				      <td><textarea name="comments" col="100" style="width: 411px;height: 137px;"></textarea></td>
+			      </tr>
+			       <tr>
+				      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
+			      </tr>
+			      </tbody>
+		      </table>
+	      </form>
+	</div>
+      
+	<div>
+		<h2></h2>
+	</div>
+      
+      {% endif %}
         
- 	{% endblock %}
+ {% endblock %}

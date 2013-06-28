@@ -1,6 +1,9 @@
 {% extends "layout-page.html" %}
 
  {% block import %}
+ 
+ {% if user.is_authenticated %}
+ 
   <script type="text/javascript">
 
 (function($){
@@ -34,13 +37,15 @@
 })(this.jQuery)
   
   </script>
-  
+  {%endif%}
  {% endblock %}
  
- 	{% block content %}
+ 		{% block content %}
+ 			{% if user.is_authenticated %}
+				<h2 style="position:absolute;">Permissions on heimdall</h2>
+				<canvas id="viewport" width="800" height="650" style="overflow:hidden;"></canvas>
+			{% else %}
+				<h2>Vous devez etre connecté pour voir cette page</h2>
+			{%endif%}
+		{% endblock %} 	
  	
- 	<h2 style="position:absolute;">Permissions on heimdall</h2>
- 	<!--<div style="margin:auto; width:800px; border: 1px solid #cacaca;">-->
- 	  <canvas id="viewport" width="800" height="650" style="overflow:hidden;"></canvas>
- 	<!--</div>-->
- 	{% endblock %}

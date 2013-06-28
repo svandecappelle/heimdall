@@ -10,34 +10,23 @@
 	  <table id="rounded-corner" width="100%">
       	<thead>
       	<tr>
+      	<th>date</th>
       	<th>Utilisateur</th>
       	<th>Serveur</th>
       	<th>Connection avec utilisateur</th>
       	<th>Commentaires</th>
       </tr>
       </thead>
-        <tr>
-        	<td>Utilisateur 1</td>
-        	<td>Serveur 1</td>
-        	<td>oracle</td>
-        	<td></td>
-        </tr>
-        
-        <tr>
-        	<td>Utilisateur 1</td>
-        	<td>Serveur 2</td>
-        	<td>oracle</td>
-        	<td></td>
-        </tr>
-        <tr>
-        	<td>Utilisateur 2</td>
-        	<td>Serveur 1</td>
-        	<td>jboss</td>
-        	<td>Urgent</td>
-        </tr>
+      {%for demand in demands%}
+      <tr>
+      	<td>{{demand.cdate}}</td>
+      	<td>{{demand.user.username}}</td>
+      	<td>{{demand.server.hostname}}</td>
+      	<td>{{demand.hostuser}}</td>
+      	<td>{{demand.comments}}</td>
+      </tr>
+      {% endfor %}
       </table>
-
-
 </div>
 
 
@@ -54,24 +43,24 @@
       </thead>
         <tr>
         	<td>Nombre d'utilisateur enregistrés</td>
-        	<td>XX</td>
+        	<td>{{stats.user_count}}</td>
         </tr>
         
         <tr>
         	<td>Nombre de serveurs enregistrés</td>
-        	<td>XX</td>
+        	<td>{{stats.server_count}}</td>
         </tr>
         
         
         <tr>
         	<td>Nombre de demandes en attente</td>
-        	<td>XX</td>
+        	<td>{{stats.demands_count}}</td>
         </tr>
         
         
         <tr>
         	<td>Nombre de permissions accordées</td>
-        	<td>XX</td>
+        	<td>{{stats.permissions_count}}</td>
         </tr>
       </table>
 
