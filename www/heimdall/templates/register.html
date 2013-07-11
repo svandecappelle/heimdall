@@ -1,0 +1,52 @@
+{% extends "layout-page.html" %}
+
+ {% block content %}
+ 
+ {% if not user.is_authenticated %}
+    <form action="register_action" method="post" accept-charset="utf-8">
+
+ <table>
+ 	{% csrf_token %}
+ 	<tr>
+		<td><label for="username">Username</label></td>
+		<td><input type="text" name="username" value="" id="username" /></td>
+	</tr>
+	
+	<tr>
+		<td><label for="firstname">Firstname</label></td>
+		<td><input type="text" name="firstname" value="" id="firstname" /></td>
+	</tr>
+	
+	
+	<tr>
+		<td><label for="lastname">LastName</label></td>
+		<td><input type="text" name="lastname" value="" id="lastname" /></td>
+	</tr>
+	
+	<tr>
+		<td><label for="password">Password</label></td>
+		<td><input type="password" name="password" value="" id="password" /></td>
+	</tr>
+	<tr>
+		<td><label for="password-verif">Password Verification</label></td>
+		<td><input type="password" name="password-verif" value="" id="password-verif" /></td>
+	</tr>
+	
+	<tr>
+		<td><label for="email">e-mail</label></td>
+		<td><input type="text" name="email" value="" id="email" /></td>
+	</tr>
+  </table>
+  <p><input type="submit" value="Register →"></p>
+</form>
+
+ {%else%}
+
+				    
+ 
+ {% endif %}
+ 
+ 
+ {%endblock%}
+ 
+
