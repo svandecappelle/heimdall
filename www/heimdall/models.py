@@ -14,6 +14,12 @@ class Permission(models.Model):
 	def __unicode__(self):
 		return u"%s->%s->%s" % (self.user.username,self.server.hostname,self.hostuser)
 		
+class SshKeys(models.Model):
+	user = models.ForeignKey(User)
+	key = models.CharField(max_length=4000)
+	host = models.CharField(max_length=250)
+
+
 class Demands(models.Model):
 	PRIORITY_CHOICES = (
 	    ('HIGH', 'HIGH'),

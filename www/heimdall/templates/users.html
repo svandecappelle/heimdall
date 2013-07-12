@@ -1,46 +1,43 @@
 {% extends "layout-page.html" %}
- 	{% block content %}
-      
-        <h2>Liste des utilisateurs enregistrés sur Heimdall</h2>
+ {% block content %}
+ 	<h2>Liste des utilisateurs enregistrés sur Heimdall</h2>
         
         
-      <table id="rounded-corner">
-      	<thead>
-      	<tr>
-      	<th>Username</th>
-      	<th>Firstname</th>
-      	<th>LastName</th>
-      	<th>function</th>
-      </tr>
-      </thead>
-        {% for user in list_users %}
-        <tr>
-        	<td>{{ user.username }}</td>
-        	<td>{{ user.first_name }}</td>
-        	<td>{{ user.last_name }}</td>
-        	<td>{{ user.function }}</td>
-        </tr>
-      {% endfor %}
-      </table>
+ 	<table id="rounded-corner">
+      		<thead>
+      			<tr>
+      				<th>Username</th>
+				<th>Firstname</th>
+				<th>LastName</th>
+				<th>function</th>
+			</tr>
+		</thead>
+		{% for user in list_users %}
+		<tbody>
+			<tr>
+				<td>{{ user.username }}</td>
+				<td>{{ user.first_name }}</td>
+				<td>{{ user.last_name }}</td>
+				<td>{{ user.function }}</td>
+			</tr>
+        	{% endfor %}
+        	</tbody>
+        </table>
         
       <!-- End of Content -->
       
       {% if user.is_authenticated %}
-      	
-      	
       	{% for group in user.groups.all %}
       		{% if group.name == 'heimdall-admin' %}
-      			
       			<div>
-      			<div>
-      				<h2>Ajouter un utilisateur</h2>
+      				<div>
+      					<h2>Ajouter un utilisateur</h2>
+      				</div>
       			</div>
-      			</div>
-      			
       		{% endif %}
       	{% endfor %}
       	
       		
       {%endif%}
       
- 	{% endblock %}
+ {% endblock %}

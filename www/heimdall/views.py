@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 # Create your views here.
 from django.shortcuts import render_to_response
-from heimdall.models import Server,Permission, Demands
+from heimdall.models import Server,Permission, Demands,SshKeys
 from heimdall.objects import Statistics
 from django.contrib.auth import authenticate, login, logout
 from django.http import Http404
@@ -9,18 +9,36 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.models import User, Group
 from datetime import date
+from form import UploadSshKeyForm
+from django.core.urlresolvers import reverse
 
-def index(request):
+def redirect_home(request,notification):
 	user_count = Group.objects.get(name="heimdall").user_set.all().count()
 	server_count = Server.objects.all().count()
+	keys_count = SshKeys.objects.all().count()
 	demands_count = Demands.objects.filter(close_date__isnull=True).all().count()
 	
 	permissions_count = Permission.objects.all().count()
-	stats = Statistics(user_count,server_count,permissions_count,demands_count)
+	stats = Statistics(user_count,server_count,permissions_count,demands_count,keys_count)
 	
 	demands = Demands.objects.filter(close_date__isnull=True).all()
+	if notification:
+		return render_to_response('index.html', {'stats': stats, 'demands':demands, 'PAGE_TITLE': 'Accueil', 'APP_TITLE' : "Heimdall", 'NOTIFICATION': notification }, context_instance=RequestContext(request))
+	else:
+		return render_to_response('index.html', {'stats': stats, 'demands':demands, 'PAGE_TITLE': 'Accueil', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+		
+def index(request):
+	user_count = Group.objects.get(name="heimdall").user_set.all().count()
+	server_count = Server.objects.all().count()
+	keys_count = SshKeys.objects.all().count()
+	demands_count = Demands.objects.filter(close_date__isnull=True).all().count()
 	
+	permissions_count = Permission.objects.all().count()
+	stats = Statistics(user_count,server_count,permissions_count,demands_count,keys_count)
+	
+	demands = Demands.objects.filter(close_date__isnull=True).all()
 	return render_to_response('index.html', {'stats': stats, 'demands':demands, 'PAGE_TITLE': 'Accueil', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+		
 	
 def users(request):
 	list_users = User.objects.all()
@@ -56,8 +74,35 @@ def convertToIterable(permissions_visible):
 	return permissions_visible_to_return
 
 def deposite(request):
-	list_users = User.objects.all()
-	return render_to_response('deposite.html', { 'list_users': list_users , 'PAGE_TITLE': 'Depot', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+	userConnected = request.user
+	# Handle file upload
+	docfile = []
+	if request.method == 'POST':
+		form = UploadSshKeyForm(request.POST, request.FILES)
+		if form.is_valid():
+		    docfile = request.FILES['docfile']
+		    for line in docfile:
+		    	    if SshKeys.objects.filter(user=userConnected).count()>0:
+		    	    	oldkey = SshKeys.objects.get(user=userConnected)
+		    	    	oldkey.key = line
+		    	    else:
+				sshkey = SshKeys(user=userConnected,key=line, host="userHost")
+		    	    	sshkey.save()
+		    
+		    # Redirect to the document list after POST
+		    return HttpResponseRedirect(reverse('deposite'))
+	else:
+		key = SshKeys.objects.get(user=userConnected).key
+		form = UploadSshKeyForm() # A empty, unbound form
+		# Load documents for the list page
+		#documents = Document.objects.all()
+	
+	# Render list page with the documents and the form
+	return render_to_response(
+		'deposite.html',
+		{'documents': docfile, 'form': form, 'key':key,'PAGE_TITLE': 'Depot', 'APP_TITLE' : "Heimdall" },
+		context_instance=RequestContext(request)
+	)
 	
 def connect(request):
 	return render_to_response('connect.html', {'PAGE_TITLE': 'Connect', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
@@ -98,15 +143,16 @@ def mylogout(request):
 	logout(request)
 	return HttpResponseRedirect('home')
 	
-	
-	user = models.ForeignKey(User)
-	server = models.ForeignKey(Server)
-	hostuser = models.CharField(max_length=50)
-	priority = models.CharField(max_length=50, choices=PRIORITY_CHOICES)
-	comments = models.CharField(max_length=4000, null=True, blank=True)
-	cdate = models.DateField()
-	close_date = models.DateField(null=True, blank=True)
-	
+def register(request):
+	return render_to_response('register.html', {'PAGE_TITLE': 'Register', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+
+def register_action(request):
+	if request.method == 'POST':
+		notification="User registered ! "
+		return redirect_home(request,notification)
+		
+	else:
+		return HttpResponseRedirect('home')
 	
 def require_access(request):
 	if request.method == 'POST':
@@ -128,3 +174,4 @@ def require_access(request):
 			return HttpResponseRedirect('home')
 	else:
 		return HttpResponseRedirect('home')
+		
