@@ -128,15 +128,18 @@ def mylogin(request):
 			if user.is_active:
 				login(request, user)
 				# success
-				return HttpResponseRedirect('home')
+				notification="Logged in."
+				return redirect_home(request,notification)
 			else:
-				#disabled account
-				return direct_to_template(request, 'inactive_account.html')
+				notification="Your account was disabled by administrator. Please contact an administrator."
+				return redirect_home(request,notification)
 		else:
 			# invalid login
-			return HttpResponseRedirect('home')
+			notification="Wrong username or password."
+			return redirect_home(request,notification)
 	else:
-		return HttpResponseRedirect('home')
+		notification="This page is not accessible."
+		return redirect_home(request,notification)
       
 
 def mylogout(request):
@@ -148,11 +151,12 @@ def register(request):
 
 def register_action(request):
 	if request.method == 'POST':
-		notification="User registered ! "
+		notification="User registered successfully."
 		return redirect_home(request,notification)
 		
 	else:
-		return HttpResponseRedirect('home')
+		notification="This page is not accessible."
+		return redirect_home(request,notification)
 	
 def require_access(request):
 	if request.method == 'POST':
@@ -168,10 +172,13 @@ def require_access(request):
 				demand.save()
 				
 				list_servers = Server.objects.all()
-				return render_to_response('servers.html', { 'list_servers': list_servers , 'PAGE_TITLE': 'Serveurs', 'APP_TITLE' : "Heimdall", 'ACTION':'DONE' }, context_instance=RequestContext(request))
+				notification = "Notification sent to an heimdall administrator."
+				return redirect_home(request, notification)
 				
 		else:
-			return HttpResponseRedirect('home')
+			notification = "You need to be connected to see this page."
+			return redirect_home(request, notification)
 	else:
-		return HttpResponseRedirect('home')
+		notification = "This page is not accessible."
+		return redirect_home(request, notification)
 		
