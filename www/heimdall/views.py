@@ -92,12 +92,11 @@ def deposite(request):
 		    # Redirect to the document list after POST
 		    return HttpResponseRedirect(reverse('deposite'))
 	else:
-		key = SshKeys.objects.get(user=userConnected).key
-		form = UploadSshKeyForm() # A empty, unbound form
-		# Load documents for the list page
-		#documents = Document.objects.all()
-	
-	# Render list page with the documents and the form
+		if SshKeys.objects.filter(user=userConnected).count()>0:
+			key = None
+		else:
+			key = SshKeys.objects.get(user=userConnected).key
+			form = UploadSshKeyForm()
 	return render_to_response(
 		'deposite.html',
 		{'documents': docfile, 'form': form, 'key':key,'PAGE_TITLE': 'Depot', 'APP_TITLE' : "Heimdall" },
