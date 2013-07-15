@@ -93,10 +93,11 @@ def deposite(request):
 		    return HttpResponseRedirect(reverse('deposite'))
 	else:
 		if SshKeys.objects.filter(user=userConnected).count()>0:
-			key = None
-		else:
 			key = SshKeys.objects.get(user=userConnected).key
-			form = UploadSshKeyForm()
+		else:
+			key = None
+			
+		form = UploadSshKeyForm()
 	return render_to_response(
 		'deposite.html',
 		{'documents': docfile, 'form': form, 'key':key,'PAGE_TITLE': 'Depot', 'APP_TITLE' : "Heimdall" },
