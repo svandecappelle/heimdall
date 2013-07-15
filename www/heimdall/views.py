@@ -42,6 +42,9 @@ def index(request):
 	
 def users(request):
 	list_users = User.objects.all()
+	
+	
+	
 	return render_to_response('users.html', { 'list_users': list_users , 'PAGE_TITLE': 'Utilisateurs', 'APP_TITLE' : "Heimdall"}, context_instance=RequestContext(request))
 	
 def servers(request):
@@ -181,4 +184,4 @@ def require_access(request):
 	else:
 		notification = "This page is not accessible."
 		return redirect_home(request, notification)
-		
+

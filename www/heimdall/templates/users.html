@@ -1,43 +1,113 @@
 {% extends "layout-page.html" %}
+
+
+{% block import %}
+	<script type="text/javascript">
+		function showForm($username,$firstname,$name,$role){
+			$("#form-user").slideDown();
+			$("#username").val($username);
+			$("#firstname").val($firstname);
+			$("#lastname").val($name);
+			$("#role").val($role);
+		}
+		function hideForm(){
+			$("#form-user").slideUp();
+		}
+	</script> 
+{% endblock %}
+
+
  {% block content %}
+    {% load tags %}
+ 
+ 
  	<h2>Liste des utilisateurs enregistrés sur Heimdall</h2>
         
-        
+        <div style="float:left; display: inline-block; margin-right:50px;">
  	<table class="rounded-corner">
       		<thead>
       			<tr>
       				<th>Username</th>
 				<th>Firstname</th>
 				<th>LastName</th>
-				<th>function</th>
+				<th>Role</th>
+				{% if user.is_authenticated %}
+					{% ifusergroup heimdall-admin %}
+						<th>Action</th>
+					{% endifusergroup %}
+				{% endif %}
 			</tr>
 		</thead>
-		{% for user in list_users %}
 		<tbody>
+		{% for a_user in list_users %}
 			<tr>
-				<td>{{ user.username }}</td>
-				<td>{{ user.first_name }}</td>
-				<td>{{ user.last_name }}</td>
-				<td>{{ user.function }}</td>
+				<td>{{ a_user.username }}</td>
+				<td>{{ a_user.first_name }}</td>
+				<td>{{ a_user.last_name }}</td>
+				<td>{{ a_user.function }}</td>
+				{% if user.is_authenticated %}
+					{% ifusergroup heimdall-admin %}
+						<td>
+							<input type="button" value="Edit" onClick="showForm('{{a_user.username}}','{{a_user.first_name}}','{{a_user.last_name}}','USER')"/>
+						</td>
+					{% endifusergroup %}
+				{% endif %}
 			</tr>
         	{% endfor %}
         	</tbody>
         </table>
         
+        </div>
+        
+        {% if user.is_authenticated %}
+		{% ifusergroup heimdall-admin %}
+			 <div style="float:left;display: block;">
+			      <form id="form-user" style="display:none;" action="edit_user" method="post" accept-charset="utf-8">
+			      {% csrf_token %}
+					<table class="rounded-corner">
+					      <thead>
+						<tr>
+						<th colspan="2">Formulaire de demande d'accès</th>
+						</tr>
+					      </thead>
+					      <tbody>
+					      <tr>
+						      <td>Username</td>
+						      <td><input name="username"/ id="username"></td>
+					      </tr>
+					      <tr>
+						      <td>Firstname</td>
+						      <td><input name="firstname" type="text" id="firstname"/></td>
+					      </tr>
+					      <tr>
+						      <td>Lastname</td>
+						      <td><input name="lastname" type="text" id="lastname"/></td>
+					      </tr>
+					      <tr>
+						      <td>Role</td>
+						      <td><select name="role" id="role"><option value="ADMIN">Administrator</option><option value="USER">User</option></select></td>
+					      </tr>
+					       <tr>
+						      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
+					      </tr>
+					      </tbody>
+				      </table>
+			      </form>
+			</div>
+		{% endifusergroup %}
+	{% endif %}
+        
+        
       <!-- End of Content -->
       
       {% if user.is_authenticated %}
-      	{% for group in user.groups.all %}
-      		{% if group.name == 'heimdall-admin' %}
+      	{% ifusergroup heimdall-admin %}
+      		<div>
       			<div>
-      				<div>
-      					<h2>Ajouter un utilisateur</h2>
-      				</div>
+      				<h2>Ajouter un utilisateur</h2>
       			</div>
-      		{% endif %}
-      	{% endfor %}
-      	
-      		
+      		</div>
+      	{% endifusergroup %}
       {%endif%}
       
  {% endblock %}

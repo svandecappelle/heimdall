@@ -14,11 +14,10 @@
 
 {% block content %}
       
-        <div style="float:left;display: block; margin-top:10px; margin-right:20px; width:50%;">
-        
-        <h1>Liste des seveurs enregistrés sur Heimdall</h1>
-        
-      
+
+
+ 	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
+        <div style="float:left;display: inline-block; margin-right:50px;">
       <table class="rounded-corner">
       	<thead>
       		<tr>
@@ -46,7 +45,7 @@
       
       </div>
       {% if user.is_authenticated %}
-      <div style="float:left;display: block; margin-top:40px; margin-right:20px; width:40%;">
+      <div style="float:left;display: block;margin-right:20px;">
 	      <form id="form-server" style="display:none;" action="require_access" method="post" accept-charset="utf-8">
 	      {% csrf_token %}
 	      		<table class="rounded-corner">
