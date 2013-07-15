@@ -29,8 +29,9 @@
 			{% endif %}
 		</tr>
 	</thead>
+	 <tbody>
         {% for server in list_servers %}
-        <tbody>
+       
 		<tr>
 			<td>{{ server.hostname }}</td>
 			<td>{{ server.description }}</td>
@@ -38,8 +39,9 @@
 				<td><button onClick="showForm('{{ server.hostname }}')">Faire une demande d'accès</button></td>
 			{% endif %}
 		</tr>
-        </tbody>
+        
       {% endfor %}
+      </tbody>
       </table>
       
       </div>
