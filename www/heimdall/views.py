@@ -9,8 +9,9 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.models import User, Group
 from datetime import date
-from form import UploadSshKeyForm
+from heimdall.form import UploadSshKeyForm
 from django.core.urlresolvers import reverse
+from heimdall import utils
 
 def redirect_home(request,notification):
 	user_count = Group.objects.get(name="heimdall").user_set.all().count()
@@ -22,10 +23,13 @@ def redirect_home(request,notification):
 	stats = Statistics(user_count,server_count,permissions_count,demands_count,keys_count)
 	
 	demands = Demands.objects.filter(close_date__isnull=True).all()
+		
+	args = utils.give_arguments(request,'Acceuil')
+	args.update({'stats': stats, 'demands':demands})
 	if notification:
-		return render_to_response('index.html', {'stats': stats, 'demands':demands, 'PAGE_TITLE': 'Accueil', 'APP_TITLE' : "Heimdall", 'NOTIFICATION': notification }, context_instance=RequestContext(request))
-	else:
-		return render_to_response('index.html', {'stats': stats, 'demands':demands, 'PAGE_TITLE': 'Accueil', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+		args.update({'NOTIFICATION': notification})
+
+	return render_to_response('index.html', args, context_instance=RequestContext(request))
 		
 def index(request):
 	user_count = Group.objects.get(name="heimdall").user_set.all().count()
@@ -37,19 +41,26 @@ def index(request):
 	stats = Statistics(user_count,server_count,permissions_count,demands_count,keys_count)
 	
 	demands = Demands.objects.filter(close_date__isnull=True).all()
-	return render_to_response('index.html', {'stats': stats, 'demands':demands, 'PAGE_TITLE': 'Accueil', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
-		
+	
+	args = utils.give_arguments(request,'Acceuil')
+	args.update({'stats': stats, 'demands':demands})
+
+	return render_to_response('index.html',args, context_instance=RequestContext(request))
 	
 def users(request):
 	list_users = User.objects.all()
 	
+	args = utils.give_arguments(request,'Utilisateurs')
+	args.update({'list_users': list_users})
 	
-	
-	return render_to_response('users.html', { 'list_users': list_users , 'PAGE_TITLE': 'Utilisateurs', 'APP_TITLE' : "Heimdall"}, context_instance=RequestContext(request))
+	return render_to_response('users.html', args , context_instance=RequestContext(request))
 	
 def servers(request):
 	list_servers = Server.objects.all()
-	return render_to_response('servers.html', { 'list_servers': list_servers , 'PAGE_TITLE': 'Serveurs', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+	args = utils.give_arguments(request,'Serveurs')
+	args.update({'list_servers': list_servers})
+
+	return render_to_response('servers.html', args, context_instance=RequestContext(request))
 	
 def permissions(request):
 	all_permissions = Permission.objects.all()
@@ -57,20 +68,21 @@ def permissions(request):
 	users_in_group_admin = Group.objects.get(name="heimdall-admin").user_set.all()
 	
 	userConnected = request.user
+
+	args = utils.give_arguments(request,'Permissions')
 	if userConnected.is_authenticated:
 		if userConnected.groups.filter(name="heimdall-admin"):
-			return render_to_response('permissions.html', { 'permissions': convertToIterable(all_permissions) , 'PAGE_TITLE': 'Permissions', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+			args.update({'permissions': convertToIterable(all_permissions)})
 		elif userConnected.groups.filter(name="heimdall"):
 			permissions_visible = Permission.objects.get(user=userConnected)
-			return render_to_response('permissions.html', { 'permissions': convertToIterable(permissions_visible) , 'PAGE_TITLE': 'Permissions', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
-		else:
-			return render_to_response('permissions.html', {'PAGE_TITLE': 'Permissions', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+			args.update({'permissions': convertToIterable(permissions_visible)})
+	return render_to_response('permissions.html',args, context_instance=RequestContext(request))
 
 def convertToIterable(permissions_visible):
 	try:
 		some_object_iterator = iter(permissions_visible)
 		permissions_visible_to_return = permissions_visible
-	except TypeError, te:
+	except TypeError:
 		permissions_visible_to_return = [1]
 		permissions_visible_to_return[0] = permissions_visible
 	
@@ -81,19 +93,32 @@ def deposite(request):
 	# Handle file upload
 	docfile = []
 	if request.method == 'POST':
-		form = UploadSshKeyForm(request.POST, request.FILES)
-		if form.is_valid():
-		    docfile = request.FILES['docfile']
-		    for line in docfile:
-		    	    if SshKeys.objects.filter(user=userConnected).count()>0:
-		    	    	oldkey = SshKeys.objects.get(user=userConnected)
-		    	    	oldkey.key = line
-		    	    else:
-				sshkey = SshKeys(user=userConnected,key=line, host="userHost")
-		    	    	sshkey.save()
-		    
-		    # Redirect to the document list after POST
-		    return HttpResponseRedirect(reverse('deposite'))
+		if request.POST['key']:
+			keysend = request.POST['key']
+			sshkey = None
+			if SshKeys.objects.filter(user=userConnected).count()>0:
+				sshkey = SshKeys.objects.get(user=userConnected)
+				sshkey.key=keysend
+				print("send key: "+keysend)
+			else:
+				sshkey = SshKeys(user=userConnected,key=keysend, host="userHost")
+			
+			sshkey.save()
+			# Redirect to the document list after POST
+			return HttpResponseRedirect(reverse('deposite'))
+		else:
+			form = UploadSshKeyForm(request.POST, request.FILES)
+			if form.is_valid():
+				docfile = request.FILES['docfile']
+				for line in docfile:
+					if SshKeys.objects.filter(user=userConnected).count()>0:
+						oldkey = SshKeys.objects.get(user=userConnected)
+						oldkey.key = line
+					else:
+						sshkey = SshKeys(user=userConnected,key=line, host="userHost")
+						sshkey.save()
+				# Redirect to the document list after POST
+				return HttpResponseRedirect(reverse('deposite'))
 	else:
 		if SshKeys.objects.filter(user=userConnected).count()>0:
 			key = SshKeys.objects.get(user=userConnected).key
@@ -101,26 +126,26 @@ def deposite(request):
 			key = None
 			
 		form = UploadSshKeyForm()
-	return render_to_response(
-		'deposite.html',
-		{'documents': docfile, 'form': form, 'key':key,'PAGE_TITLE': 'Depot', 'APP_TITLE' : "Heimdall" },
-		context_instance=RequestContext(request)
-	)
+
+	args = utils.give_arguments(request,'Depot')
+	args.update({'documents': docfile, 'form': form, 'key':key})
+	return render_to_response('deposite.html', args, context_instance=RequestContext(request))
 	
 def connect(request):
-	return render_to_response('connect.html', {'PAGE_TITLE': 'Connect', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+	args = utils.give_arguments(request,'Connect')
+	return render_to_response('connect.html', args, context_instance=RequestContext(request))
 	
 
 def auth():
 	if user is not None:
-	    # the password verified for the user
-	    if user.is_active:
-		print("User is valid, active and authenticated")
-	    else:
-		print("The password is valid, but the account has been disabled!")
+	    	# the password verified for the user
+		if user.is_active:
+			print("User is valid, active and authenticated")
+		else:
+			print("The password is valid, but the account has been disabled!")
 	else:
-	    # the authentication system was unable to verify the username and password
-	    print("The username and password were incorrect.")
+		# the authentication system was unable to verify the username and password
+		print("The username and password were incorrect.")
 	    
 	 
 	 
@@ -150,7 +175,8 @@ def mylogout(request):
 	return HttpResponseRedirect('home')
 	
 def register(request):
-	return render_to_response('register.html', {'PAGE_TITLE': 'Register', 'APP_TITLE' : "Heimdall" }, context_instance=RequestContext(request))
+	args = utils.give_arguments(request,'Register')
+	return render_to_response('register.html', args, context_instance=RequestContext(request))
 
 def register_action(request):
 	if request.method == 'POST':

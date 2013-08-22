@@ -8,11 +8,37 @@ body{
 	margin: 0px;
 	background-image: url('../img/greysnow.png');
 	font-family: monospace;
+	font-size: 12px;
+	text-align: left;
+	border-collapse: collapse;
 }
+
+
 
 html *{
 	outline : none;	
 }
+
+.inline-block{
+	display:inline-block;
+	float: left;
+}
+
+.default-block{
+	padding: 3px;
+	min-width: 480px;
+}
+.separate-token{
+	background-color:#cacaca;
+	height:1px;
+	border: 0px;
+}
+.mini-title{
+	font-size: 0.7em;
+	margin-top: 17px;
+	margin-left: 3px;
+}
+
 nav{
 	top:0px;
 	bottom: 0px;
@@ -62,6 +88,7 @@ nav #tabs{
 	overflow:auto;	
 	border-radius:5px;
 	padding: 5px;
+	padding-right:20px;
 }
 .close-button{
 	margin-right:5px;
@@ -162,7 +189,7 @@ h2{
 	height:45px;
 }
 
-.GCHESSFBKJ {
+.header-actions {
 	position: absolute;
 	right: 0;
 	height: 30px;
@@ -170,6 +197,31 @@ h2{
 	padding-right: 20px;
 }
 
-.GCHESSFBOJ {
+
+.form{
 	float: left;
+	display: inline-block; 
+	background: #e8edff; 
+	margin:3px; 
+	border-radius:7px; 
+	border: 1px solid #b9c9fe;
+}
+
+.align-form{
+	margin:3px;
+	float: left;
+	display: inline-block; 
+}
+
+.legend-permission{
+	position:absolute; 
+	top:55px;
+	right:50px;
+	user-select:none;
+}
+
+.legend-block{
+	display:inline-block; 
+	height:100%;
+	width:20px;
 }

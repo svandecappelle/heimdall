@@ -52,29 +52,44 @@
           {% block header %}
                       <div class="header">
                       	<div class="app">
-                      		<h1>{{APP_TITLE}}</h1>
-                      		<img src="{% static "images/logo.png"%}">
+                      		<h1 class="inline-block" ><a href="/heimdall/home">{{APP_TITLE}}</a></h1><span class="inline-block mini-title">The RSA key replicator bastion.</span>
+				<!-- DESACTIVATE LOGO for the moment -->
+                      		<!--<img src="{% static "images/logo.png"%}">-->
                       	</div>
-                      <div class="GCHESSFBKJ">
-                      	<div class="GCHESSFBNJ">
+                      <div class="header-actions">
+                      	<div>
                       		<div>
                       			<!--messages-->
-                      			<div class="GCHESSFBML GCHESSFBLL">
                       			<div>
-                      			{% if user.is_authenticated %}
-					    <span>Welcome, {{ user.username }}.</span>
-					    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNpiXLVm/X8GCgATA4WABYvYAijGBhKgGKsBH4BYAKrgQFhI4EJkhUCvxiNphqlF8YIDVALsCqgGZM0LkDQ7YIQB0MaLWAzJB2F0zVC1mIGIxZAJUIxVM9ZYgCowAIUDkjCIbYCuGVcsgAx5CKQcgc6XR+ITHY3oBhGXDshNkRSnRIAAAwCEDDi73FPsUgAAAABJRU5ErkJggg==" class="GCHESSFBNL">
-					    <span class="GCHESSFBOL">Messages : 0 </span>
-					    <form action="logout" method="post">
-					    {% csrf_token %}
-					    <input type="submit" value="Disconect →">
-					    </form>
-					{% else %}
-					    <span id="connect">Welcome, new user. Please log in or register.</span>
-					{% endif %}
+		              			<div class="inline-block" style="padding-top:4px; margin-right:4px;">
+		              			{% if user.is_authenticated %}
+						    <span>Welcome, {{ user.username }}.</span>
+							<span><a href="#">
+							 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNpiXLVm/X8GCgATA4WABYvYAijGBhKgGKsBH4BYAKrgQFhI4EJkhUCvxiNphqlF8YIDVALsCqgGZM0LkDQ7YIQB0MaLWAzJB2F0zVC1mIGIxZAJUIxVM9ZYgCowAIUDkjCIbYCuGVcsgAx5CKQcgc6XR+ITHY3oBhGXDshNkRSnRIAAAwCEDDi73FPsUgAAAABJRU5ErkJggg==" class="GCHESSFBNL">
+							{% if messages_count == None %}
+							    <span>Messages: 0 </span>
+							{% elif messages_count > 0 %}
+							    <span>Messages:</span>
+							    <span style="font-weight:bolder; font-size:11pt;">{{messages_count}}</span>
+							{% else %}
+							    <span>Messages: {{messages_count}}</span>
+							{% endif %}
+							</a></span>	   
+						{% else %}
+						    <span id="connect">Welcome, new user. Please log in or register.</span>
+						{% endif %}
+						</div>
+						
+						{% if user.is_authenticated %}
+						<div class="inline-block">
+							<form action="/heimdall/logout" method="post">
+							    {% csrf_token %}
+							    <input type="submit" value="Disconect →">
+							</form>
+						</div>
+						{% endif %}
+						
 					</div>
-					</div>
-                      			
                       		</div>
                       	</div>
                       	
@@ -87,7 +102,7 @@
                       	
 			    <div class="connect">
 				    <h2>Connexion</h2>
-				    <form action="login" method="post" accept-charset="utf-8">
+				    <form action="/heimdall/login" method="post" accept-charset="utf-8">
 				    	{% csrf_token %}
 					<label for="username">Username</label><input type="text" name="username" value="" id="username" />
 					<label for="password">Password</label><input type="password" name="password" value="" id="password" />
@@ -113,13 +128,27 @@
         {% block navigation %}
           <div id="tabs">
           	<ul>
-          		<li><a href="home"><img src="{% static "img/icons/home-32x32.png" %}" title="Acceuil"/> Accueil</a></li>
-          		<li><a href="users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/> Utilisateurs</a></li>
-          		<li><a href="servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/> Serveurs</a></li>
+          		<li><a href="/heimdall/home"><img src="{% static "img/icons/home-32x32.png" %}" title="Acceuil"/> Accueil</a></li>
+          		<li><a href="/heimdall/users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/> Utilisateurs</a></li>
+          		<li><a href="/heimdall/servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/> Serveurs</a></li>
           		{% if user.is_authenticated %}
-          		<li><a href="permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/> Permissions</a></li>
-          		<li><a href="deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/> Dépot</a></li>
-          		{% endif %}
+          		<li><a href="/heimdall/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/> Permissions</a></li>
+          		<li><a href="/heimdall/deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/> Dépot</a></li>
+          
+
+
+			{% for group in user.groups.all %}
+			{% if group.name == "heimdall-admin" %}
+				<!-- admin panel -->
+				<hr class="separate-token"/>
+				<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/> Permissions</a></li>
+		  		<li><a href="/heimdall/admin/user"><img src="{% static "img/icons/users-32x32.png" %}" title="Depot"/> Utilisateurs</a></li>
+			{% endif %}
+			{% endfor %}
+
+			{% endif %}
+
+
           	</ul>
           </div>
         {% endblock %}

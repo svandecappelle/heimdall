@@ -3,32 +3,33 @@
  	
  	{% if not user.is_authenticated %}
  		<h2>Vous devez etre connecté pour voir cette page</h2>
- 	{%endif%}
- 		<h2>Deposez et mettez a jour votre clés SSH directement a partir d'ici</h2>
- 	
- 		
- 		
- 		
- 		 {% if documents %}
-			<ul>
-			{% for document in documents %}
-			    <li><a href="{{ document.docfile.url }}">{{ document.docfile.name }}</a></li>
-			{% endfor %}
-			</ul>
-		    {% else %}
-			<p>No documents.</p>
-		    {% endif %}
-		
-			<!-- Upload form. Note enctype attribute! -->
-			<form action="deposite" method="post" enctype="multipart/form-data">
-			    {% csrf_token %}
-			    <p>{{ form.non_field_errors }}</p>
-			    <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
-			    <p>
-				{{ form.docfile.errors }}
-				{{ form.docfile }}
-			    </p>
-			    <p><input type="submit" value="Upload" /></p>
-			</form>
-			<span>{{key}}</span>
- 	{% endblock %}
+ 	{% else %}
+		<div class="inline-block">
+			<h2>Upload your key</h2>
+			<div class="form default-block">		
+				<form style="padding: 3px;" action="deposite" method="post" enctype="multipart/form-data">
+				    {% csrf_token %}
+				    <p>{{ form.non_field_errors }}</p>
+				    <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+				    <p>
+					{{ form.docfile.errors }}
+					{{ form.docfile }}
+				    </p>
+				    <p><input type="submit" value="Upload" /></p>
+				</form>
+			</div>
+		</div>
+		{% if key != None %}
+			<div class="inline-block">
+				<h2>Or update it</h2>
+				<div class="form default-block">
+					<form style="padding: 3px;" action="deposite" method="post" enctype="multipart/form-data">
+					    {% csrf_token %}
+						<textarea style="width:500px; height:150px;" name="key" >{{key}}</textarea>
+					    <p><input type="submit" value="Update" /></p>
+					</form>
+				</div>
+			</div>
+		{% endif %}
+	{%endif%}
+{% endblock %}
