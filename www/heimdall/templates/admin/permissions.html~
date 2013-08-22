@@ -1,0 +1,104 @@
+{% extends "layout-page.html" %}
+
+
+{% block content %}
+
+ 	<div class="inline-block">
+		<h2>Add a user permission:</h2>
+		<div class="align-form">
+	      			<table class="rounded-corner">
+				      	<thead>
+				      		<tr>
+							<th>User</th>
+							<th>Host</th>
+							<th>User in host</th>
+							{% if user.is_authenticated %}
+								<th>Grant access</th>
+							{% endif %}
+						</tr>
+					</thead>
+					<tbody>
+					{% for demand in demands %}
+					<tr>
+						<td><span>{{ demand.user.username }}</span></td>
+						<td><span>{{ demand.server.hostname }}</span></td>
+						<td><span>{{ demand.hostuser }}</span></td>
+						{% if user.is_authenticated %}
+							<td>
+								<form id="form-permission" action="/heimdall/admin/grant_access" method="post" accept-charset="utf-8">
+								{% csrf_token%}									<input type="hidden" name="username" value="{{ demand.user.username }}"/>
+									<input type="hidden" name="hostname" value="{{ demand.server.hostname }}"/>
+									<input type="hidden" name="hostuser" value="{{ demand.hostuser }}"/>
+									<input type="submit" value="Grant access"/>
+								</form>
+							</td>
+						{% endif %}
+					</tr>
+
+					{% endfor %}
+	      				</tbody>
+				
+					{% if demands %}
+					<tfoot>					
+						<tr>
+							<td colspan="4">
+								<form id="form-permission" action="/heimdall/admin/grant_access" method="post" accept-charset="utf-8">
+								{% csrf_token %}
+									<input type="hidden" value="{{ALL}}" name="username"/>
+									<input type="hidden" value="{{ALL}}" name="hostname"/>
+									<input type="hidden" value="{{ALL}}" name="hostuser"/>
+									<input type="submit" value="Grant access to all" style="width:100%;"/>
+								</form>
+							</td>
+						</tr>
+					</tfoot>
+					{% endif %}
+	      			</table>
+		</div>
+	</div>
+
+	<div class="inline-block">
+		<h2>Add a permission without demand:</h2>
+		<div class="form">
+			<form id="form-permission-from-scratch" class="default-block" action="/heimdall/admin/grant_access" method="post" accept-charset="utf-8">
+			{% csrf_token %}
+				<table>
+					<tbody>
+						<tr>
+							<td>
+								<label for="hostname">Hostname</label>
+							</td>
+							<td>					
+								<select name="hostname" >
+								{% for server in servers %}				
+									<option value="{{server.hostname}}">{{server.hostname}}</option>
+								{% endfor %}
+								</select>
+							</td>
+						</tr>
+						<tr>				
+							<td>
+								<label for="username">User</label>
+							</td>
+							<td>
+								<select name="username" >
+								{% for user_perm in users %}				
+									<option value="{{user_perm.username}}">{{user_perm.username}}</option>
+								{% endfor %}
+								</select>
+							</td>
+						</tr>					
+						<tr>
+							<td>
+								<label for="hostuser">Host user</label><input type="text" name="hostuser" value=""/>
+							</td>
+							<td>
+								<input type="submit" value="Add permission" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+	</div>
+{% endblock %}

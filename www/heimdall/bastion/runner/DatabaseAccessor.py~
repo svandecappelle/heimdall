@@ -29,8 +29,8 @@ Authors:
 # Email:        svandecappelle at vekia.fr
 """
 
-import heimdall.bastion.runner.ConfigurationFiles
-import heimdall.bastion.runner.Controller
+import ConfigurationFiles
+import Controller
 
 from runner import *
 from lib.utils.Logger import Logger

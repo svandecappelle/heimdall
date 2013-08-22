@@ -16,8 +16,10 @@ DEBUG=int(3)
 
 """The rsa repository to check"""
 #DEPOT=config.get("folders", "deposit_dir")
+DEPOT="none"
 """The heimdall database file"""
 #DB_FILE=config.get("folders", "sqlite_database")
+DB_FILE="heimdallwww.sqlite"
 """The ssh service port"""
 SSH_PORT=22
 """Configuration to send file when access is open or close to admin"""

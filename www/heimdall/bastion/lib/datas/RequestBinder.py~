@@ -178,7 +178,7 @@ class Request:
 			query = self.mode + " INTO " + self.table_name + " (" + fieldsStr + ") VALUES(" + inserted_values  + ")"
 		elif self.mode == "DELETE":
                         query = self.mode + " FROM "+self.table_name
-		else:
+                else:
 			query = self.mode + " " + fieldsStr + " FROM " + self.table_name
 		
 		where = ""

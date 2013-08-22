@@ -54,13 +54,13 @@ def addServer():
 	"""
 	logger.log("addServer",Constants.DEBUG)
 	
-def addPermission(user_target,server_target,hostuser_target):
+def addPermission(user,server,hostuser):
 	"""
 	Grant a permission to an existing server and an existing user on database.
 	If the user has already uploaded his rsa key, then the replicator replicate 
 	his key on the server to instant grant access.
 	"""
-	permission = Permission(user=user_target,server=server_target,hostuser=hostuser_target)
+	permission = Permission(user,server,hostuser)
 	permission.save()
 	# TODO replicate
 	logger.log("permission added need replicate", Constants.INFO)

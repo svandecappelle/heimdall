@@ -45,7 +45,7 @@ class Logger:
 	
 	def __init__(self, source,*level):
 		if level:
-			self.level = level
+			self.level = int(level)
 		else:
 			self.level = Constants.INFO
 			

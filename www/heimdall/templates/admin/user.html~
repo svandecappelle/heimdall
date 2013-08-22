@@ -1,0 +1,153 @@
+{% extends "layout-page.html" %}
+
+{% block import %}
+	<script type="text/javascript">
+		function showForm(user_target){
+			$("#form-updateuser").slideDown();
+			$("#form-updateuser-username").val(user_target.username);
+			$("#form-updateuser-firstname").val(user_target.username);
+			//$("#users-updateuser").set_style("left");
+			$("#form-adduser").slideUp();
+		}
+		function hideForm(){
+			//$("#users-updateuser").float="none";
+			$("#form-updateuser").slideUp();
+			$("#form-adduser").slideDown();
+		}
+	</script> 
+{% endblock %}
+
+
+ {% block content %}
+<h2>Edit an heimdall's user: </h2>
+
+   <div class="inline-block">
+      <table class="rounded-corner">
+      	<thead>
+      		<tr>
+			<th>Username</th>
+			{% if user.is_authenticated %}
+				<th>Action</th>
+			{% endif %}
+		</tr>
+	</thead>
+	 <tbody>
+        {% for user_target in list_users %}
+       
+		<tr>
+			<td>{{ user_target.username }}</td>
+			{% if user.is_authenticated %}
+				<td><button onClick="showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}'})">Modifier les propriétés</button></td>
+			{% endif %}
+		</tr>
+        
+      {% endfor %}
+      </tbody>
+      </table>
+      
+    </div>
+
+    <div class="inline-block" style="margin-left: 10px;">
+			      <form id="form-updateuser" style="display:none;" action="register_user" method="post" accept-charset="utf-8">
+			      {% csrf_token %}
+					<table class="rounded-corner">
+					      <thead>
+						<tr>
+						<th colspan="2">Modify a user to heimdall: </th>
+						</tr>
+					      </thead>
+					      <tbody>
+					      <tr>
+						      <td>Username</td>
+						      <td><input id="form-updateuser-username" name="username"/></td>
+					      </tr>
+					      <tr>
+						      <td>Firstname</td>
+						      <td><input id="form-updateuser-firstname" name="firstname" type="text"/></td>
+					      </tr>
+					      <tr>
+						      <td>Lastname</td>
+						      <td><input name="lastname" type="text"/></td>
+					      </tr>
+						<tr>
+						      <td>E-mail</td>
+						      <td><input name="email"/></td>
+					      </tr>
+						<tr>
+						      <td>Password</td>
+						      <td><input type="password" name="password"/></td>
+					      </tr>
+						<tr>
+						      <td>Password confirm</td>
+						      <td><input type="password" name="password-confirm"/></td>
+					      </tr>
+					      <tr>
+						      <td>Role</td>
+						      <td><select name="role"><option value="ADMIN">Administrator</option><option value="USER">User</option></select></td>
+					      </tr>
+					       <tr>
+						      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
+					      </tr>
+					      </tbody>
+				      </table>
+			      </form>
+			</div>
+
+
+
+
+
+
+
+<div style="width:100%; display:inline-block;">
+<hr/>
+
+<h2>Add a user on heimdall: </h2>
+<div class="inline-block">
+			      <form id="form-user" action="register_user" method="post" accept-charset="utf-8">
+			      {% csrf_token %}
+					<table class="rounded-corner">
+					      <thead>
+						<tr>
+						<th colspan="2">Add a user to heimdall: </th>
+						</tr>
+					      </thead>
+					      <tbody>
+					      <tr>
+						      <td>Username</td>
+						      <td><input name="username"/></td>
+					      </tr>
+					      <tr>
+						      <td>Firstname</td>
+						      <td><input name="firstname" type="text"/></td>
+					      </tr>
+					      <tr>
+						      <td>Lastname</td>
+						      <td><input name="lastname" type="text"/></td>
+					      </tr>
+						<tr>
+						      <td>E-mail</td>
+						      <td><input name="email"/></td>
+					      </tr>
+						<tr>
+						      <td>Password</td>
+						      <td><input type="password" name="password"/></td>
+					      </tr>
+						<tr>
+						      <td>Password confirm</td>
+						      <td><input type="password" name="password-confirm"/></td>
+					      </tr>
+					      <tr>
+						      <td>Role</td>
+						      <td><select name="role"><option value="ADMIN">Administrator</option><option value="USER">User</option></select></td>
+					      </tr>
+					       <tr>
+						      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
+					      </tr>
+					      </tbody>
+				      </table>
+			      </form>
+			</div>
+
+</div>
+ {% endblock %}

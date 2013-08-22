@@ -28,8 +28,7 @@ Authors:
 # Website:      http://vekia.github.io/heimdall/
 # Email:        svandecappelle at vekia.fr
 """
-
-import sqlite3
+from heimdall.models import Server,Permission, Demands,SshKeys
 
 class DataBaseConnector:
 	"""

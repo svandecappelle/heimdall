@@ -35,6 +35,8 @@ from email.mime.text import MIMEText
 import sys,os,re,socket,smtplib
 #import pyinotify
 
+from heimdall.bastion.runner import ConfigurationFiles
+
 from heimdall.bastion.lib.utils import Constants
 from heimdall.bastion.lib.utils.Logger import Logger
 from heimdall.bastion.lib.utils import fileutils
