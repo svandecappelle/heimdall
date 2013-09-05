@@ -19,6 +19,25 @@ class SshKeys(models.Model):
 	key = models.CharField(max_length=4000)
 	host = models.CharField(max_length=250)
 
+class Roles(models.Model):
+	ROLES_CHOICES = (
+	    ('ADMIN', 'ADMIN'),
+	    ('MANAGER', 'MANAGER'),
+	    ('USER', 'USER'),
+	)
+	name = models.CharField(max_length=250)
+	type=models.CharField(max_length=50, choices=ROLES_CHOICES)
+	description = models.CharField(max_length=1500)
+	
+class UserRoles(models.Model):
+	user = models.ForeignKey(User)
+	role = models.ForeignKey(Roles)
+	
+class RolePerimeter(models.Model):
+	server = models.ForeignKey(Server)
+	roles = models.ForeignKey(Roles)
+	def __unicode__(self):
+		return u"%s->%s" % (self.server.hostname,self.roles.name)
 
 class Demands(models.Model):
 	PRIORITY_CHOICES = (

@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 # Create your views here.
 from django.shortcuts import render_to_response
-from heimdall.models import Server,Permission, Demands,SshKeys
+from heimdall.models import Server,Permission, Demands,SshKeys, Roles, RolePerimeter
 from heimdall.objects import Statistics
 from django.contrib.auth import authenticate, login, logout
 from django.http import Http404
@@ -68,9 +68,88 @@ def grant_access(request):
 	demands = Demands.objects.all()
 	servers = Server.objects.all()	
 	users = User.objects.all()
-	args.update({'demands' : demands, 'servers': servers, 'users': users})	
+	
+	
+	args = utils.give_arguments(request,'Group management')
 
 	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
+
+
+def manage_groups(request):
+	servers = Server.objects.all()	
+	users = User.objects.all()
+	
+	roles = Roles.objects.all()
+	groups = Group.objects.exclude(name="heimdall-admin").exclude(name="heimdall")
+	
+	args = utils.give_arguments(request,'Group management')
+	args.update({'groups' : groups, 'servers': servers, 'users': users, 'roles': roles})	
+	
+	return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
+
+def add_group(request):
+	notification = {'NOTIFICATION': 'Cannot create group'}
+	if request.user.groups.filter(name="heimdall-admin"):
+		if request.method == 'POST':
+			args = utils.give_arguments(request,'Group management')
+			if Roles.objects.filter(name=request.POST['groupname']).count() == 0:
+				new_role = Roles(name=request.POST['groupname'], type=request.POST['grouptype'])
+				new_role.save()
+				notification = {'NOTIFICATION': 'Group created'}
+				args.update({'NOTIFICATION': 'Group created'})	
+				return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
+			else:
+				args.update({'NOTIFICATION': 'Group already exists'})	
+				return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
+				
+	#return HttpResponseRedirect(reverse('admin-group-management'))
+	return render_to_response("admin/groups.html", notification, context_instance=RequestContext(request))
+
+def change_perimeter_role(request):
+	if request.user.groups.filter(name="heimdall-admin"):
+		servers = Server.objects.all()
+		if request.method == 'POST':
+			role = Roles.objects.get(name=request.POST['groupname'])
+			server = Server.objects.get(hostname=request.POST['hostname'])
+			role_perimeter = RolePerimeter.objects.filter(roles=Roles.objects.get(name=request.POST['groupname']))
+			
+			if request.POST['action'] == 'add':
+				
+				is_allow_to_add = RolePerimeter.objects.filter(roles=role,server=server).count() == 0
+				print is_allow_to_add
+				if is_allow_to_add:
+					new_perimeter = RolePerimeter(roles=role, server=server)
+					new_perimeter.save()
+					role_perimeter = RolePerimeter.objects.filter(roles=Roles.objects.get(name=request.POST['groupname']))
+					args = utils.give_arguments(request,'Group management')
+					args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.POST['groupname'], 'NOTIFICATION': 'Group perimeter modified' })	
+					return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+				else:                                                                                                    
+					args = utils.give_arguments(request,'Group management')
+					args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.POST['groupname'], 'NOTIFICATION': 'Server already present in the perimeter' })	
+					return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+					
+			elif request.POST['action'] == 'remove':
+				is_allow_to_remove = RolePerimeter.objects.filter(roles=role,server=server).count() == 1
+				if is_allow_to_remove:
+					
+					perimeter_to_delete = RolePerimeter.objects.get(roles=role,server=server)
+					perimeter_to_delete.delete()
+					args = utils.give_arguments(request,'Group management')
+					args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.POST['groupname'], 'NOTIFICATION': 'Group perimeter modified' })	
+					return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+				else:                                                                                                    
+					args = utils.give_arguments(request,'Group management')
+					args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.POST['groupname'], 'NOTIFICATION': 'Server not present in the perimeter' })	
+					return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+		else:
+			print Roles.objects.get(name=request.GET['groupname']).name
+			role_perimeter = RolePerimeter.objects.filter(roles=Roles.objects.get(name=request.GET['groupname']))
+			
+			args = utils.give_arguments(request,'Group management')
+			args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.GET['groupname'] })	
+			print  role_perimeter[0]
+			return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
 
 def register_user(request):
 	print("adduser")

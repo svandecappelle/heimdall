@@ -23,4 +23,7 @@ urlpatterns = patterns('',
 	url(r'^admin/permissions$', adminPanel.permissions, name='admin-permissions'),
 	url(r'^admin/grant_access$', adminPanel.grant_access, name='admin-grant-permission'),
 	url(r'^admin/register_user$', adminPanel.register_user, name='admin-register-user'),
+	url(r'^admin/manage_groups$', adminPanel.manage_groups, name='admin-group-management'),
+	url(r'^admin/add_group$', adminPanel.add_group, name='add-group'),
+	url(r'^admin/change_perimeter_role$', adminPanel.change_perimeter_role, name='change-perimeter-role'),
 )
