@@ -1,0 +1,60 @@
+{% extends "layout-page.html" %}
+
+
+{% block content %}
+   {% load tags %}
+
+<div class="inline-block">
+   <h2>Manage the perimeter of group {{groupname}}:</h2>
+	<table class="rounded-corner rounded-corner-with-footer">
+		<thead>
+			<tr>
+				<th>Serveur</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+				{% for group in perimeter %}
+				<tr>
+					<td>
+						<span>{{group.server.hostname}}</span>
+					</td>
+					<td>
+						 <form class="default-block" action="/heimdall/admin/change_perimeter_role" method="post" accept-charset="utf-8">
+						 {% csrf_token %}
+						 	<input type="submit" name="remove" value="Remove"/>
+						 	<input type="hidden" name="action" value="remove"/>
+						 	<input type="hidden" name="groupname" value="{{groupname}}"/>
+						 	<input type="hidden" name="hostname" value="{{group.server.hostname}}"/>
+						 </form>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+			<tfoot>
+				
+					<tr>
+						<form action="/heimdall/admin/change_perimeter_role" method="post" accept-charset="utf-8">
+						{% csrf_token %}
+						<td>
+							<select name="hostname">
+								{% for server in servers %}
+									<option>{{server.hostname}}</option>	
+								{% endfor %}
+							</select>
+						</td>
+						<td>
+							 
+								<input type="submit" name="add" value="Add"/>
+								<input type="hidden" name="action" value="add"/>
+								<input type="hidden" name="groupname" value="{{groupname}}"/>
+							 </form>
+						</td>
+						</form>
+					</tr>
+			</tfoot>
+		</table>
+	</form>
+</div>	
+			
+{% endblock %}

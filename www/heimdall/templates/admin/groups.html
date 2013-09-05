@@ -1,0 +1,135 @@
+{% extends "layout-page.html" %}
+
+
+{% block content %}
+   {% load tags %}
+
+ 	<div class="inline-block">
+		<h2>Grant acces group to:</h2>
+		<div class="align-form">
+	      			<table class="rounded-corner">
+				      	<thead>
+				      		<tr>
+							<th>User</th>
+							<th>Group</th>
+							<th>Role</th>
+							{% if user.is_authenticated %}
+								<th>Add to group</th>
+							{% endif %}
+						</tr>
+					</thead>
+					<tbody>
+					<tr>
+					
+						<form id="form-permission" action="/heimdall/admin/add_to_group" method="post" accept-charset="utf-8">
+						{% csrf_token%}
+						<td>
+							<select name="username">
+							{% for user in users %}
+								<option>{{user.username}}</option>
+							{% endfor %}
+							</select>
+						</td>
+						<td>
+							<select name="groupname">
+							{% for group in groups %}
+								<option>{{group.name}}</option>
+							{% endfor %}
+							
+							{% ifusergroup heimdall-admin %}
+								<option>Heimdall</option>
+								<option>Heimdall administrateur</option>
+							{% endifusergroup %}
+							</select>
+						</td>
+						
+						<td>
+							<select name="rolename">
+							{% for role in roles %}
+								<option>{{role.name}}</option>
+							{% endfor %}
+							</select>
+						
+						</td>
+						
+						<td>
+						{% if user.is_authenticated %}
+						<input type="submit" value="Add to group"/>
+						{% endif %}
+						</td>
+						</form>
+					</tr>
+	      				</tbody>
+	      			</table>
+		</div>
+	</div>
+
+	{% ifusergroup heimdall-admin %}
+	<div class="inline-block">
+		<h2>Create a group:</h2>
+		<div class="form">
+			<form id="form-permission-from-scratch" class="default-block" action="/heimdall/admin/change_perimeter_role" method="post" accept-charset="utf-8">
+			{% csrf_token %}
+				<table>
+					<tbody>
+						<tr>
+							<td>
+								<label for="text">Group name</label>
+							</td>
+							<td>
+								<input type="text" name="groupname"/>
+							</td>
+						</tr>
+						<tr>				
+							<td>
+								<label for="grouptype">Type</label>
+							</td>
+							<td>
+								<select name="grouptype" >
+									<option value="{{user_perm.username}}">Administrateur</option>
+									<option value="{{user_perm.username}}">Manager</option>
+									<option value="{{user_perm.username}}">Utilisateur</option>
+								</select>
+							</td>
+						</tr>					
+						<tr>
+							<td colspan="2">
+								<input type="submit" value="Create" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+	</div>
+	
+	
+	<div class="inline-block">
+		<h2>Modify the role perimeter:</h2>
+		<div class="form">
+		
+			<table>
+					<tbody>
+						{% for role in roles %}
+						<tr>
+							<td>
+								<label for="text">{{role.name}}</label>
+							</td>
+							<td>
+								<form id="form-permission-from-scratch" class="default-block" action="/heimdall/admin/change_perimeter_role" method="get" accept-charset="utf-8">
+								{% csrf_token %}
+									<input type="hidden" value="{{role.name}}" name="groupname"/>
+									<button type="submit">click here for change the role perimeter</button>
+								</form>	
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+		</div>
+	</div>
+	
+	
+	{% endifusergroup %}
+
+{% endblock %}
