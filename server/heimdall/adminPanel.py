@@ -49,7 +49,6 @@ def permissions(request):
 	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
 
 def add_to_group(request):
-	args = utils.give_arguments(request, 'Permission admin')
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 			user = User.objects.get(username=request.POST['username'])
@@ -59,7 +58,7 @@ def add_to_group(request):
 			new_userrole.save()
 			
 			messages.success(request, 'Role associated')
-			return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
+			return HttpResponseRedirect(reverse('admin-group-management'))
 		else:
 			messages.success(request, 'You have not the rights to do this action')
 	else:

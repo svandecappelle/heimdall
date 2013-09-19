@@ -1,0 +1,21 @@
+{% extends "layout-page.html" %} {% block content %} {% load tags %} 
+{% if user.is_authenticated %} {% ifusergroup heimdall-admin %}
+<form action="/heimdall/admin/create_server" method="post" accept-charset="utf-8">
+
+	<table>
+		{% csrf_token %}
+		<tr>
+			<td><label for="hostname">hostname</label></td>
+			<td><input type="text" name="hostname" value=""/></td>
+		</tr>
+
+		<tr>
+			<td><label for="description">Description</label></td>
+			<td><textarea rows="5" cols="20" name="description" ></textarea></td>
+		</tr>
+	</table>
+	<p>
+		<input type="submit" value="Create →">
+	</p>
+</form>
+{% endifusergroup %}{% endif %} {% endblock %}
