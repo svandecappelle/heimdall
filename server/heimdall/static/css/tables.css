@@ -47,10 +47,10 @@ table tr:last-child td:last-child {
 	-webkit-border-bottom-right-radius:10px;
 	border-bottom-right-radius:10px;
 }
-.rounded-corner-with-footer>tfoot>tr:last-child th:first-child {
-	-moz-border-radius-topleft:10px;
-	-webkit-border-top-left-radius:10px;
-	border-top-left-radius:10px;
+.rounded-corner-with-footer>tfoot tr:last-child td:first-child {
+	-moz-border-radius-bottomleft:10px;
+	-webkit-border-bottom-left-radius:10px;
+	border-bottom-left-radius:10px;
 }
 
 .rounded-corner
@@ -65,15 +65,16 @@ table tr:last-child td:last-child {
 	padding: 8px;
 	font-weight: normal;
 	font-size: 13px;
-	color: #039;
-	background: #b9c9fe;
+	color: #cacaca;
+	background: #6D4848;
+	border: 1px solid #cacaca;
 }
 .rounded-corner td
 {
 	padding: 8px;
-	background: #e8edff;
-	border-top: 1px solid #fff;
-	color: #669;
+	background: #3C3838;
+	border: 1px solid #cacaca;
+	color: #cacaca;
 }
 .rounded-corner tfoot td.rounded-foot-left
 {
@@ -85,5 +86,5 @@ table tr:last-child td:last-child {
 }
 .rounded-corner tbody tr:hover td
 {
-	background: #d0dafd;
+	background: #151224;
 }

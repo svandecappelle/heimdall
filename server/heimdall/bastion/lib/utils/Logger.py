@@ -70,19 +70,19 @@ class Logger:
 	def debug(self, message):
 		if self.level >= Constants.DEBUG:
 			print(colored(self.get_log(self.getLevel(Constants.DEBUG), message), self.getColor(Constants.DEBUG)))
-        		
+
 	def info(self, message):
 		print(self.level)
 		if self.level >= Constants.INFO:
 			print(colored(self.get_log(self.getLevel(Constants.INFO), message), self.getColor(Constants.INFO)))
-        		
+
 	def warn(self, message):
 		if self.level >= Constants.WARN:
 			print(colored(self.get_log(self.getLevel(Constants.WARN), message), self.getColor(Constants.WARN)))
 		
 	def error(self, message):
-        	if self.level >= Constants.ERROR:
-        		print(colored(self.get_log(self.getLevel(Constants.ERROR), message), self.getColor(Constants.ERROR)))
+		if self.level >= Constants.ERROR:
+			print(colored(self.get_log(self.getLevel(Constants.ERROR), message), self.getColor(Constants.ERROR)))
 
 	def getLevel(self, level):
 		if level == 0:

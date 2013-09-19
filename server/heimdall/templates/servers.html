@@ -18,7 +18,7 @@
 
  	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
         <div style="float:left;display: inline-block; margin-right:50px;">
-      <table class="rounded-corner">
+      <table class="rounded-corner rounded-corner-with-footer">
       	<thead>
       		<tr>
 			<th>Host</th>
@@ -41,6 +41,12 @@
         
       {% endfor %}
       </tbody>
+      
+      <tfoot>
+      	<tr>
+      	<td colspan="3" ><a href="/heimdall/admin/create_server">Créer un serveur.</a></td>
+      	</tr>
+      </tfoot>
       </table>
       
       </div>

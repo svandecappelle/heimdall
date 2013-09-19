@@ -75,8 +75,7 @@ def ifisa(parser, token):
     try:
         tokensp = token.contents.split()
         user = tokensp[1]
-        print user
-	groups = []
+        groups = []
         groups += tokensp[2:]
     except ValueError:
         raise template.TemplateSyntaxError("Tag 'ifisa' requires at least 2 arguments.")

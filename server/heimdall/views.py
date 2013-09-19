@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
-from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -49,9 +48,6 @@ def servers(request):
 	
 def permissions(request):
 	all_permissions = Permission.objects.all()
-	users_in_group = Group.objects.get(name="heimdall").user_set.all()
-	users_in_group_admin = Group.objects.get(name="heimdall-admin").user_set.all()
-	
 	userConnected = request.user
 
 	args = utils.give_arguments(request, 'Permissions')
@@ -70,7 +66,7 @@ def convertToIterable(permissions_visible):
 	except TypeError:
 		permissions_visible_to_return = [1]
 		permissions_visible_to_return[0] = permissions_visible
-	
+
 	return permissions_visible_to_return
 
 def deposite(request):
@@ -78,7 +74,7 @@ def deposite(request):
 	# Handle file upload
 	docfile = []
 	if request.method == 'POST':
-		if request.POST['key']:
+		if request.POST['type'] == 'update':
 			keysend = request.POST['key']
 			sshkey = None
 			if SshKeys.objects.filter(user=userConnected).count() > 0:
@@ -86,7 +82,7 @@ def deposite(request):
 				sshkey.key = keysend
 				print("send key: " + keysend)
 			else:
-				sshkey = SshKeys(user=userConnected, key=keysend, host="userHost")
+				sshkey = SshKeys(user=userConnected, key=keysend)
 			
 			sshkey.save()
 			# Redirect to the document list after POST
@@ -100,7 +96,7 @@ def deposite(request):
 						oldkey = SshKeys.objects.get(user=userConnected)
 						oldkey.key = line
 					else:
-						sshkey = SshKeys(user=userConnected, key=line, host="userHost")
+						sshkey = SshKeys(user=userConnected, key=line)
 						sshkey.save()
 				# Redirect to the document list after POST
 				return HttpResponseRedirect(reverse('deposite'))
@@ -123,7 +119,7 @@ def connect(request):
 
 def auth():
 	if user is not None:
-	    	# the password verified for the user
+		# the password verified for the user
 		if user.is_active:
 			print("User is valid, active and authenticated")
 		else:
@@ -131,9 +127,9 @@ def auth():
 	else:
 		# the authentication system was unable to verify the username and password
 		print("The username and password were incorrect.")
-	    
-	 
-	 
+	
+
+
 def mylogin(request):
 	if request.method == 'POST':
 		user = authenticate(username=request.POST['username'], password=request.POST['password'])
@@ -186,9 +182,18 @@ def require_access(request):
 				
 				messages.success(request, 'Notification sent to an heimdall administrator.')
 				return HttpResponseRedirect(reverse('servers'))
+			elif userConnected.groups.filter(name="heimdall-admin"):
+				serverHost = Server.objects.get(hostname=request.POST['server'])
+				userHost = request.POST['user']
+				priority = request.POST['priority']
+				comments = request.POST['comments']
+				cdate = date.today()
+				demand = Demands(user=userConnected, server=serverHost, hostuser=userHost, priority=priority, comments=comments, cdate=cdate)
+				demand.save()
 				
+				messages.success(request, 'Notification sent to an heimdall administrator for: ' + request.user.username)
+				return HttpResponseRedirect(reverse('servers'))
 		else:
-			notification = ""
 			messages.success(request, 'You need to be connected to see this page.')
 			return HttpResponseRedirect(reverse('index'))
 	else:

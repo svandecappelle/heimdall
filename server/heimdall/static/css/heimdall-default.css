@@ -55,11 +55,21 @@ nav{
 }
 
 nav img{
-	padding-right: 10px;	
+	padding-right: 13px;	
 }
 
 a{
 	color: #cacaca;
+	text-decoration: none;	
+}
+
+a:hover{
+	color: #AC6969;
+	text-decoration: none;	
+}
+
+a:active{
+	color: #AC9970;
 	text-decoration: none;	
 }
 
@@ -201,10 +211,14 @@ h2{
 .form{
 	float: left;
 	display: inline-block; 
-	background: #e8edff; 
+	background: #746969; 
 	margin:3px; 
 	border-radius:7px; 
-	border: 1px solid #b9c9fe;
+	border: 1px solid #77394B;
+}
+
+.form label{
+	color: #cacaca;	
 }
 
 .align-form{

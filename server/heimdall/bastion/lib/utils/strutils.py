@@ -29,8 +29,6 @@ Authors:
 # Email:        svandecappelle at vekia.fr
 """
 
-import datetime
-
 def file_len(fname):
 	"""
 	Return the file line number

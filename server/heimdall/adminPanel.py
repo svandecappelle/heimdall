@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
 # Create your views here.
-from datetime import date
-
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
-from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from heimdall import utils
 from heimdall.bastion.runner import Controller
-from heimdall.form import UploadSshKeyForm
-from heimdall.models import Server, Permission, Demands, SshKeys, Roles, RolePerimeter, UserRoles
-from heimdall.objects import Statistics
+from heimdall.models import Server, Demands, SshKeys, Roles, RolePerimeter, UserRoles
 
 def user(request):
 	args = utils.give_arguments(request, 'Users admin')
@@ -25,6 +19,24 @@ def user(request):
 	else:
 		messages.success(request, 'You have not the rights to see this page')
 		return HttpResponseRedirect(reverse('admin'))
+
+def create_server(request):
+	if request.user.groups.filter(name="heimdall-admin"):
+		if request.method == 'POST':
+			
+			if request.POST['hostname']:
+				server = Server(hostname=request.POST['hostname'], description= request.POST['description'])
+				server.save()
+				messages.success(request, 'Server created')
+				return HttpResponseRedirect(reverse('servers'))
+			messages.success(request, 'Form datas in errors. Check your parameters.')
+			return HttpResponseRedirect(reverse('create-server'))
+		else:
+			return render_to_response('admin/create_server.html', context_instance=RequestContext(request))
+
+	else:
+		messages.success(request, 'You have not the rights to do this action')
+	return HttpResponseRedirect(reverse('servers'))
 
 def permissions(request):
 	Controller.showServers()
@@ -89,6 +101,10 @@ def grant_access(request):
 
 	return HttpResponseRedirect(reverse('admin-permissions'))
 
+def manage_user_group(request):
+	args = utils.give_arguments(request, 'User group')
+	return render_to_response('admin/user_groups.html', args, context_instance=RequestContext(request))
+
 def manage_groups(request):
 	servers = Server.objects.all()	
 	users = User.objects.all()
@@ -105,7 +121,6 @@ def manage_groups(request):
 def add_group(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
-			args = utils.give_arguments(request, 'Group management')
 			if Roles.objects.filter(name=request.POST['groupname']).count() == 0:
 				new_role = Roles(name=request.POST['groupname'], type=request.POST['grouptype'])
 				new_role.save()

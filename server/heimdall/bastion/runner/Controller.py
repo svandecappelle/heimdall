@@ -29,7 +29,6 @@ Authors:
 # Email:        svandecappelle at vekia.fr
 """
 
-import os, sys
 from heimdall.bastion.lib.ReplicationFactory import ReplicationFactory
 from heimdall.bastion.lib.utils.Logger import Logger
 from heimdall.bastion.lib.utils import Constants
@@ -54,12 +53,13 @@ def addServer():
 	"""
 	logger.log("addServer", Constants.DEBUG)
 	
-def addPermission(user_target, server_target, hostuser_target):
+def addPermission(user_target, server_target, hostuser_target, sshkey):
 	"""
 	Grant a permission to an existing server and an existing user on database.
 	If the user has already uploaded his rsa key, then the replicator replicate 
 	his key on the server to instant grant access.
 	"""
+	logger.log("Add permission: " + user_target.username + " for server: ["+server_target.hostname+"]" + " with user: {"+hostuser_target+"}", Constants.INFO)
 	permission = Permission(user=user_target, server=server_target, hostuser=hostuser_target)
 	permission.save()
 	# TODO replicate

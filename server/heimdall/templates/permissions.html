@@ -1,5 +1,5 @@
-{% extends "layout-page.html" %} {% block import %} {% if
-user.is_authenticated %}
+{% extends "layout-page.html" %} {% block import %} 
+{% if user.is_authenticated %}
 
 <script type="text/javascript">
 
@@ -40,8 +40,8 @@ user.is_authenticated %}
 })(this.jQuery)
   
   </script>
-{%endif%} {% endblock %} {% block content %} {% if user.is_authenticated
-%}
+{%endif%} {% endblock %} {% block content %} 
+{% if user.is_authenticated%}
 <h2 style="position: absolute;">Permissions on heimdall</h2>
 <canvas id="viewport" width="800" height="650" style="overflow: hidden;"></canvas>
 {% else %}

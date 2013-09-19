@@ -17,7 +17,7 @@
 				<tr>
 					<td>{{ user }}</td>
 					<td>{% for agroup in user.groups.all%} {{agroup.name}} <a
-						href="">(manage)</a> {% endfor %}
+						href="/heimdall/admin/manage_user_group">(manage)</a> {% endfor %}
 					</td>
 					<td>{% for arole in userRoles%} 
 							{% ifequal arole.user.username user.username %} 

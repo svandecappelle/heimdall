@@ -35,6 +35,6 @@ class Messager:
 	"""
 	Standard output message with color.
 	"""
-        @staticmethod
-        def printm(message, color):
-        	print colored(message, color)
+	@staticmethod
+	def printm(message, color):
+		print colored(message, color)

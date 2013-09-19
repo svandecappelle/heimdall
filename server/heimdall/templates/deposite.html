@@ -9,6 +9,7 @@
 			<div class="form default-block">		
 				<form style="padding: 3px;" action="deposite" method="post" enctype="multipart/form-data">
 				    {% csrf_token %}
+				    <input type="hidden" name="type" value="upload"/>
 				    <p>{{ form.non_field_errors }}</p>
 				    <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
 				    <p>
@@ -25,6 +26,7 @@
 				<div class="form default-block">
 					<form style="padding: 3px;" action="deposite" method="post" enctype="multipart/form-data">
 					    {% csrf_token %}
+						<input type="hidden" name="type" value="update"/>
 						<textarea style="width:500px; height:150px;" name="key" >{{key}}</textarea>
 					    <p><input type="submit" value="Update" /></p>
 					</form>
