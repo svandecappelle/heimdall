@@ -31,4 +31,4 @@ administratorEmail = "toto@dlsn.fr"
 """Admin notification email"""
 ccAdmins = []
 """Not used for the moment. In future version."""
-heimdallHost = "host"
+mailHost = "host"

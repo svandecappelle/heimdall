@@ -125,7 +125,7 @@ class ReplicationFactory:
 		# Create an html message
 		msg = MIMEText(message,'html')
 
-		s = smtplib.SMTP(Constants.heimdallHost)
+		s = smtplib.SMTP(Constants.mailHost)
 		
 		sender = Constants.heimdallEmail
 		recipients = [Constants.administratorEmail] + Constants.ccAdmins
@@ -139,7 +139,7 @@ class ReplicationFactory:
 		'''Alert by email the user who granted / revoked'''
 		userEmail = usermail;
 		
-		s = smtplib.SMTP(Constants.heimdallHost)
+		s = smtplib.SMTP(Constants.mailHost)
 		# Create an html message
 		msg = MIMEText(message,'html')
 		
