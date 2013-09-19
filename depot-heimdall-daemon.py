@@ -34,18 +34,18 @@ import sys
 
 if __name__ == '__main__':
 	if sys.version_info >= (3, 0):
-		print("\nThis is the Python 2 version of Python Koans, but you are " +
+		print("\nThis is the Python 2 version of Python Koans, but you are " + 
 			"running it with Python 3 or newer!\n\n")
 	else:
 		if sys.version_info < (2, 6):
-			print("\n" +
-			"********************************************************\n" +
-			"WARNING:\n" +
-			"This version of Python Koans was designed for " +
-			"Python 2.6 or greater.\n" +
-			"Your version of Python is older, so this is unlikely " +
-			"to work!\n\n" +
-			"But lets see how far we get...\n" +
+			print("\n" + 
+			"********************************************************\n" + 
+			"WARNING:\n" + 
+			"This version of Python Koans was designed for " + 
+			"Python 2.6 or greater.\n" + 
+			"Your version of Python is older, so this is unlikely " + 
+			"to work!\n\n" + 
+			"But lets see how far we get...\n" + 
 			"********************************************************\n")
 
 	

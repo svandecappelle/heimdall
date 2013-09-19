@@ -39,7 +39,9 @@
 						<td>
 							<select name="hostname">
 								{% for server in servers %}
-									<option>{{server.hostname}}</option>	
+									{% if server not in server_perimeter %}
+										<option>{{server.hostname}}</option>
+									{% endif %}
 								{% endfor %}
 							</select>
 						</td>

@@ -1,36 +1,21 @@
 # -*- coding: utf-8 -*-
 # Create your views here.
-from django.shortcuts import render_to_response
-from heimdall.models import Server, Permission, Demands, SshKeys
-from heimdall.objects import Statistics
+from datetime import date
+
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User, Group
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from django.contrib.auth.models import User, Group
-from datetime import date
-from heimdall.form import UploadSshKeyForm
-from django.core.urlresolvers import reverse
+from django.shortcuts import render_to_response
+
 from heimdall import utils
+from heimdall.form import UploadSshKeyForm
+from heimdall.models import Server, Permission, Demands, SshKeys
+from heimdall.objects import Statistics
 
-def redirect_home(request, notification):
-	user_count = Group.objects.get(name="heimdall").user_set.all().count()
-	server_count = Server.objects.all().count()
-	keys_count = SshKeys.objects.all().count()
-	demands_count = Demands.objects.filter(close_date__isnull=True).all().count()
-	
-	permissions_count = Permission.objects.all().count()
-	stats = Statistics(user_count, server_count, permissions_count, demands_count, keys_count)
-	
-	demands = Demands.objects.filter(close_date__isnull=True).all()
-		
-	args = utils.give_arguments(request, 'Acceuil')
-	args.update({'stats': stats, 'demands':demands})
-	if notification:
-		args.update({'NOTIFICATION': notification})
-
-	return render_to_response('index.html', args, context_instance=RequestContext(request))
-		
 def index(request):
 	user_count = Group.objects.get(name="heimdall").user_set.all().count()
 	server_count = Server.objects.all().count()
@@ -156,19 +141,18 @@ def mylogin(request):
 			if user.is_active:
 				login(request, user)
 				# success
-				notification = "Logged in."
-				return redirect_home(request, notification)
+				messages.success(request, 'Logged in')
+				return HttpResponseRedirect(reverse('index'))
 			else:
-				notification = "Your account was disabled by administrator. Please contact an administrator."
-				return redirect_home(request, notification)
+				messages.success(request, 'Your account was disabled by administrator. Please contact an administrator.')
+				return HttpResponseRedirect(reverse('index'))
 		else:
 			# invalid login
-			notification = "Wrong username or password."
-			return redirect_home(request, notification)
+			messages.success(request, 'Wrong username or password.')
+			return HttpResponseRedirect(reverse('index'))
 	else:
-		notification = "This page is not accessible."
-		return redirect_home(request, notification)
-      
+		messages.success(request, 'This page is not accessible.')
+		return HttpResponseRedirect(reverse('index'))
 
 def mylogout(request):
 	logout(request)
@@ -180,12 +164,12 @@ def register(request):
 
 def register_action(request):
 	if request.method == 'POST':
-		notification = "User registered successfully."
-		return redirect_home(request, notification)
+		messages.success(request, 'User registered successfully.')
+		return HttpResponseRedirect(reverse('index'))
 		
 	else:
-		notification = "This page is not accessible."
-		return redirect_home(request, notification)
+		messages.success(request, 'This page is not accessible.')
+		return HttpResponseRedirect(reverse('index'))
 	
 def require_access(request):
 	if request.method == 'POST':
@@ -200,14 +184,13 @@ def require_access(request):
 				demand = Demands(user=userConnected, server=serverHost, hostuser=userHost, priority=priority, comments=comments, cdate=cdate)
 				demand.save()
 				
-				list_servers = Server.objects.all()
-				notification = "Notification sent to an heimdall administrator."
-				return redirect_home(request, notification)
+				messages.success(request, 'Notification sent to an heimdall administrator.')
+				return HttpResponseRedirect(reverse('servers'))
 				
 		else:
-			notification = "You need to be connected to see this page."
-			return redirect_home(request, notification)
+			notification = ""
+			messages.success(request, 'You need to be connected to see this page.')
+			return HttpResponseRedirect(reverse('index'))
 	else:
-		notification = "This page is not accessible."
-		return redirect_home(request, notification)
-
+		messages.success(request, 'This page is not accessible.')
+		return HttpResponseRedirect(reverse('index'))

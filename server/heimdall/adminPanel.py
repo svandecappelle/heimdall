@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
 # Create your views here.
-from django.shortcuts import render_to_response
-from heimdall.models import Server, Permission, Demands, SshKeys, Roles, RolePerimeter
-from heimdall.objects import Statistics
+from datetime import date
+
+from django.core.urlresolvers import reverse
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User, Group
 from django.http import Http404
 from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.auth.models import User, Group
-from datetime import date
-from heimdall.form import UploadSshKeyForm
-from django.core.urlresolvers import reverse
-from heimdall import utils
 
+from heimdall import utils
 from heimdall.bastion.runner import Controller
-	
+from heimdall.form import UploadSshKeyForm
+from heimdall.models import Server, Permission, Demands, SshKeys, Roles, RolePerimeter, UserRoles
+from heimdall.objects import Statistics
+
 def user(request):
 	args = utils.give_arguments(request, 'Users admin')
 	if request.user.groups.filter(name="heimdall-admin"):
 		args.update({'list_users': Group.objects.get(name="heimdall").user_set.all()})
 		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	else:
-		args.update({'NOTIFICATION': 'You have not the rights to see this page'})	
-		return render_to_response('index.html', args, context_instance=RequestContext(request))	
+		messages.success(request, 'You have not the rights to see this page')
+		return HttpResponseRedirect(reverse('admin'))
 
 def permissions(request):
 	Controller.showServers()
@@ -34,11 +36,30 @@ def permissions(request):
 	args.update({'demands' : demands, 'servers': servers, 'users': users})
 	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
 
-def grant_access(request):
+def add_to_group(request):
 	args = utils.give_arguments(request, 'Permission admin')
-	
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
+			user = User.objects.get(username=request.POST['username'])
+			role = Roles.objects.get(name=request.POST['rolename'])
+			
+			new_userrole = UserRoles(user=user, role=role)
+			new_userrole.save()
+			
+			messages.success(request, 'Role associated')
+			return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
+		else:
+			messages.success(request, 'You have not the rights to do this action')
+	else:
+		messages.success(request, 'You have not the rights to do this action')
+		
+	return HttpResponseRedirect(reverse('admin-group-management'))
+
+def grant_access(request):
+	if request.user.groups.filter(name="heimdall-admin"):
+		if request.method == 'POST':
+			user = None
+			host = None
 			if request.POST['username'] != '[[ALL]]':
 				user = User.objects.get(username=request.POST['username'])
 			else:
@@ -55,55 +76,46 @@ def grant_access(request):
 				print('TODO: look after demands')					
 						
 			# TODO activate this function
-			# Controller.addPermission(user,host,hostuser)
+			rsa_key = SshKeys.objects.get(user=user)
+			Controller.addPermission(user, host, request.POST['hostuser'], rsa_key)
 			
 			if request.POST['username'] != '[[ALL]]':
 				message = 'Permission granted on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
+				messages.success(request, message)
 			else:
-				message = 'All requested permissions granted'
-			args.update({'NOTIFICATION': message})
+				messages.success(request, 'All requested permissions granted')
 	else:
-		args.update({'NOTIFICATION': 'You have not the rights to do this action'})	
+		messages.success(request, 'You have not the rights to do this action')
 
-	demands = Demands.objects.all()
-	servers = Server.objects.all()	
-	users = User.objects.all()
-	
-	
-	args = utils.give_arguments(request, 'Group management')
-
-	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
-
+	return HttpResponseRedirect(reverse('admin-permissions'))
 
 def manage_groups(request):
 	servers = Server.objects.all()	
 	users = User.objects.all()
 	
+	userRoles = UserRoles.objects.all()
 	roles = Roles.objects.all()
 	groups = Group.objects.exclude(name="heimdall-admin").exclude(name="heimdall")
 	
 	args = utils.give_arguments(request, 'Group management')
-	args.update({'groups' : groups, 'servers': servers, 'users': users, 'roles': roles})	
+	args.update({'groups' : groups, 'servers': servers, 'users': users, 'roles': roles, 'userRoles' : userRoles})	
 	
 	return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
 
 def add_group(request):
-	notification = {'NOTIFICATION': 'Cannot create group'}
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 			args = utils.give_arguments(request, 'Group management')
 			if Roles.objects.filter(name=request.POST['groupname']).count() == 0:
 				new_role = Roles(name=request.POST['groupname'], type=request.POST['grouptype'])
 				new_role.save()
-				notification = {'NOTIFICATION': 'Group created'}
-				args.update({'NOTIFICATION': 'Group created'})	
-				return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
+				messages.success(request, "Your data has been saved!")
 			else:
-				args.update({'NOTIFICATION': 'Group already exists'})	
-				return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
-				
-	# return HttpResponseRedirect(reverse('admin-group-management'))
-	return render_to_response("admin/groups.html", notification, context_instance=RequestContext(request))
+				messages.success(request, "Group already exists")
+			
+			return HttpResponseRedirect(reverse('admin-group-management'))
+			
+	return render_to_response("index.html", context_instance=RequestContext(request))
 
 def change_perimeter_role(request):
 	if request.user.groups.filter(name="heimdall-admin"):
@@ -121,13 +133,12 @@ def change_perimeter_role(request):
 					new_perimeter = RolePerimeter(roles=role, server=server)
 					new_perimeter.save()
 					role_perimeter = RolePerimeter.objects.filter(roles=Roles.objects.get(name=request.POST['groupname']))
-					args = utils.give_arguments(request, 'Group management')
-					args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.POST['groupname'], 'NOTIFICATION': 'Group perimeter modified' })	
-					return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+					messages.success(request, "Group perimeter modified")
+					return HttpResponseRedirect(reverse('admin-group-management'))
 				else:                                                                                                    
 					args = utils.give_arguments(request, 'Group management')
-					args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.POST['groupname'], 'NOTIFICATION': 'Server already present in the perimeter' })	
-					return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+					messages.success(request, "Server already present in the perimeter")
+					return HttpResponseRedirect(reverse('admin-group-management'))
 					
 			elif request.POST['action'] == 'remove':
 				is_allow_to_remove = RolePerimeter.objects.filter(roles=role, server=server).count() == 1
@@ -136,33 +147,32 @@ def change_perimeter_role(request):
 					perimeter_to_delete = RolePerimeter.objects.get(roles=role, server=server)
 					perimeter_to_delete.delete()
 					args = utils.give_arguments(request, 'Group management')
-					args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.POST['groupname'], 'NOTIFICATION': 'Group perimeter modified' })	
-					return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+					messages.success(request, "Group perimeter modified")
+					return HttpResponseRedirect(reverse('admin-group-management'))
 				else:                                                                                                    
 					args = utils.give_arguments(request, 'Group management')
-					args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.POST['groupname'], 'NOTIFICATION': 'Server not present in the perimeter' })	
-					return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+					messages.success(request, "Server not present in the perimeter")
+					return HttpResponseRedirect(reverse('admin-group-management'))
 		else:
-			print Roles.objects.get(name=request.GET['groupname']).name
 			role_perimeter = RolePerimeter.objects.filter(roles=Roles.objects.get(name=request.GET['groupname']))
 			
+			server_perimeter = []
+			
+			for role in role_perimeter:
+				server_perimeter.append(role.server)
+			
 			args = utils.give_arguments(request, 'Group management')
-			args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.GET['groupname'] })	
-			print  role_perimeter[0]
+			args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.GET['groupname'], 'server_perimeter':server_perimeter })	
 			return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
 
 def register_user(request):
 	print("adduser")
-	args = utils.give_arguments(request, 'Permission admin')
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 			if check_password(request.POST['password'], request.POST['password-confirm']):
-
-
 				code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname']) 
 				print("return code ", str(code_return_check))
 				if code_return_check == 1:
-				
 					group = None
 					if request.POST['role'] == 'ADMIN':
 						group = Group.objects.get(name='heimdall-admin')
@@ -172,22 +182,21 @@ def register_user(request):
 					new_user = User.objects.create_user(username=request.POST['username'], email=request.POST['email'], password=request.POST['password'], first_name=request.POST['firstname'], last_name=request.POST['lastname'])
 					new_user.groups.add(group)
 					new_user.save()
-					args.update({'NOTIFICATION': 'User created'})
-					
+					messages.success(request, "Server not present in the perimeter")
 				elif code_return_check == 0:
-					args.update({'NOTIFICATION': 'You need to fill all the blanks fields'})
+					messages.success(request, "You need to fill all the blanks fields")
 				elif code_return_check == 2:
-					args.update({'NOTIFICATION': 'The username already exists'})
+					messages.success(request, "The username already exists")
 				elif code_return_check == 3:
-					args.update({'NOTIFICATION': 'The email you enterred is already associated with another account'})
+					messages.success(request, "The email you enterred is already associated with another account")
 				
 			else:
-				args.update({'NOTIFICATION': 'Password and password confirmation does not match'})
+				messages.success(request, "Password and password confirmation does not match")
 	else:
-		args.update({'NOTIFICATION': 'You have not the rights to do this action'})
+		messages.success(request, "Server not present in the perimeter")
+		return HttpResponseRedirect(reverse('index'))
 	
-	return render_to_response('admin/user.html', args, context_instance=RequestContext(request))	
-	# User()
+	return HttpResponseRedirect(reverse('admin-user'))
 
 def check_password(password, password_confirm):
 	if password == password_confirm:

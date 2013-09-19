@@ -31,20 +31,16 @@
     {% block body %}
 
     <div class="notifications-layout">
-    {% for CURRENT_NOTIF in NOTIFICATIONS %} 
-    <!-- Notifications-->
-	    <div class="notification" id="notification{{forloop.counter}}">
-	    	<span class="close-button"><img src="{% static "img/buttons/close.png"%}" onclick="closenotification('notification{{forloop.counter}}')"/></span>
-		<span>{{ CURRENT_NOTIF }}</span>
-	    </div>
-    {% endfor%}
-    
      <!-- Notifications-->
-	   {%if NOTIFICATION %}
-	   <div class="notification" id="single">
-	    	<span class="close-button"><img src="{% static "img/buttons/close.png"%}" onclick="closenotification('single')"/></span>
-		<span>{{ NOTIFICATION }}</span>
-	    </div>
+	    {% if messages %}
+	    <div class="notification" id="single">
+		<span class="close-button"><img src="{% static "img/buttons/close.png"%}" onclick="closenotification('single')"/></span>
+		<ul class="messages">
+		  {% for message in messages %}
+		  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+		  {% endfor %}
+		</ul>
+	     </div>
 	    {% endif %}
     </div>
       <!-- Header -->
@@ -128,12 +124,12 @@
         {% block navigation %}
           <div id="tabs">
           	<ul>
-          		<li><a href="/heimdall/home"><img src="{% static "img/icons/home-32x32.png" %}" title="Acceuil"/> Accueil</a></li>
-          		<li><a href="/heimdall/users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/> Utilisateurs</a></li>
-          		<li><a href="/heimdall/servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/> Serveurs</a></li>
+          		<li><a href="/heimdall/home"><img src="{% static "img/icons/home-32x32.png" %}" title="Acceuil"/>Accueil</a></li>
+          		<li><a href="/heimdall/users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/>Utilisateurs</a></li>
+          		<li><a href="/heimdall/servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/>Serveurs</a></li>
           		{% if user.is_authenticated %}
-          		<li><a href="/heimdall/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/> Permissions</a></li>
-          		<li><a href="/heimdall/deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/> Dépot</a></li>
+          		<li><a href="/heimdall/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/>Permissions</a></li>
+          		<li><a href="/heimdall/deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/>Dépot</a></li>
           
 
 
@@ -141,8 +137,8 @@
 			{% if group.name == "heimdall-admin" %}
 				<!-- admin panel -->
 				<hr class="separate-token"/>
-				<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/> Permissions</a></li>
-		  		<li><a href="/heimdall/admin/user"><img src="{% static "img/icons/users-32x32.png" %}" title="Depot"/> Utilisateurs</a></li>
+				<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/>Permissions</a></li>
+		  		<li><a href="/heimdall/admin/user"><img src="{% static "img/icons/users-32x32.png" %}" title="Depot"/>Utilisateurs</a></li>
 		  		<li><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/users-32x32.png" %}" title="Depot"/>Manage Groups</a></li>
 			{% endif %}
 			{% endfor %}
