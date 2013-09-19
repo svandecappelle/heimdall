@@ -1,2 +1,17 @@
 *.db
 *.sqlite
+*.~
+*.pyc
+*.py~
+*~
+.*.swp
+.swp
+.project
+.cache
+.settings
+*.pyc
+dist
+env
+.pydev*
+*__pycache__
+*/*.py~

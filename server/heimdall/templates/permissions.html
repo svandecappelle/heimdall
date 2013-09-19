@@ -1,0 +1,79 @@
+{% extends "layout-page.html" %} {% block import %} {% if
+user.is_authenticated %}
+
+<script type="text/javascript">
+
+(function($){
+  $(document).ready(function(){
+   var sys = arbor.ParticleSystem(2600, 512,0.5);
+   sys.parameters({gravity:true});
+    sys.renderer = Renderer("#viewport") ;
+    
+    // central repository
+    var heimdall = sys.addNode('Heimdall',{'color':'red','shape':'dot','label':'Heimdall'});
+    {% for permission in permissions %}
+	var serverName = '{{permission.server.hostname}}';
+    	var server = sys.addNode(serverName,{'color':'blue','shape':'dot','label':serverName});
+
+	var hostTarget='{{permission.hostuser}}'
+	var hostTargetNode = sys.addNode(hostTarget,{'color':'#0ECEDA','shape':'dot','label':hostTarget});
+
+    	{% if permission.user.username == user.username %}
+    		var color = "green";
+    	{% else %}
+    		var color = "orange";
+    	{% endif %}
+
+    	var userName = '{{permission.user.username}}';	
+    	var user = sys.addNode(userName,{'color':color,'label':userName});
+
+	sys.addEdge(user,hostTargetNode);
+
+	sys.addEdge(hostTargetNode,server);
+
+    	sys.addEdge(heimdall, server);
+    	
+    
+    {% endfor %}
+  })
+
+})(this.jQuery)
+  
+  </script>
+{%endif%} {% endblock %} {% block content %} {% if user.is_authenticated
+%}
+<h2 style="position: absolute;">Permissions on heimdall</h2>
+<canvas id="viewport" width="800" height="650" style="overflow: hidden;"></canvas>
+{% else %}
+<h2>Vous devez etre connecté pour voir cette page</h2>
+{%endif%}
+<div class="legend-permission">
+	<table>
+		<tbody>
+			<tr>
+				<td>Heimdall central repository</td>
+				<td><span class="legend-block" style="background-color: red;"></span></td>
+			</tr>
+			<tr>
+				<td>Server</td>
+				<td><span class="legend-block" style="background-color: blue;"></span></td>
+			</tr>
+			<tr>
+				<td>You</td>
+				<td><span class="legend-block" style="background-color: green;"></span></td>
+			</tr>
+			<tr>
+				<td>Other users</td>
+				<td><span class="legend-block"
+					style="background-color: orange;"></span></td>
+			</tr>
+			<tr>
+				<td>Connection user</td>
+				<td><span class="legend-block"
+					style="background-color: #0ECEDA;"></span></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+{% endblock %}
+
