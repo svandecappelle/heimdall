@@ -101,4 +101,45 @@
 			</form>
 		</div>
 	</div>
+	
+	<div>
+		<h2>Revoke an access</h2>
+		
+		<div class="align-form">
+	      			<table class="rounded-corner">
+				      	<thead>
+				      		<tr>
+							<th>User</th>
+							<th>Host</th>
+							<th>User in host</th>
+							{% if user.is_authenticated %}
+								<th>Revoke access</th>
+							{% endif %}
+						</tr>
+					</thead>
+					<tbody>
+					{% for permission in permissions %}
+					<tr>
+						<td><span>{{ permission.user.username }}</span></td>
+						<td><span>{{ permission.server.hostname }}</span></td>
+						<td><span>{{ permission.hostuser }}</span></td>
+						{% if user.is_authenticated %}
+							<td>
+								<form id="form-permission" action="/heimdall/admin/revoke_access" method="post" accept-charset="utf-8">
+								{% csrf_token%}									
+								    <input type="hidden" name="username" value="{{ permission.user.username }}"/>
+									<input type="hidden" name="hostname" value="{{ permission.server.hostname }}"/>
+									<input type="hidden" name="hostuser" value="{{ permission.hostuser }}"/>
+									<input type="submit" value="Revoke access"/>
+								</form>
+							</td>
+						{% endif %}
+					</tr>
+
+					{% endfor %}
+	      				</tbody>
+	      			</table>
+		</div>
+		
+	</div>
 {% endblock %}

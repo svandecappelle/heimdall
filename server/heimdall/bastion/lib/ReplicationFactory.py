@@ -29,101 +29,22 @@ Authors:
 # Email:        svandecappelle at vekia.fr
 """
 
-from sqlite3 import *
-# from paramiko import *
+from paramiko import SSHClient
+from paramiko import SSHException
+from paramiko import AutoAddPolicy
+from paramiko import AuthenticationException
+
 from email.mime.text import MIMEText
-import sys, os, re, socket, smtplib
-# import pyinotify
+import socket, smtplib
 
 from heimdall.bastion.lib.utils import Constants
 from heimdall.bastion.lib.utils.Logger import Logger
-from heimdall.bastion.lib.utils import fileutils
-
-from heimdall.bastion.lib.datas.DataBaseConnector import DataBaseConnector
-from heimdall.bastion.lib.datas.RequestBinder import RequestBinder
-from heimdall.bastion.lib.datas.RequestBinder import Request
 
 
 logger = Logger("ReplicationFactory", Constants.DEBUG)
 
 class ReplicationFactory: 
-                                                                              
-	def revoke_all_access(self):
-		'''Revoke all access. Note: fonction not yet available'''
-		logger.log("Revoke all access (not yet implemented)", Constants.WARN)
-		con = connect(Constants.DB_FILE)
-		cur = con.cursor()
-		try:
-		    # Ths query give us a tuple which contain server name, login and username
-		    cur.execute("select * from server_permissions")
-		    logger.log("Revoked all access (not yet implemented)", Constants.WARN)
-		except Exception as e:
-		    logger.log("Error occured while retreiving permissions : " + e.args[0] , Constants.ERROR)
-		cur.close()
-		con.close()
-
-	def replicate_file(self, file_name):
-		'''Replicate a permission'''
-		length = fileutils.file_len(file_name)
-		if length > 1:
-			logger.log("Error: file '%s' is not a valid rsa-id file" % file_name, Constants.ERROR)
-		else:
-			userName = os.path.basename(file_name).split('-', 1)[0]
-			logger.log("Received key from : " + userName, Constants.INFO)
-			
-			# Reading and coying the rsa key file
-			try:
-				file_rsa = open(file_name, 'rU')
-			except IOError as e:
-				logger.log("Can't open file " + file_name, Constants.ERROR)
-			else:
-				key_rsa = file_rsa.readline()				
-			
-				# ## Insert key RSA_ID_PUB to db file for remove access
-				insertRsa = Request("RSA_ID")
-				insertRsa.setMode("INSERT")
-				insertRsa.addSelect("USER_NAME")
-				insertRsa.addSelect("RSA")
-			
-				insertRsa.addValues(str(userName.upper()))
-				insertRsa.addValues(str(key_rsa))
-			
-				connector = DataBaseConnector(Constants.DB_FILE)
-				insertRsaQuery = RequestBinder(connector)
-				insertRsaQuery.execQuery(insertRsa);
-				logger.log("Permission added to datafile", Constants.DEBUG)		
-			
-				self.replicate_key(userName, key_rsa)
-				file_rsa.close()
-
-	def replicate_key(self, userName, key_rsa):
-		'''Replicate RSA key '''
-		con = connect(Constants.DB_FILE)
-		cur = con.cursor()
-		try:
-			# Ths query give us a tuple which contain server name, login and username
-			cur.execute("select * from server_permissions where user_name = '%s';" % userName.upper())
-			# 	print "select * from server_permissions where user_name = '%s';"%userName.upper()
-		except Exception as e:
-			# no error on DB: try to replicate
-			logger.log("Error occured while retreiving permissions : " + e.args[0] , Constants.ERROR)
-			    
-		logger.log("Looking for available server", Constants.DEBUG)
-		rows = cur.fetchall()		
-		# if no server permission 
-		if len(rows) == 0:
-			logger.log("No server permission for user '%s'" % userName.upper(), Constants.WARN)
-			    
-		# else 
-		for permissions in rows :
-			# for each permission add a key on the .ssh/authorized_keys file
-			srv, user, login = permissions
-			# user : is the user to loggin (oracle/jboss...)
-			server = str(srv)
-			logger.log('For user %s, key is copying on %s as and unix user : %s' % (str(user), server, str(login)), Constants.INFO)
-			self.replicate_one_server(server, login , key_rsa , userName)
-    
-	def replicate_one_server(self, server, userhost, key_rsa, userName):
+	def replicate_one_server(self, server, userhost, key_rsa, userName, usermail):
 		'''Replicate access on one server for one user'''
 		try:
 			client = SSHClient()
@@ -142,11 +63,11 @@ class ReplicationFactory:
 			logger.log("Error Socket: " + str(e), Constants.ERROR)
 		except Exception as e:
 			logger.log("Not catched error on replication: " + str(e), Constants.ERROR)
-				 
+			
 		client.close()
-		self.notify(server, userName, userhost, False)
+		self.notify(server, userName, userhost, False, usermail)
 
-	def delete_replication(self, server, userhost, key_rsa, userName):
+	def revoke_one_server(self, server, userhost, key_rsa, userName, usermail):
 		"""
 		Delete a heimdall replication.
 		"""
@@ -174,11 +95,10 @@ class ReplicationFactory:
 			logger.log(e, Constants.ERROR)
 		except Exception as e:
 			logger.log("Not catched error on replication: " + str(e) , Constants.ERROR)
-				 
 		client.close()	
-		self.notify(server, userName, userhost, True)
+		self.notify(server, userName, userhost, True, usermail)
 
-	def notify(self, server, trig, user, isRevoke):
+	def notify(self, server, trig, user, isRevoke, usermail):
 		"""
 		Notify the user and admin if config constant is enable to
 		"""
@@ -193,17 +113,17 @@ class ReplicationFactory:
 		if Constants.notifyUserByEmail:
 			logger.log("Notify user by email", Constants.INFO)
 			if isRevoke:
-				self.alertToUser('An administrator has just revoke access for you account on %s to %s user connected with %s' % (server, trig, user), trig, server);
+				self.alertToUser('An administrator has just revoke access for you account on %s to %s user connected with %s' % (server, trig, user), trig, server, usermail);
 			else:
-				self.alertToUser('An administrator has just open access for you account on %s to %s user connected with %s' % (server, trig, user), trig, server);
+				self.alertToUser('An administrator has just open access for you account on %s to %s user connected with %s' % (server, trig, user), trig, server, usermail);
 			
 		logger.log("Replication finished", Constants.INFO)
-		                                              
-		
+	
+	
 	def alertToAdmin(self, message, server):
 		'''Alert by email the admins'''
 		# Create an html message
-		msg = MIMEText(message, 'html')
+		msg = MIMEText(message,'html')
 
 		s = smtplib.SMTP(Constants.heimdallHost)
 		
@@ -215,13 +135,13 @@ class ReplicationFactory:
 		s.sendmail(sender, recipients, msg.as_string())
 		s.quit()
 		
-	def alertToUser(self, message, trig, server):
+	def alertToUser(self, message, trig, server, usermail):
 		'''Alert by email the user who granted / revoked'''
-		userEmail = self.getUserEmail(trig);
+		userEmail = usermail;
 		
 		s = smtplib.SMTP(Constants.heimdallHost)
 		# Create an html message
-		msg = MIMEText(message, 'html')
+		msg = MIMEText(message,'html')
 		
 		sender = Constants.heimdallEmail
 		msg['Subject'] = 'Heimdall notification access to %s' % server
@@ -229,21 +149,4 @@ class ReplicationFactory:
 		msg['To'] = userEmail
 		s.sendmail(sender, userEmail, msg.as_string())
 		s.quit()
-		
-	def getUserEmail(self, user):
-		'''Return the user email address'''
-		connector = DataBaseConnector(Constants.DB_FILE)
-		selectUserQuery = RequestBinder(connector)
-		selectUserPub = Request("USER")
-		selectUserPub.setIsPrint(False)
-		selectUserPub.addSelect("EMAIL")
-		selectUserPub.addWhere("USER_NAME  = '" + user + "'")
-		result = selectUserQuery.execQuery(selectUserPub)
 	
-		row = result.fetchone()
-		try:
-			email = str(row[0])
-			connector.database.close()
-			return email
-		except Exception as e:
-			logger.error("Failed to get email user: " + user + "\n" + str(e))

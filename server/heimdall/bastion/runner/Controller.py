@@ -32,26 +32,11 @@ Authors:
 from heimdall.bastion.lib.ReplicationFactory import ReplicationFactory
 from heimdall.bastion.lib.utils.Logger import Logger
 from heimdall.bastion.lib.utils import Constants
-from heimdall.bastion.lib.datas.DataBaseConnector import DataBaseConnector
-from heimdall.bastion.lib.datas.RequestBinder import RequestBinder
-from heimdall.bastion.lib.datas.RequestBinder import Request
 
-from heimdall.models import Server, Permission, Demands, SshKeys
+from heimdall.models import Server, Permission
 
 logger = Logger("WebController")
-
-
-def addUser():
-	"""
-	Add a user to the heimdall database.
-	"""
-	logger.log("User created", Constants.INFO)
-
-def addServer():
-	"""
-	Add a server to the heimdall database.
-	"""
-	logger.log("addServer", Constants.DEBUG)
+replicator = ReplicationFactory()
 	
 def addPermission(user_target, server_target, hostuser_target, sshkey):
 	"""
@@ -63,75 +48,20 @@ def addPermission(user_target, server_target, hostuser_target, sshkey):
 	permission = Permission(user=user_target, server=server_target, hostuser=hostuser_target)
 	permission.save()
 	# TODO replicate
+	replicator.replicate_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email)
+	
 	logger.log("permission added need replicate", Constants.INFO)
 
-def revokePermission():
+def revokePermission(user_target, server_target, hostuser_target, sshkey):
 	"""
 	Revoke a permission to an existing server and an existing user on database.
 	If the user has already uploaded his rsa key, then the replicator revoke 
 	his key on the server.
 	"""
-	logger.log("Permission revoked", Constants.INFO)
-
-def removeServer():
-	"""
-	Remove a server from the database.
-	Note: it will no revoke the access granted.
-	"""
-	logger.log("removeServer", Constants.DEBUG)
-
-def showUsers():
-	"""
-	Show all user added into the heimdall database.
-	"""
-	logger.log("Users: ", Constants.INFO)
-
-def delRsa():
-	"""
-	Delete a rsa key from the heimdall database.
-	The user associated need to re-upload a new one to grant new access.
-	Note: it will no revoke the access granted.
-	"""
-	logger.log("Delete RSA ids", Constants.INFO)
+	logger.log("Revoke permission ", Constants.INFO)
+	permission = Permission.objects.filter(user=user_target, server=server_target, hostuser=hostuser_target)
+	permission.delete()
+	# TODO replicate
+	replicator.revoke_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email)
 	
-def showServers():
-	"""
-	Show all servers added into heimdall database.
-	"""
-	print(Constants.INFO)
-	logger.info("Servers: ")
-	list_servers = Server.objects.all()
-	print(list_servers)
-
-
-def replicate(user, server, hostuser, add):
-	"""
-	Replicate an access to a server for a user.
-	"""
-	logger.log("replicate modification data", Constants.INFO)
-	
-# 	connector = DataBaseConnector(Constants.DB_FILE)
-# 	selectRsaQuery = RequestBinder(connector)
-# 	selectRsaIdPub = Request("RSA_ID")
-# 	selectRsaIdPub.setIsPrint(False)
-# 	selectRsaIdPub.addWhere("USER_NAME  = '" + user + "'")
-# 	result = selectRsaQuery.execQuery(selectRsaIdPub)
-#
-# 	row = result.fetchone()
-# 	try:
-# 		key_rsa = str(row[1])
-#
-# 		connector.database.close()
-# 		replicator = ReplicationFactory()#
-#
-# 		if add:#
-# 			logger.log("Adding access for server: "+server+" to " + user + " on "+ hostuser, Constants.INFO)
-# 			replicator.replicate_one_server(server, hostuser,key_rsa, user)
-# 		else:
-# 			logger.log("Revoking access for server: "+server+" to " + user + " on "+ hostuser, Constants.INFO)
-# 			replicator.delete_replication(server, hostuser,key_rsa,  user)
-#
-# 	except Exception:
-# 		logger.log("Failed to revoke access: "+server+" to " + user + " on "+ hostuser + " check the users RSA_ID on database:\n " , Constants.ERROR)
-	
-
+	logger.log("permission added need replicate", Constants.INFO)

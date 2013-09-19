@@ -21,7 +21,6 @@ html *{
 
 .inline-block{
 	display:inline-block;
-	float: left;
 }
 
 .default-block{

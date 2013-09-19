@@ -9,7 +9,7 @@ from django.template import RequestContext
 
 from heimdall import utils
 from heimdall.bastion.runner import Controller
-from heimdall.models import Server, Demands, SshKeys, Roles, RolePerimeter, UserRoles
+from heimdall.models import Server, Demands, SshKeys, Roles, RolePerimeter, UserRoles, Permission
 
 def user(request):
 	args = utils.give_arguments(request, 'Users admin')
@@ -19,6 +19,22 @@ def user(request):
 	else:
 		messages.success(request, 'You have not the rights to see this page')
 		return HttpResponseRedirect(reverse('admin'))
+def revoke_access(request):
+	if request.user.groups.filter(name="heimdall-admin"):
+		if request.method == 'POST':
+			user = User.objects.get(username=request.POST['username'])
+			host = Server.objects.get(hostname=request.POST['hostname'])
+			hostuser = request.POST['hostuser']
+						
+			rsa_key = SshKeys.objects.get(user=user)
+			Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
+			
+			message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
+			messages.success(request, message)
+	else:
+		messages.success(request, 'You have not the rights to do this action')
+
+	return HttpResponseRedirect(reverse('admin-permissions'))
 
 def create_server(request):
 	if request.user.groups.filter(name="heimdall-admin"):
@@ -39,13 +55,13 @@ def create_server(request):
 	return HttpResponseRedirect(reverse('servers'))
 
 def permissions(request):
-	Controller.showServers()
 	demands = Demands.objects.all()
 	servers = Server.objects.all()	
 	users = User.objects.all()
+	permissions = Permission.objects.all()
 	
 	args = utils.give_arguments(request, 'Permissions admin')
-	args.update({'demands' : demands, 'servers': servers, 'users': users})
+	args.update({'demands' : demands, 'servers': servers, 'users': users, 'permissions' : permissions})
 	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
 
 def add_to_group(request):
@@ -65,6 +81,10 @@ def add_to_group(request):
 		messages.success(request, 'You have not the rights to do this action')
 		
 	return HttpResponseRedirect(reverse('admin-group-management'))
+
+def manage_user_role(request):
+	return render_to_response('admin/manage_user_role.html', context_instance=RequestContext(request))
+
 
 def grant_access(request):
 	if request.user.groups.filter(name="heimdall-admin"):
@@ -86,7 +106,6 @@ def grant_access(request):
 			else:
 				print('TODO: look after demands')					
 						
-			# TODO activate this function
 			rsa_key = SshKeys.objects.get(user=user)
 			Controller.addPermission(user, host, request.POST['hostuser'], rsa_key)
 			

@@ -21,7 +21,7 @@
 					</td>
 					<td>{% for arole in userRoles%} 
 							{% ifequal arole.user.username user.username %} 
-							{{arole.role.name}} <a href="">(manage)</a> {% endifequal %} 
+							{{arole.role.name}} <a href="manage_user_role">(manage)</a> {% endifequal %} 
 						{% endfor %}
 					</td>
 				</tr>
