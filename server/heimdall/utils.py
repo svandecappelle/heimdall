@@ -9,8 +9,14 @@ def give_arguments(user, page_title):
 # utils
 def get_demands_filtered(user_filter):
 	userRoles = UserRoles.objects.filter(user=user_filter).values_list('role')
-	rolePerimeters = RolePerimeter.objects.filter(roles=userRoles).values_list('server')
-	demands = Demands.objects.filter(server=rolePerimeters,close_date__isnull=True)
+	demands = None
+	if user_filter.groups.filter(name="heimdall-admin"):
+		demands = Demands.objects.filter(close_date__isnull=True)
+	elif userRoles.role.type == 'MANAGER' or userRoles.role.type == 'ADMINISTRATOR':
+		rolePerimeters = RolePerimeter.objects.filter(roles=userRoles).values_list('server')
+		demands = Demands.objects.filter(server=rolePerimeters,close_date__isnull=True)
+	else:
+		demands = Demands.objects.filter(user=user_filter,close_date__isnull=True)
 	return demands
 
 def handler404(request):

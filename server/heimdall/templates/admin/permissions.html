@@ -26,10 +26,22 @@
 						{% if user.is_authenticated %}
 							<td>
 								<form id="form-permission" action="/heimdall/admin/grant_access" method="post" accept-charset="utf-8">
-								{% csrf_token%}									<input type="hidden" name="username" value="{{ demand.user.username }}"/>
+								{% csrf_token%}									
+									<input type="hidden" name="username" value="{{ demand.user.username }}"/>
+									<input type="hidden" name="type" value="grant"/>
 									<input type="hidden" name="hostname" value="{{ demand.server.hostname }}"/>
 									<input type="hidden" name="hostuser" value="{{ demand.hostuser }}"/>
 									<input type="submit" value="Grant access"/>
+								</form>
+							</td>
+							<td>
+								<form id="form-permission" action="/heimdall/admin/grant_access" method="post" accept-charset="utf-8">
+								{% csrf_token%}									
+								    <input type="hidden" name="username" value="{{ demand.user.username }}"/>
+								    <input type="hidden" name="type" value="reject"/>
+									<input type="hidden" name="hostname" value="{{ demand.server.hostname }}"/>
+									<input type="hidden" name="hostuser" value="{{ demand.hostuser }}"/>
+									<input type="submit" value="Reject access"/>
 								</form>
 							</td>
 						{% endif %}

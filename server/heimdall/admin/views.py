@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # Create your views here.
+from datetime import date
+
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
@@ -26,11 +28,17 @@ def revoke_access(request):
 			user = User.objects.get(username=request.POST['username'])
 			host = Server.objects.get(hostname=request.POST['hostname'])
 			hostuser = request.POST['hostuser']
-						
-			rsa_key = SshKeys.objects.get(user=user)
-			Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
 			
-			message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
+			message = None
+			
+			if SshKeys.objects.filter(user=user).count == 0:
+				message = 'No RSA saved on database. Contact user to set his RSA key.'
+			elif SshKeys.objects.filter(user=user).count > 1:
+				message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
+			else:
+				rsa_key = SshKeys.objects.get(user=user)
+				Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
+				message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
 			messages.success(request, message)
 	else:
 		messages.success(request, 'You have not the rights to do this action')
@@ -56,7 +64,7 @@ def create_server(request):
 	return HttpResponseRedirect(reverse('servers'))
 
 def permissions(request):
-	demands = Demands.objects.all()
+	demands = Demands.objects.filter(close_date__isnull=True)
 	servers = Server.objects.all()	
 	users = User.objects.all()
 	permissions = Permission.objects.all()
@@ -84,44 +92,116 @@ def add_to_group(request):
 	return HttpResponseRedirect(reverse('admin-group-management'))
 
 def manage_user_role(request):
-	return render_to_response('admin/manage_user_role.html', context_instance=RequestContext(request))
+	roles = Roles.objects.filter(name=request.GET['rolename'])	
+	userRoles = UserRoles.objects.filter(role=roles)
+	print (UserRoles.objects.filter(role=roles).values_list('user'))
+	usersToFilter = []
+	for userRole in UserRoles.objects.filter(role=roles):
+		print (userRole.user)
+		usersToFilter.append(userRole.user.username)
+		
+	users = User.objects.exclude(username__in=usersToFilter)
+	print (users)
+	args = utils.give_arguments(request.user, 'Role management')
+	args.update({'userRoles' : userRoles , 'users':users, 'rolename' : request.GET['rolename']})	
+	
+	return render_to_response('admin/manage_user_role.html',args, context_instance=RequestContext(request))
+
+def manage_group(request):
+	
+	group = Group.objects.get(name=request.POST['groupname'])
+	user = User.objects.get(username=request.POST['username'])
+	
+	if request.POST['type'] == "add":
+		user.groups.add(group)
+	else:
+		user.groups.remove(group)
+	
+	user.save()
+	
+	message = 'Group modified'
+	messages.success(request, message)
+	return HttpResponseRedirect(reverse('admin-group-management'))
+
+def manage_role(request):
+	print (request.POST['username'])
+	user = User.objects.get(username=request.POST['username'])
+	role = Roles.objects.get(name=request.POST['rolename'])
+	
+	if request.POST['type'] == "add":
+		UserRoles.objects.create(user=user,role=role)
+	else:
+		userRole = UserRoles.objects.get(user=user,role=role)
+		userRole.delete()
+	
+	message = 'Group modified'
+	messages.success(request, message)
+	return HttpResponseRedirect(reverse('admin-group-management'))
 
 
 def grant_access(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
-			user = None
-			host = None
+			
 			if request.POST['username'] != '[[ALL]]':
 				user = User.objects.get(username=request.POST['username'])
 			else:
 				print('TODO: look after demands')
-
+			
 			if request.POST['hostname'] != '[[ALL]]':
 				host = Server.objects.get(hostname=request.POST['hostname'])
 			else:
 				print('TODO: look after demands')
-
+			
 			if request.POST['hostuser'] != '[[ALL]]':
 				hostuser = request.POST['hostuser']
 			else:
 				print('TODO: look after demands')					
-						
-			rsa_key = SshKeys.objects.get(user=user)
-			Controller.addPermission(user, host, request.POST['hostuser'], rsa_key)
 			
-			if request.POST['username'] != '[[ALL]]':
-				message = 'Permission granted on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
-				messages.success(request, message)
+			request_type = request.POST['type']
+			if request_type == 'grant':
+				user = None
+				host = None
+				
+				message = None
+				
+				if SshKeys.objects.filter(user=user).count == 0:
+					message = 'No RSA saved on database. Contact user to set his RSA key.'
+				elif SshKeys.objects.filter(user=user).count > 1:
+					message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
+				else:
+					rsa_key = SshKeys.objects.get(user=user)
+					Controller.addPermission(user, host, request.POST['hostuser'], rsa_key)
+					demand = Demands.objects.get(user=user,server=host,hostuser=hostuser)
+					demand.close_date=date.today()
+					demand.save()
+				
+				if request.POST['username'] != '[[ALL]]':
+					message = 'Permission granted on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
+					messages.success(request, message)
+				else:
+					messages.success(request, 'All requested permissions granted')
 			else:
-				messages.success(request, 'All requested permissions granted')
+				host = Server.objects.get(hostname=request.POST['hostname'])
+				demand = Demands.objects.get(user=user,server=host,hostuser=hostuser)
+				demand.close_date=date.today()
+				demand.save()
+				
+				message = 'Permission rejected on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
+				messages.success(request, message)
 	else:
 		messages.success(request, 'You have not the rights to do this action')
 
 	return HttpResponseRedirect(reverse('admin-permissions'))
 
 def manage_user_group(request):
-	args = utils.give_arguments(request.user, 'User group')
+	groups = Group.objects.filter(name=request.GET['groupname'])
+	groupUser = User.objects.filter(groups=groups)	
+	users = User.objects.exclude(username__in=groupUser.values_list('username'))
+	
+	args = utils.give_arguments(request.user, 'Group management')
+	args.update({'group': groupUser, 'users':users,'groupname' : request.GET['groupname']})
+	
 	return render_to_response('admin/user_groups.html', args, context_instance=RequestContext(request))
 
 def manage_groups(request):
@@ -200,7 +280,6 @@ def change_perimeter_role(request):
 			return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
 
 def register_user(request):
-	print("adduser")
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 			if check_password(request.POST['password'], request.POST['password-confirm']):

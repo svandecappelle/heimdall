@@ -46,10 +46,8 @@ def addPermission(user_target, server_target, hostuser_target, sshkey):
 	"""
 	logger.log("Add permission: " + user_target.username + " for server: ["+server_target.hostname+"]" + " with user: {"+hostuser_target+"}", Constants.INFO)
 	permission = Permission(user=user_target, server=server_target, hostuser=hostuser_target)
-	permission.save()
-	# TODO replicate
 	replicator.replicate_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email)
-	
+	permission.save()
 	logger.log("permission added need replicate", Constants.INFO)
 
 def revokePermission(user_target, server_target, hostuser_target, sshkey):
@@ -60,8 +58,6 @@ def revokePermission(user_target, server_target, hostuser_target, sshkey):
 	"""
 	logger.log("Revoke permission ", Constants.INFO)
 	permission = Permission.objects.filter(user=user_target, server=server_target, hostuser=hostuser_target)
-	permission.delete()
-	# TODO replicate
 	replicator.revoke_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email)
-	
+	permission.delete()
 	logger.log("permission added need replicate", Constants.INFO)

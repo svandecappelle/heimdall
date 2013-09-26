@@ -36,4 +36,7 @@ urlpatterns = patterns('',
 	url(r'^admin/create_server$', heimdall.admin.views.create_server, name='create-server'),
 	url(r'^admin/manage_user_role$', heimdall.admin.views.manage_user_role, name='manage-user-role'),
 	url(r'^admin/revoke_access$', heimdall.admin.views.revoke_access, name='revoke-access'),
+	url(r'^admin/manage_role$', heimdall.admin.views.manage_role, name='manage-role'),
+	url(r'^admin/manage_group$', heimdall.admin.views.manage_group, name='manage-group'),
+	
 )

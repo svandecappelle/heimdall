@@ -149,6 +149,11 @@ def require_access(request):
             if userConnected.groups.filter(name="heimdall"):
                 serverHost = Server.objects.get(hostname=request.POST['server'])
                 userHost = request.POST['user']
+                
+                if userHost == "":
+                    messages.success(request, 'You must write a user host')
+                    return HttpResponseRedirect(reverse('servers'))
+                
                 priority = request.POST['priority']
                 comments = request.POST['comments']
                 cdate = date.today()

@@ -1,5 +1,46 @@
 {% extends "layout-page.html" %} {% block content %} {% load tags %}
 
 
+<div class="inline-block">
+	<h2>Members of {{groupname}}:</h2>
+	<div class="align-form">
+		<table class="rounded-corner rounded-corner-with-footer">
+			<thead>
+				<tr>
+					<th>Users</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				{% for member in group%}
+				<tr>
+					<form action="/heimdall/admin/manage_group" method="post"
+						accept-charset="utf-8">
+						{% csrf_token%} <input type="hidden" name="type" value="remove" />
+						<input type="hidden" name="username" value="{{ member.username }}" />
+						<input type="hidden" name="groupname" value="{{ groupname }}" />
+					<td style="with: 100%">{{ member.username }}</td>
+					<td><input type="submit" value="Remove user"></td>
+					</form>
+				</tr
+			{% endfor %}>
+			</tbody>
+
+			<tfoot>
+				<tr>
+					<form action="/heimdall/admin/manage_group" method="post"
+						accept-charset="utf-8">
+						{% csrf_token%} <input type="hidden" name="type" value="add" />
+						<input type="hidden" name="groupname" value="{{ groupname }}" />
+					<td><select name="username"> {% for user in users %}
+							<option>{{user.username}}</option> {% endfor %}
+					</select></td>
+					<td><input type="submit" value="Add to group"></td>
+					</form>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>
 
 {% endblock %}

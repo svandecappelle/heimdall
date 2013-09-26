@@ -56,7 +56,6 @@ table tr:last-child td:last-child {
 .rounded-corner
 {
 	font-size: 12px;
-	min-width: 480px;
 	text-align: left;
 	border-collapse: collapse;
 }
