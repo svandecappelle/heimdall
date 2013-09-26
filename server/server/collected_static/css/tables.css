@@ -1,0 +1,90 @@
+/* ------------------
+ styling for the tables 
+   ------------------   */
+body
+{
+	line-height: 1.6em;
+}
+
+table thead tr:last-child th:first-child {
+	-moz-border-radius-topleft:10px;
+	-webkit-border-top-left-radius:10px;
+	border-top-left-radius:10px;
+}
+table tr:last-child th:last-child {
+	-moz-border-radius-topright:10px;
+	-webkit-border-top-right-radius:10px;
+	border-top-right-radius:10px;
+}
+
+
+table tr:last-child td:first-child {
+	-moz-border-radius-bottomleft:10px;
+	-webkit-border-bottom-left-radius:10px;
+	border-bottom-left-radius:10px;
+}
+table tr:last-child td:last-child {
+	-moz-border-radius-bottomright:10px;
+	-webkit-border-bottom-right-radius:10px;
+	border-bottom-right-radius:10px;
+}
+
+
+.rounded-corner-with-footer>tbody>tr:last-child td:first-child {
+	-moz-border-radius-bottomleft:0px;
+	-webkit-border-bottom-left-radius:0px;
+	border-bottom-left-radius:0px;
+}
+
+.rounded-corner-with-footer>tbody tr:last-child td:last-child {
+	-moz-border-radius-bottomright:0px;
+	-webkit-border-bottom-right-radius:0px;              
+	border-bottom-right-radius:0px;
+}
+
+.rounded-corner-with-footer>tfoot tr:last-child td:last-child {
+	-moz-border-radius-bottomright:10px;
+	-webkit-border-bottom-right-radius:10px;
+	border-bottom-right-radius:10px;
+}
+.rounded-corner-with-footer>tfoot tr:last-child td:first-child {
+	-moz-border-radius-bottomleft:10px;
+	-webkit-border-bottom-left-radius:10px;
+	border-bottom-left-radius:10px;
+}
+
+.rounded-corner
+{
+	font-size: 12px;
+	min-width: 480px;
+	text-align: left;
+	border-collapse: collapse;
+}
+.rounded-corner th
+{
+	padding: 8px;
+	font-weight: normal;
+	font-size: 13px;
+	color: #cacaca;
+	background: #6D4848;
+	border: 1px solid #cacaca;
+}
+.rounded-corner td
+{
+	padding: 8px;
+	background: #3C3838;
+	border: 1px solid #cacaca;
+	color: #cacaca;
+}
+.rounded-corner tfoot td.rounded-foot-left
+{
+	background: #e8edff url('../img/table-images/botleft.png') left bottom no-repeat;
+}
+.rounded-corner tfoot td.rounded-foot-right
+{
+	background: #e8edff url('../img/table-images/botright.png') right bottom no-repeat;
+}
+.rounded-corner tbody tr:hover td
+{
+	background: #151224;
+}
