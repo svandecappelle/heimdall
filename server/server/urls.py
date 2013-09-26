@@ -4,6 +4,9 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
+handler404 = 'heimdall.utils.handler404'
+handler500 = 'heimdall.utils.handler500'
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'www.views.home', name='home'),

@@ -33,7 +33,7 @@ from heimdall.bastion.lib.ReplicationFactory import ReplicationFactory
 from heimdall.bastion.lib.utils.Logger import Logger
 from heimdall.bastion.lib.utils import Constants
 
-from heimdall.models import Server, Permission
+from heimdall.models import Permission
 
 logger = Logger("WebController")
 replicator = ReplicationFactory()

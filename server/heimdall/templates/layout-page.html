@@ -60,15 +60,15 @@
 		              			<div class="inline-block" style="padding-top:4px; margin-right:4px;">
 		              			{% if user.is_authenticated %}
 						    <span>Welcome, {{ user.username }}.</span>
-							<span><a href="#">
+							<span><a href="/heimdall/messages">
 							 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNpiXLVm/X8GCgATA4WABYvYAijGBhKgGKsBH4BYAKrgQFhI4EJkhUCvxiNphqlF8YIDVALsCqgGZM0LkDQ7YIQB0MaLWAzJB2F0zVC1mIGIxZAJUIxVM9ZYgCowAIUDkjCIbYCuGVcsgAx5CKQcgc6XR+ITHY3oBhGXDshNkRSnRIAAAwCEDDi73FPsUgAAAABJRU5ErkJggg==" class="GCHESSFBNL">
-							{% if messages_count == None %}
+							{% if inbox_demands_count == None %}
 							    <span>Messages: 0 </span>
-							{% elif messages_count > 0 %}
+							{% elif inbox_demands_count > 0 %}
 							    <span>Messages:</span>
-							    <span style="font-weight:bolder; font-size:11pt;">{{messages_count}}</span>
+							    <span style="font-weight:bolder; font-size:11pt;">{{inbox_demands_count}}</span>
 							{% else %}
-							    <span>Messages: {{messages_count}}</span>
+							    <span>Messages: {{inbox_demands_count}}</span>
 							{% endif %}
 							</a></span>	   
 						{% else %}

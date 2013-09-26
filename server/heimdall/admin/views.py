@@ -12,13 +12,14 @@ from heimdall.bastion.runner import Controller
 from heimdall.models import Server, Demands, SshKeys, Roles, RolePerimeter, UserRoles, Permission
 
 def user(request):
-	args = utils.give_arguments(request, 'Users admin')
+	args = utils.give_arguments(request.user, 'Users admin')
 	if request.user.groups.filter(name="heimdall-admin"):
 		args.update({'list_users': Group.objects.get(name="heimdall").user_set.all()})
 		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	else:
 		messages.success(request, 'You have not the rights to see this page')
 		return HttpResponseRedirect(reverse('admin'))
+	
 def revoke_access(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
@@ -60,7 +61,7 @@ def permissions(request):
 	users = User.objects.all()
 	permissions = Permission.objects.all()
 	
-	args = utils.give_arguments(request, 'Permissions admin')
+	args = utils.give_arguments(request.user, 'Permissions admin')
 	args.update({'demands' : demands, 'servers': servers, 'users': users, 'permissions' : permissions})
 	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
 
@@ -120,7 +121,7 @@ def grant_access(request):
 	return HttpResponseRedirect(reverse('admin-permissions'))
 
 def manage_user_group(request):
-	args = utils.give_arguments(request, 'User group')
+	args = utils.give_arguments(request.user, 'User group')
 	return render_to_response('admin/user_groups.html', args, context_instance=RequestContext(request))
 
 def manage_groups(request):
@@ -131,7 +132,7 @@ def manage_groups(request):
 	roles = Roles.objects.all()
 	groups = Group.objects.exclude(name="heimdall-admin").exclude(name="heimdall")
 	
-	args = utils.give_arguments(request, 'Group management')
+	args = utils.give_arguments(request.user, 'Group management')
 	args.update({'groups' : groups, 'servers': servers, 'users': users, 'roles': roles, 'userRoles' : userRoles})	
 	
 	return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
@@ -169,7 +170,7 @@ def change_perimeter_role(request):
 					messages.success(request, "Group perimeter modified")
 					return HttpResponseRedirect(reverse('admin-group-management'))
 				else:                                                                                                    
-					args = utils.give_arguments(request, 'Group management')
+					args = utils.give_arguments(request.user, 'Group management')
 					messages.success(request, "Server already present in the perimeter")
 					return HttpResponseRedirect(reverse('admin-group-management'))
 					
@@ -179,11 +180,11 @@ def change_perimeter_role(request):
 					
 					perimeter_to_delete = RolePerimeter.objects.get(roles=role, server=server)
 					perimeter_to_delete.delete()
-					args = utils.give_arguments(request, 'Group management')
+					args = utils.give_arguments(request.user, 'Group management')
 					messages.success(request, "Group perimeter modified")
 					return HttpResponseRedirect(reverse('admin-group-management'))
 				else:                                                                                                    
-					args = utils.give_arguments(request, 'Group management')
+					args = utils.give_arguments(request.user, 'Group management')
 					messages.success(request, "Server not present in the perimeter")
 					return HttpResponseRedirect(reverse('admin-group-management'))
 		else:
@@ -194,7 +195,7 @@ def change_perimeter_role(request):
 			for role in role_perimeter:
 				server_perimeter.append(role.server)
 			
-			args = utils.give_arguments(request, 'Group management')
+			args = utils.give_arguments(request.user, 'Group management')
 			args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.GET['groupname'], 'server_perimeter':server_perimeter })	
 			return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
 
