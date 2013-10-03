@@ -4,19 +4,23 @@ from django.template import RequestContext
 from heimdall.models import Demands, UserRoles, RolePerimeter
 
 def give_arguments(user, page_title):
-	return {'PAGE_TITLE': page_title, 'APP_TITLE' : "Heimdall", 'inbox_demands_count':get_demands_filtered(user).count}
+	print user
+	if user.is_anonymous:
+		return {'PAGE_TITLE': page_title, 'APP_TITLE' : "Heimdall", 'inbox_demands_count':0}
+	else:
+		return {'PAGE_TITLE': page_title, 'APP_TITLE' : "Heimdall", 'inbox_demands_count':get_demands_filtered(user).count}
 
 # utils
 def get_demands_filtered(user_filter):
-	userRoles = UserRoles.objects.filter(user=user_filter).values_list('role')
 	demands = None
+	
+	if user_filter.is_anonymous:
+		return Demands.objects.filter(close_date__isnull=True,  priority='None')
+	
 	if user_filter.groups.filter(name="heimdall-admin"):
 		demands = Demands.objects.filter(close_date__isnull=True)
-	elif userRoles.role.type == 'MANAGER' or userRoles.role.type == 'ADMINISTRATOR':
-		rolePerimeters = RolePerimeter.objects.filter(roles=userRoles).values_list('server')
-		demands = Demands.objects.filter(server=rolePerimeters,close_date__isnull=True)
 	else:
-		demands = Demands.objects.filter(user=user_filter,close_date__isnull=True)
+		demands = Demands.objects.filter(user=user_filter, close_date__isnull=True)
 	return demands
 
 def handler404(request):

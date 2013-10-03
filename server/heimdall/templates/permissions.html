@@ -5,7 +5,15 @@
 
 (function($){
   $(document).ready(function(){
-   var sys = arbor.ParticleSystem(2600, 512,0.5);
+	  
+	{% if permissions.count == 0 %}
+		var sys = arbor.ParticleSystem(0, 512,0.5);
+	{% else %}
+		var sys = arbor.ParticleSystem(2600, 512,0.5);
+	{% endif %}
+   
+   
+   
    sys.parameters({gravity:true});
     sys.renderer = Renderer("#viewport") ;
     

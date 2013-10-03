@@ -64,14 +64,48 @@ def create_server(request):
 	return HttpResponseRedirect(reverse('servers'))
 
 def permissions(request):
-	demands = Demands.objects.filter(close_date__isnull=True)
-	servers = Server.objects.all()	
+	if request.user.groups.filter(name="heimdall-admin"):
+		args = getarguments_for_admin(request.user)
+	else:
+		args = getarguments_for_manager(request.user)
+
+	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
+
+def getarguments_for_admin(user):
+	servers = Server.objects.all()
 	users = User.objects.all()
+	demands = Demands.objects.all();
+	permissions = Permission.objects.all()
+	args = utils.give_arguments(user, 'Permissions admin')
+	args.update({'demands' : demands, 'servers': servers, 'users': users, 'permissions' : permissions})
+	return args
+
+def getarguments_for_manager(user):
+	roles = UserRoles.objects.filter(user=user)
+	perimeters = RolePerimeter.objects.filter(roles = roles)
+
+	servers=[]
+	for one_perimeter in perimeters:	
+		servers.append(one_perimeter.server)
+
+	users=[]
+	for one_role_user in roles:
+		user_role = UserRoles.objects.filter(role=one_role_user.role)
+		for users_roles in user_role:
+			users.append(users_roles.user)
+	
+	demands = Demands.objects.filter(close_date__isnull=True, user__in= users, server__in =servers)
+	for filtered_demands in demands:
+		
+		print filtered_demands
+	
+	
+	#users = User.objects.all()
 	permissions = Permission.objects.all()
 	
-	args = utils.give_arguments(request.user, 'Permissions admin')
+	args = utils.give_arguments(user, 'Permissions admin')
 	args.update({'demands' : demands, 'servers': servers, 'users': users, 'permissions' : permissions})
-	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
+	return args
 
 def add_to_group(request):
 	if request.user.groups.filter(name="heimdall-admin"):
@@ -94,7 +128,6 @@ def add_to_group(request):
 def manage_user_role(request):
 	roles = Roles.objects.filter(name=request.GET['rolename'])	
 	userRoles = UserRoles.objects.filter(role=roles)
-	print (UserRoles.objects.filter(role=roles).values_list('user'))
 	usersToFilter = []
 	for userRole in UserRoles.objects.filter(role=roles):
 		print (userRole.user)
@@ -124,20 +157,24 @@ def manage_group(request):
 	return HttpResponseRedirect(reverse('admin-group-management'))
 
 def manage_role(request):
-	print (request.POST['username'])
-	user = User.objects.get(username=request.POST['username'])
-	role = Roles.objects.get(name=request.POST['rolename'])
-	
-	if request.POST['type'] == "add":
-		UserRoles.objects.create(user=user,role=role)
+	if request.user.groups.filter(name="heimdall-admin"):
+		user = User.objects.get(username=request.POST['username'])
+		role = Roles.objects.get(name=request.POST['rolename'])
+		
+		if request.POST['type'] == "add":
+			UserRoles.objects.create(user=user,role=role)
+		else:
+			userRole = UserRoles.objects.get(user=user,role=role)
+			userRole.delete()
+		
+		message = 'Group modified'
+		
 	else:
-		userRole = UserRoles.objects.get(user=user,role=role)
-		userRole.delete()
-	
-	message = 'Group modified'
+		message = 'You have not the rights to do this action'
+		
 	messages.success(request, message)
 	return HttpResponseRedirect(reverse('admin-group-management'))
-
+	
 
 def grant_access(request):
 	if request.user.groups.filter(name="heimdall-admin"):
@@ -210,7 +247,7 @@ def manage_groups(request):
 	
 	userRoles = UserRoles.objects.all()
 	roles = Roles.objects.all()
-	groups = Group.objects.exclude(name="heimdall-admin").exclude(name="heimdall")
+	groups = Group.objects.all
 	
 	args = utils.give_arguments(request.user, 'Group management')
 	args.update({'groups' : groups, 'servers': servers, 'users': users, 'roles': roles, 'userRoles' : userRoles})	

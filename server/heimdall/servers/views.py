@@ -26,7 +26,9 @@ def permissions(request):
         elif userConnected.groups.filter(name="heimdall"):
             if Permission.objects.filter(user=userConnected).count > 0:
                 print (Permission.objects.filter(user=userConnected).count)
-                permissions_visible = Permission.objects.get(user=userConnected)
+                
+                permissions_visible = Permission.objects.filter(user=userConnected)
+                
                 args.update({'permissions': convertToIterable(permissions_visible)})
     return render_to_response('permissions.html', args, context_instance=RequestContext(request))
 

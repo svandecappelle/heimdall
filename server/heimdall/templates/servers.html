@@ -1,4 +1,4 @@
-{% extends "layout-page.html" %}
+{% extends "layout-page.html" %} {% load tags %} 
 
 {% block import %}
 	<script type="text/javascript">
@@ -18,7 +18,7 @@
 
  	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
         <div style="float:left;display: inline-block; margin-right:50px;">
-      <table class="rounded-corner rounded-corner-with-footer">
+      <table class="bordered">
       	<thead>
       		<tr>
 			<th>Host</th>
@@ -42,11 +42,14 @@
       {% endfor %}
       </tbody>
       
+      {% ifusergroup heimdall-admin %}
       <tfoot>
       	<tr>
       	<td colspan="3" ><a href="/heimdall/admin/create_server">Créer un serveur.</a></td>
       	</tr>
       </tfoot>
+      {% endifusergroup %}
+      
       </table>
       
       </div>
@@ -54,7 +57,7 @@
       <div style="float:left;display: block;margin-right:20px;">
 	      <form id="form-server" style="display:none;" action="require_access" method="post" accept-charset="utf-8">
 	      {% csrf_token %}
-	      		<table class="rounded-corner">
+	      		<table class="bordered">
 		       	      <thead>
 		       	      	<tr>
 		       	      	<th colspan="2">Formulaire de demande d'accès</th>

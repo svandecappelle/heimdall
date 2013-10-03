@@ -22,7 +22,7 @@
 <h2>Edit an heimdall's user: </h2>
 
    <div class="inline-block">
-      <table class="rounded-corner">
+      <table class="bordered">
       	<thead>
       		<tr>
 			<th>Username</th>
@@ -50,7 +50,7 @@
     <div class="inline-block" style="margin-left: 10px;">
 			      <form id="form-updateuser" style="display:none;" action="register_user" method="post" accept-charset="utf-8">
 			      {% csrf_token %}
-					<table class="rounded-corner">
+					<table class="bordered">
 					      <thead>
 						<tr>
 						<th colspan="2">Modify a user to heimdall: </th>
@@ -103,7 +103,7 @@
 <div class="inline-block">
 			      <form id="form-user" action="register_user" method="post" accept-charset="utf-8">
 			      {% csrf_token %}
-					<table class="rounded-corner">
+					<table class="bordered">
 					      <thead>
 						<tr>
 						<th colspan="2">Add a user to heimdall: </th>

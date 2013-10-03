@@ -3,7 +3,7 @@
 <div class="inline-block">
 	<h2>Grant acces group to:</h2>
 	<div class="align-form">
-		<table class="rounded-corner rounded-corner-with-footer">
+		<table class="bordered">
 			<thead>
 				<tr>
 					<th>User</th>
@@ -13,27 +13,76 @@
 			</thead>
 
 			<tbody>
-				{% for user in users %}
+				{% for usertarget in users %}
 				<tr>
-					<td>{{ user }}</td>
-					<td>{% for agroup in user.groups.all%} {{agroup.name}} <a
-						href="/heimdall/admin/manage_user_group?groupname={{agroup.name}}">(manage)</a> {% endfor %}
-					</td>
-					<td>{% for arole in userRoles%} 
-							{% ifequal arole.user.username user.username %} 
-							{{arole.role.name}} <a href="manage_user_role?rolename={{arole.role.name}}">(manage)</a> {% endifequal %} 
+					<td>{{ usertarget }}</td>
+					<td>
+					
+					{% ifusergroup heimdall-admin %}
+					<!-- Interface admin -->	
+						{% for agroup in usertarget.groups.all%} 
+							{{agroup.name}}
+							<a href="/heimdall/admin/manage_user_group?groupname={{agroup.name}}">(manage)</a> 
 						{% endfor %}
+					
+						<form action="/heimdall/admin/manage_group" method="post" accept-charset="utf-8">
+							{% csrf_token%} 
+							<input type="hidden" name="type" value="add" />
+							<input type="hidden" name="username" value="{{ usertarget }}" />
+							<select name="groupname">
+								{% for role in groups %}
+									{% ifisa usertarget role.name %}
+										
+									{% else %}
+										<option>{{role.name}}</option>
+									{% endifisa %}
+								{% endfor %}
+							</select>
+								
+							<input type="submit" value="→ add to group">
+						</form>
+					<!-- Interface manager -->	
+					{% else %}
+						{% for agroup in usertarget.groups.all%} 
+							{{agroup.name}} 
+						{% endfor %}
+					{% endifusergroup %}
+					</td>
+					<td>
+						<form action="/heimdall/admin/manage_group" method="post" accept-charset="utf-8">
+							{% csrf_token%} 
+							<input type="hidden" name="type" value="add" />
+							<input type="hidden" name="username" value="{{ usertarget }}" />
+							{% for arole in userRoles%} 
+								{% ifequal arole.user.username usertarget.username %}
+									{{arole.role.name}} 
+									<a href="manage_user_role?rolename={{arole.role.name}}">(manage)</a>
+								{% endifequal %} 
+							{% endfor %}
+							<br/>
+							<select name="groupname">
+								{% for arole in userRoles%}
+									{% ifhasrole usertarget arole.role.name %}
+									{% else %}
+										<option>{{arole.role.name}}</option>
+									{% endifhasrole %}
+								
+								{% endfor %}
+							</select>
+							
+							<input type="submit" value="→ add role">
+						</form>
 					</td>
 				</tr>
 				{% endfor %}
 			</tbody>
 			<tfoot>
 				<tr>
-					<form id="form-permission" action="/heimdall/admin/add_to_group"
+					<form action="/heimdall/admin/add_to_group"
 						method="post" accept-charset="utf-8">
 						{% csrf_token%}
-						<td><select name="username"> {% for user in users %}
-								<option>{{user.username}}</option> {% endfor %}
+						<td><select name="username"> {% for usertarget in users %}
+								<option>{{usertarget.username}}</option> {% endfor %}
 						</select></td>
 						<td></td>
 						<td><select name="rolename"> {% for role in roles %}
@@ -52,7 +101,7 @@
 <div class="inline-block">
 	<h2>Create a group:</h2>
 	<div class="form">
-		<form id="form-permission-from-scratch" class="default-block"
+		<form class="default-block"
 			action="/heimdall/admin/add_group" method="post"
 			accept-charset="utf-8">
 			{% csrf_token %}
@@ -90,13 +139,10 @@
 				<tr>
 					<td><label for="text">{{role.name}}</label></td>
 					<td>
-						<form id="form-permission-from-scratch" class="default-block"
-							action="/heimdall/admin/change_perimeter_role" method="get"
-							accept-charset="utf-8">
-							{% csrf_token %} <input type="hidden" value="{{role.name}}"
-								name="groupname" />
-							<button type="submit">click here for change the role
-								perimeter</button>
+						<form class="default-block" action="/heimdall/admin/change_perimeter_role" method="get" accept-charset="utf-8">
+							{% csrf_token %} 
+							<input type="hidden" value="{{role.name}}" name="groupname" />
+							<button type="submit">click here for change the role perimeter</button>
 						</form>
 					</td>
 				</tr>

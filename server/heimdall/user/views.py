@@ -57,7 +57,7 @@ def deposite(request):
         if SshKeys.objects.filter(user=userConnected).count() > 0:
             key = SshKeys.objects.get(user=userConnected).key
         else:
-            key = None
+            key = ''
             
         form = UploadSshKeyForm()
 
@@ -108,7 +108,7 @@ def users(request):
 
 # HTTPS POST forms
 
-def login(request):
+def user_login(request):
     if request.method == 'POST':
         user = authenticate(username=request.POST['username'], password=request.POST['password'])
         if user is not None:
@@ -128,7 +128,7 @@ def login(request):
         messages.success(request, 'This page is not accessible.')
         return HttpResponseRedirect(reverse('index'))
 
-def logout(request):
+def user_logout(request):
     logout(request)
     return HttpResponseRedirect('home')
 
