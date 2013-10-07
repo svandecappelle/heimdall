@@ -24,6 +24,7 @@ urlpatterns = patterns('',
 	
 	url(r'^connect$', 'django.contrib.auth.views.login', {'template_name': 'heimdall/connect.html'}),
 	
+	url(r'^admin/install$', heimdall.admin.views.install, name='install'),
 	url(r'^admin/user$', heimdall.admin.views.user, name='admin-user'),
 	url(r'^admin/permissions$', heimdall.admin.views.permissions, name='admin-permissions'),
 	url(r'^admin/grant_access$', heimdall.admin.views.grant_access, name='admin-grant-permission'),

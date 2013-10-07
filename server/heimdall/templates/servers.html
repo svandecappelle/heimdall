@@ -37,6 +37,9 @@
 			{% if user.is_authenticated %}
 				<td><button onClick="showForm('{{ server.hostname }}')">Faire une demande d'accès</button></td>
 			{% endif %}
+			{% ifusergroup heimdall-admin %}
+				<td><a href="/heimdall/admin/create_server?hostname={{server.hostname}}">update</a></td>
+			{% endifusergroup %}
 		</tr>
         
       {% endfor %}
@@ -45,7 +48,7 @@
       {% ifusergroup heimdall-admin %}
       <tfoot>
       	<tr>
-      	<td colspan="3" ><a href="/heimdall/admin/create_server">Créer un serveur.</a></td>
+      		<td colspan="3" ><a href="/heimdall/admin/create_server">Créer un serveur.</a></td>
       	</tr>
       </tfoot>
       {% endifusergroup %}

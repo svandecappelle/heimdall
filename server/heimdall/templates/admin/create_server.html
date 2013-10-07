@@ -6,12 +6,17 @@
 		{% csrf_token %}
 		<tr>
 			<td><label for="hostname">hostname</label></td>
-			<td><input type="text" name="hostname" value=""/></td>
+			<td><input type="text" name="hostname" value="{{hostname}}"/></td>
 		</tr>
 
 		<tr>
 			<td><label for="description">Description</label></td>
-			<td><textarea rows="5" cols="20" name="description" ></textarea></td>
+			<td><textarea rows="5" cols="20" name="description">{{description}}</textarea></td>
+		</tr>
+		
+		<tr>
+			<td><label for="port">SSH Port</label></td>
+			<td><input type="text" name="port" value="{{port}}"/></td>
 		</tr>
 	</table>
 	<p>

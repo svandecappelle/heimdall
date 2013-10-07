@@ -96,18 +96,5 @@
 			</div>
 		{% endifusergroup %}
 	{% endif %}
-        
-        
       <!-- End of Content -->
-      
-      {% if user.is_authenticated %}
-      	{% ifusergroup heimdall-admin %}
-      		<div>
-      			<div>
-      				<h2>Ajouter un utilisateur</h2>
-      			</div>
-      		</div>
-      	{% endifusergroup %}
-      {%endif%}
-      
  {% endblock %}

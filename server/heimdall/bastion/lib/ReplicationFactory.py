@@ -44,13 +44,13 @@ from heimdall.bastion.lib.utils.Logger import Logger
 logger = Logger("ReplicationFactory", Constants.DEBUG)
 
 class ReplicationFactory: 
-	def replicate_one_server(self, server, userhost, key_rsa, userName, usermail):
+	def replicate_one_server(self, server, userhost, key_rsa, userName, usermail, port):
 		'''Replicate access on one server for one user'''
 		try:
 			client = SSHClient()
 			client.load_system_host_keys()
 			client.set_missing_host_key_policy(AutoAddPolicy())
-			client.connect('%s' % server, port=Constants.SSH_PORT, username=userhost)    
+			client.connect('%s' % server, port=port, username=userhost)    
 		
 			# ## Insert permission into server authorized_keys ssh file
 			stdin, stdout, stderr = client.exec_command("echo '%s' >> .ssh/authorized_keys" % key_rsa)
@@ -67,7 +67,7 @@ class ReplicationFactory:
 		client.close()
 		self.notify(server, userName, userhost, False, usermail)
 
-	def revoke_one_server(self, server, userhost, key_rsa, userName, usermail):
+	def revoke_one_server(self, server, userhost, key_rsa, userName, usermail, port):
 		"""
 		Delete a heimdall replication.
 		"""
@@ -75,7 +75,7 @@ class ReplicationFactory:
 			client = SSHClient()
 			client.load_system_host_keys()
 			client.set_missing_host_key_policy(AutoAddPolicy())
-			client.connect('%s' % server, port=Constants.SSH_PORT, username=userhost)    
+			client.connect('%s' % server, port=port, username=userhost)    
 		
 			# ## Insert permission into server authorized_keys ssh file
 			sshconfig_file = "~/.ssh/authorized_keys"

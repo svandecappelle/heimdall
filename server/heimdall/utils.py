@@ -13,11 +13,11 @@ def give_arguments(user, page_title):
 # utils
 def get_demands_filtered(user_filter):
 	demands = None
-	
-	if user_filter.is_anonymous:
+	if user_filter.is_anonymous == True:
+		print "anonymous"
 		return Demands.objects.filter(close_date__isnull=True,  priority='None')
-	
-	if user_filter.groups.filter(name="heimdall-admin"):
+
+	if user_filter.groups.filter(name="heimdall-admin").exists():
 		demands = Demands.objects.filter(close_date__isnull=True)
 	else:
 		demands = Demands.objects.filter(user=user_filter, close_date__isnull=True)

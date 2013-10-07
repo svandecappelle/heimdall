@@ -13,14 +13,13 @@ from heimdall.form import UploadSshKeyForm
 from heimdall.models import Server, Permission, Demands, SshKeys, UserRoles, RolePerimeter
 from heimdall.objects import Statistics
 
-
 # HTTP views
 
 # View connect
 def connect(request):
     args = utils.give_arguments(request.user, 'Connect')
-    return render_to_response('connect.html', args, context_instance=RequestContext(request))
-
+    return HttpResponseRedirect(reverse('deposite'))
+    
 # View deposite RSA
 def deposite(request):
     userConnected = request.user
@@ -79,6 +78,7 @@ def inbox(request):
 # View Home
 def index(request):
     user_count = Group.objects.get(name="heimdall").user_set.all().count()
+    user_count += Group.objects.get(name="heimdall-admin").user_set.all().count()
     server_count = Server.objects.all().count()
     keys_count = SshKeys.objects.all().count()
     demands_count = Demands.objects.filter(close_date__isnull=True).all().count()

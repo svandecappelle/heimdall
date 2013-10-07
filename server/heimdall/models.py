@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 class Server(models.Model):
 	hostname = models.CharField(max_length=50)
 	description = models.CharField(max_length=250)
+	port = models.IntegerField()
 	def __unicode__(self):
 		return u"%s" % (self.hostname)
 

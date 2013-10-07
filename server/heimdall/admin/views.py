@@ -5,6 +5,7 @@ from datetime import date
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -13,10 +14,44 @@ from heimdall import utils
 from heimdall.bastion.runner import Controller
 from heimdall.models import Server, Demands, SshKeys, Roles, RolePerimeter, UserRoles, Permission
 
+
+#Installation
+def install(request):
+	if not Group.objects.filter(name='heimdall').exists():
+		user_group = Group.objects.create(name='heimdall')
+		user_group.save()
+		print "heimdall group created"
+
+	
+	if not Group.objects.filter(name='heimdall-admin').exists():
+		group = Group.objects.create(name='heimdall-admin')
+		group.save()
+		print "admin group created"
+	else:
+		group = Group.objects.get(name='heimdall-admin')
+       
+	if not User.objects.filter(username='heimdall').exists():
+		new_user = User.objects.create_user(username="heimdall",password="heimdall")
+		new_user.groups.add(group)
+		new_user.save()
+		print "admin user created"
+    
+	messages.success(request, 'Installation successfull. You can connect with heimdall')
+	return render_to_response('index.html', context_instance=RequestContext(request))
+
+
+
 def user(request):
 	args = utils.give_arguments(request.user, 'Users admin')
 	if request.user.groups.filter(name="heimdall-admin"):
-		args.update({'list_users': Group.objects.get(name="heimdall").user_set.all()})
+		users = list(Group.objects.get(name="heimdall").user_set.all())
+		admin_users = Group.objects.get(name="heimdall-admin").user_set.all()
+		
+		for user in admin_users:
+			if user not in users:
+				users.append(user)
+		
+		args.update({'list_users': users})
 		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	else:
 		messages.success(request, 'You have not the rights to see this page')
@@ -48,15 +83,22 @@ def revoke_access(request):
 def create_server(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
-			
 			if request.POST['hostname']:
-				server = Server(hostname=request.POST['hostname'], description= request.POST['description'])
+				server = Server(hostname=request.POST['hostname'], description= request.POST['description'], port=request.POST['port'])
 				server.save()
 				messages.success(request, 'Server created')
 				return HttpResponseRedirect(reverse('servers'))
 			messages.success(request, 'Form datas in errors. Check your parameters.')
 			return HttpResponseRedirect(reverse('create-server'))
 		else:
+			if 'hostname' in request.GET:
+				host = Server.objects.get(hostname=request.GET['hostname'])
+				args = utils.give_arguments(request.user, 'Create server')
+				
+				args.update({'hostname' : host.hostname, 'description' : host.description, 'port': host.port})
+				return render_to_response('admin/create_server.html', args, context_instance=RequestContext(request))
+			
+			
 			return render_to_response('admin/create_server.html', context_instance=RequestContext(request))
 
 	else:
@@ -179,7 +221,9 @@ def manage_role(request):
 def grant_access(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
-			
+			user = None
+			host = None
+				
 			if request.POST['username'] != '[[ALL]]':
 				user = User.objects.get(username=request.POST['username'])
 			else:
@@ -197,8 +241,6 @@ def grant_access(request):
 			
 			request_type = request.POST['type']
 			if request_type == 'grant':
-				user = None
-				host = None
 				
 				message = None
 				
