@@ -17,43 +17,43 @@
 
 
  	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
-        <div style="float:left;display: inline-block; margin-right:50px;">
-      <table class="bordered">
-      	<thead>
-      		<tr>
-			<th>Host</th>
-			<th>Description</th>
-			{% if user.is_authenticated %}
-				<th>Action</th>
-			{% endif %}
-		</tr>
-	</thead>
-	 <tbody>
-        {% for server in list_servers %}
-       
-		<tr>
-			<td>{{ server.hostname }}</td>
-			<td>{{ server.description }}</td>
-			{% if user.is_authenticated %}
-				<td><button onClick="showForm('{{ server.hostname }}')">Faire une demande d'accès</button></td>
-			{% endif %}
-			{% ifusergroup heimdall-admin %}
-				<td><a href="/heimdall/admin/create_server?hostname={{server.hostname}}">update</a></td>
-			{% endifusergroup %}
-		</tr>
-        
-      {% endfor %}
-      </tbody>
-      
-      {% ifusergroup heimdall-admin %}
-      <tfoot>
-      	<tr>
-      		<td colspan="3" ><a href="/heimdall/admin/create_server">Créer un serveur.</a></td>
-      	</tr>
-      </tfoot>
-      {% endifusergroup %}
-      
-      </table>
+        <div class="inline-block" style="width:80%">
+	      <table class="bordered" style="width:100%">
+	      	<thead>
+	      		<tr>
+				<th>Host</th>
+				<th>Description</th>
+				{% if user.is_authenticated %}
+					<th colspan="2" >Actions</th>
+				{% endif %}
+			</tr>
+			</thead>
+		 	<tbody>
+	        {% for server in list_servers %}
+	       
+				<tr>
+					<td>{{ server.hostname }}</td>
+					<td>{{ server.description }}</td>
+					{% if user.is_authenticated %}
+						<td><button onClick="showForm('{{ server.hostname }}')">Faire une demande d'accès</button></td>
+					{% endif %}
+					{% ifusergroup heimdall-admin %}
+						<td><a href="/heimdall/admin/create_server?hostname={{server.hostname}}">update</a></td>
+					{% endifusergroup %}
+				</tr>
+	        
+	      	{% endfor %}
+	      	</tbody>
+	      
+	      	{% ifusergroup heimdall-admin %}
+		    <tfoot>
+		      	<tr>
+		      		<td colspan="4" ><a href="/heimdall/admin/create_server">Créer un serveur.</a></td>
+		      	</tr>
+		    </tfoot>
+	      	{% endifusergroup %}
+	      
+	      </table>
       
       </div>
       {% if user.is_authenticated %}

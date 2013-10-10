@@ -19,29 +19,24 @@ class SshKeys(models.Model):
 	user = models.ForeignKey(User)
 	key = models.CharField(max_length=4000)
 
-class Roles(models.Model):
+class HeimdallPool(models.Model):
+	name = models.CharField(max_length=250)
+
+class HeimdallUserRole(models.Model):	
 	ROLES_CHOICES = (
 	    ('ADMIN', 'ADMIN'),
 	    ('MANAGER', 'MANAGER'),
 	    ('USER', 'USER'),
 	)
-	name = models.CharField(max_length=250)
 	type = models.CharField(max_length=50, choices=ROLES_CHOICES)
-	description = models.CharField(max_length=1500)
-	def __unicode__(self):
-		return u"%s | %s" % (self.name, self.type)
-	
-class UserRoles(models.Model):
 	user = models.ForeignKey(User)
-	role = models.ForeignKey(Roles)
-	def __unicode__(self):
-		return u"%s | %s [%s]" % (self.user.username, self.role.name, self.role.type)
+	pool = models.ForeignKey(HeimdallPool)
 	
-class RolePerimeter(models.Model):
+class PoolPerimeter(models.Model):
 	server = models.ForeignKey(Server)
-	roles = models.ForeignKey(Roles)
+	pool = models.ForeignKey(HeimdallPool)
 	def __unicode__(self):
-		return u"%s | %s" % (self.server.hostname, self.roles.name)
+		return u"%s | %s" % (self.server.hostname, self.pool.name)
 
 class Demands(models.Model):
 	PRIORITY_CHOICES = (

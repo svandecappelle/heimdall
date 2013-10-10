@@ -5,14 +5,13 @@ from datetime import date
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
-from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from heimdall import utils
 from heimdall.bastion.runner import Controller
-from heimdall.models import Server, Demands, SshKeys, Roles, RolePerimeter, UserRoles, Permission
+from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission
 
 
 #Installation
@@ -29,13 +28,13 @@ def install(request):
 		print "admin group created"
 	else:
 		group = Group.objects.get(name='heimdall-admin')
-       
+		
 	if not User.objects.filter(username='heimdall').exists():
 		new_user = User.objects.create_user(username="heimdall",password="heimdall")
 		new_user.groups.add(group)
 		new_user.save()
 		print "admin user created"
-    
+
 	messages.success(request, 'Installation successfull. You can connect with heimdall')
 	return render_to_response('index.html', context_instance=RequestContext(request))
 
@@ -123,16 +122,16 @@ def getarguments_for_admin(user):
 	return args
 
 def getarguments_for_manager(user):
-	roles = UserRoles.objects.filter(user=user)
-	perimeters = RolePerimeter.objects.filter(roles = roles)
+	pools = HeimdallUserRole.objects.filter(user=user)
+	perimeters = PoolPerimeter.objects.filter(pool = pools)
 
 	servers=[]
 	for one_perimeter in perimeters:	
 		servers.append(one_perimeter.server)
 
 	users=[]
-	for one_role_user in roles:
-		user_role = UserRoles.objects.filter(role=one_role_user.role)
+	for one_role_pool in pools:
+		user_role = HeimdallUserRole.objects.filter(pool=one_role_pool.pool)
 		for users_roles in user_role:
 			users.append(users_roles.user)
 	
@@ -153,9 +152,9 @@ def add_to_group(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 			user = User.objects.get(username=request.POST['username'])
-			role = Roles.objects.get(name=request.POST['rolename'])
+			pool = HeimdallPool.objects.get(name=request.POST['poolname'])
 			
-			new_userrole = UserRoles(user=user, role=role)
+			new_userrole = HeimdallUserRole(user=user, pool=pool, type="USERS")
 			new_userrole.save()
 			
 			messages.success(request, 'Role associated')
@@ -168,17 +167,17 @@ def add_to_group(request):
 	return HttpResponseRedirect(reverse('admin-group-management'))
 
 def manage_user_role(request):
-	roles = Roles.objects.filter(name=request.GET['rolename'])	
-	userRoles = UserRoles.objects.filter(role=roles)
+	pool = HeimdallPool.objects.filter(name=request.GET['poolname'])	
+	userRoles = HeimdallUserRole.objects.filter(pool=pool)
 	usersToFilter = []
-	for userRole in UserRoles.objects.filter(role=roles):
+	for userRole in HeimdallUserRole.objects.filter(pool=pool):
 		print (userRole.user)
 		usersToFilter.append(userRole.user.username)
 		
 	users = User.objects.exclude(username__in=usersToFilter)
 	print (users)
 	args = utils.give_arguments(request.user, 'Role management')
-	args.update({'userRoles' : userRoles , 'users':users, 'rolename' : request.GET['rolename']})	
+	args.update({'userRoles' : userRoles , 'users':users, 'poolname' : request.GET['poolname']})	
 	
 	return render_to_response('admin/manage_user_role.html',args, context_instance=RequestContext(request))
 
@@ -201,12 +200,12 @@ def manage_group(request):
 def manage_role(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		user = User.objects.get(username=request.POST['username'])
-		role = Roles.objects.get(name=request.POST['rolename'])
+		pool = HeimdallPool.objects.get(name=request.POST['poolname'])
 		
 		if request.POST['type'] == "add":
-			UserRoles.objects.create(user=user,role=role)
+			HeimdallUserRole.objects.create(user=user,pool=pool)
 		else:
-			userRole = UserRoles.objects.get(user=user,role=role)
+			userRole = HeimdallUserRole.objects.get(user=user,pool=pool)
 			userRole.delete()
 		
 		message = 'Group modified'
@@ -287,21 +286,21 @@ def manage_groups(request):
 	servers = Server.objects.all()	
 	users = User.objects.all()
 	
-	userRoles = UserRoles.objects.all()
-	roles = Roles.objects.all()
+	userRoles = HeimdallUserRole.objects.all()
+	pool = HeimdallPool.objects.all()
 	groups = Group.objects.all
 	
 	args = utils.give_arguments(request.user, 'Group management')
-	args.update({'groups' : groups, 'servers': servers, 'users': users, 'roles': roles, 'userRoles' : userRoles})	
+	args.update({'groups' : groups, 'servers': servers, 'users': users, 'roles': pool, 'userRoles' : userRoles})	
 	
 	return render_to_response('admin/groups.html', args, context_instance=RequestContext(request))
 
 def add_group(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
-			if Roles.objects.filter(name=request.POST['groupname']).count() == 0:
-				new_role = Roles(name=request.POST['groupname'], type=request.POST['grouptype'])
-				new_role.save()
+			if HeimdallPool.objects.filter(name=request.POST['groupname']).count() == 0:
+				pool = HeimdallPool(name=request.POST['groupname'])
+				pool.save()
 				messages.success(request, "Your data has been saved!")
 			else:
 				messages.success(request, "Group already exists")
@@ -310,22 +309,23 @@ def add_group(request):
 			
 	return render_to_response("index.html", context_instance=RequestContext(request))
 
-def change_perimeter_role(request):
+def perimeter_pool(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		servers = Server.objects.all()
 		if request.method == 'POST':
-			role = Roles.objects.get(name=request.POST['groupname'])
-			server = Server.objects.get(hostname=request.POST['hostname'])
-			role_perimeter = RolePerimeter.objects.filter(roles=Roles.objects.get(name=request.POST['groupname']))
+			pool = HeimdallPool.objects.get(name=request.POST['poolname'])
+			if 'hostname' in request.POST:
+				server = Server.objects.get(hostname=request.POST['hostname'])
+				role_perimeter = PoolPerimeter.objects.filter(pool=HeimdallPool.objects.get(name=request.POST['poolname']))
 			
 			if request.POST['action'] == 'add':
 				
-				is_allow_to_add = RolePerimeter.objects.filter(roles=role, server=server).count() == 0
+				is_allow_to_add = PoolPerimeter.objects.filter(pool=pool, server=server).count() == 0
 				print is_allow_to_add
 				if is_allow_to_add:
-					new_perimeter = RolePerimeter(roles=role, server=server)
+					new_perimeter = PoolPerimeter(pool=pool, server=server)
 					new_perimeter.save()
-					role_perimeter = RolePerimeter.objects.filter(roles=Roles.objects.get(name=request.POST['groupname']))
+					role_perimeter = PoolPerimeter.objects.filter(pool=HeimdallPool.objects.get(name=request.POST['poolname ']))
 					messages.success(request, "Group perimeter modified")
 					return HttpResponseRedirect(reverse('admin-group-management'))
 				else:                                                                                                    
@@ -334,10 +334,10 @@ def change_perimeter_role(request):
 					return HttpResponseRedirect(reverse('admin-group-management'))
 					
 			elif request.POST['action'] == 'remove':
-				is_allow_to_remove = RolePerimeter.objects.filter(roles=role, server=server).count() == 1
+				is_allow_to_remove = HeimdallPool.objects.filter(pool=pool, server=server).count() == 1
 				if is_allow_to_remove:
 					
-					perimeter_to_delete = RolePerimeter.objects.get(roles=role, server=server)
+					perimeter_to_delete = PoolPerimeter.objects.get(pool=pool, server=server)
 					perimeter_to_delete.delete()
 					args = utils.give_arguments(request.user, 'Group management')
 					messages.success(request, "Group perimeter modified")
@@ -346,17 +346,32 @@ def change_perimeter_role(request):
 					args = utils.give_arguments(request.user, 'Group management')
 					messages.success(request, "Server not present in the perimeter")
 					return HttpResponseRedirect(reverse('admin-group-management'))
+			elif request.POST['action'] == 'setmanager':
+				user_pool = User.objects.get(username=request.POST['username'])
+				user_pool_role = HeimdallUserRole.objects.get(pool=pool,user=user_pool)
+				user_pool_role.type='MANAGER'
+				user_pool_role.save()
+				
+				messages.success(request, "Manager added")
+				return HttpResponseRedirect(reverse('admin-group-management'))
+			
+			else:
+				messages.success(request, "Action not enabled")
+				return HttpResponseRedirect(reverse('admin-group-management'))
 		else:
-			role_perimeter = RolePerimeter.objects.filter(roles=Roles.objects.get(name=request.GET['groupname']))
+			pool = HeimdallPool.objects.get(name=request.GET['poolname'])
+			role_perimeter = PoolPerimeter.objects.filter(pool=pool)
 			
 			server_perimeter = []
 			
 			for role in role_perimeter:
 				server_perimeter.append(role.server)
 			
+			managers_in_pool = HeimdallUserRole.objects.filter(pool=pool,type="MANAGER")
+			users_not_manager_in_pool = HeimdallUserRole.objects.filter(pool=pool, type="USER")
 			args = utils.give_arguments(request.user, 'Group management')
-			args.update({'perimeter': role_perimeter, 'servers' : servers, 'groupname': request.GET['groupname'], 'server_perimeter':server_perimeter })	
-			return render_to_response("admin/role_perimeter.html", args, context_instance=RequestContext(request))
+			args.update({'perimeter': role_perimeter, 'servers' : servers, 'poolname': request.GET['poolname'], 'server_perimeter':server_perimeter ,"managers_in_pool" : managers_in_pool , 'users_not_manager_in_pool' : users_not_manager_in_pool})	
+			return render_to_response("admin/pool_perimeter.html", args, context_instance=RequestContext(request))
 
 def register_user(request):
 	if request.user.groups.filter(name="heimdall-admin"):

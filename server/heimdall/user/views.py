@@ -10,15 +10,10 @@ from django.shortcuts import render_to_response
 
 from heimdall import utils
 from heimdall.form import UploadSshKeyForm
-from heimdall.models import Server, Permission, Demands, SshKeys, UserRoles, RolePerimeter
+from heimdall.models import Server, Permission, Demands, SshKeys, HeimdallPool,HeimdallUserRole, PoolPerimeter
 from heimdall.objects import Statistics
 
 # HTTP views
-
-# View connect
-def connect(request):
-    args = utils.give_arguments(request.user, 'Connect')
-    return HttpResponseRedirect(reverse('deposite'))
     
 # View deposite RSA
 def deposite(request):
@@ -66,9 +61,9 @@ def deposite(request):
     
 # View demands inbox
 def inbox(request):
-    userRoles = UserRoles.objects.filter(user=request.user).values_list('role')
-    rolePerimeters = RolePerimeter.objects.filter(roles=userRoles).values_list('server')
-    demands = Demands.objects.filter(server=rolePerimeters)
+    pool_role = HeimdallUserRole.objects.filter(user=request.user, type="MANAGER")
+    poolPerimeters = PoolPerimeter.objects.filter(pool=pool_role).values_list('server')
+    demands = Demands.objects.filter(server=poolPerimeters)
    
     args = utils.give_arguments(request.user, 'Messages')
     args.update({'demands': demands})

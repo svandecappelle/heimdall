@@ -3,17 +3,17 @@
 
 {% block content %}
 
- 	<div class="inline-block">
+ 	<div class="inline-block" style="width:50%">
 		<h2>Add a user permission:</h2>
-		<div class="align-form">
-	      			<table class="bordered">
+		<div class="align-form" style="width:100%">
+	      			<table class="bordered" style="width:100%">
 				      	<thead>
 				      		<tr>
 							<th>User</th>
 							<th>Host</th>
 							<th>User in host</th>
 							{% if user.is_authenticated %}
-								<th>Grant access</th>
+								<th colspan="2">Access</th>
 							{% endif %}
 						</tr>
 					</thead>
@@ -53,7 +53,7 @@
 					{% if demands %}
 					<tfoot>					
 						<tr>
-							<td colspan="4">
+							<td colspan="5">
 								<form id="form-permission" action="/heimdall/admin/grant_access" method="post" accept-charset="utf-8">
 								{% csrf_token %}
 									<input type="hidden" value="[[ALL]]" name="username"/>
@@ -74,7 +74,8 @@
 		<div class="form">
 			<form id="form-permission-from-scratch" class="default-block" action="/heimdall/admin/grant_access" method="post" accept-charset="utf-8">
 			{% csrf_token %}
-				<table>
+				<table class="bordered">
+					<thead><tr><th colspan="2">Permission properties</th></tr></thead>
 					<tbody>
 						<tr>
 							<td>
@@ -114,11 +115,11 @@
 		</div>
 	</div>
 	
-	<div>
+	<div class="inline-block" style="width:50%">
 		<h2>Revoke an access</h2>
 		
-		<div class="align-form">
-	      			<table class="rounded-corner">
+		<div class="align-form" style="width:100%">
+	      			<table class="bordered" style="width:100%">
 				      	<thead>
 				      		<tr>
 							<th>User</th>

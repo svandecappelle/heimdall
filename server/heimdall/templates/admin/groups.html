@@ -1,14 +1,14 @@
 {% extends "layout-page.html" %} {% block content %} {% load tags %}
 
-<div class="inline-block">
+<div class="inline-block" style="width:100%">
 	<h2>Grant acces group to:</h2>
-	<div class="align-form">
-		<table class="bordered">
+	<div class="align-form" style="width:100%">
+		<table class="bordered" style="width:100%">
 			<thead>
 				<tr>
 					<th>User</th>
 					<th>Group</th>
-					<th>Role</th>
+					<th>Pool</th>
 				</tr>
 			</thead>
 
@@ -55,16 +55,16 @@
 							<input type="hidden" name="username" value="{{ usertarget }}" />
 							{% for arole in userRoles%} 
 								{% ifequal arole.user.username usertarget.username %}
-									{{arole.role.name}} 
-									<a href="manage_user_role?rolename={{arole.role.name}}">(manage)</a>
+									{{arole.pool.name}} 
+									<a href="manage_user_role?poolname={{arole.pool.name}}">(manage)</a>
 								{% endifequal %} 
 							{% endfor %}
 							<br/>
 							<select name="groupname">
 								{% for arole in userRoles%}
-									{% ifhasrole usertarget arole.role.name %}
+									{% ifhasrole usertarget arole.pool.name %}
 									{% else %}
-										<option>{{arole.role.name}}</option>
+										<option>{{arole.pool.name}}</option>
 									{% endifhasrole %}
 								
 								{% endfor %}
@@ -85,7 +85,7 @@
 								<option>{{usertarget.username}}</option> {% endfor %}
 						</select></td>
 						<td></td>
-						<td><select name="rolename"> {% for role in roles %}
+						<td><select name="poolname"> {% for role in roles %}
 								<option>{{role.name}}</option> {% endfor %}
 						</select> {% if user.is_authenticated %} <input type="submit"
 							value="Add role" /> {% endif %}</td>
@@ -98,26 +98,19 @@
 </div>
 
 {% ifusergroup heimdall-admin %}
-<div class="inline-block">
-	<h2>Create a group:</h2>
-	<div class="form">
+<div class="inline-block" style="width:50%">
+	<h2>Create a pool:</h2>
+	<div class="form" style="width:100%">
 		<form class="default-block"
 			action="/heimdall/admin/add_group" method="post"
-			accept-charset="utf-8">
+			accept-charset="utf-8" style="width:100%">
 			{% csrf_token %}
-			<table>
+			<table class="bordered" style="width:100%">
+				<thead><tr><th colspan="2">Create a pool</th></tr></thead>
 				<tbody>
 					<tr>
 						<td><label for="groupname">Group name</label></td>
 						<td><input type="text" name="groupname" /></td>
-					</tr>
-					<tr>
-						<td><label for="grouptype">Type</label></td>
-						<td><select name="grouptype">
-								<option value="ADMIN">Administrateur</option>
-								<option value="MANAGER">Manager</option>
-								<option value="USER">Utilisateur</option>
-						</select></td>
 					</tr>
 					<tr>
 						<td colspan="2"><input type="submit" value="Create" /></td>
@@ -129,19 +122,20 @@
 </div>
 
 
-<div class="inline-block">
+<div class="inline-block" style="width:49%">
 	<h2>Modify the role perimeter:</h2>
-	<div class="form">
+	<div class="form" style="width:100%">
 
-		<table>
+		<table class="bordered" style="width:100%">
+			<thead><tr><th colspan="2">Manage a pool</th></tr></thead>
 			<tbody>
 				{% for role in roles %}
 				<tr>
 					<td><label for="text">{{role.name}}</label></td>
 					<td>
-						<form class="default-block" action="/heimdall/admin/change_perimeter_role" method="get" accept-charset="utf-8">
+						<form class="default-block" action="/heimdall/admin/perimeter_pool" method="get" accept-charset="utf-8">
 							{% csrf_token %} 
-							<input type="hidden" value="{{role.name}}" name="groupname" />
+							<input type="hidden" value="{{role.name}}" name="poolname" />
 							<button type="submit">click here for change the role perimeter</button>
 						</form>
 					</td>

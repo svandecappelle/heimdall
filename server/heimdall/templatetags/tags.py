@@ -2,7 +2,7 @@ from django import template
 from django.template import resolve_variable, NodeList
 from django.contrib.auth.models import Group, User
 
-from heimdall.models import UserRoles, Roles
+from heimdall.models import HeimdallUserRole, HeimdallPool
 
 register = template.Library()
 
@@ -135,10 +135,10 @@ class RoleTypeCheck(template.Node):
         allowed = False
         
         user = resolve_variable('user', context)
-        userroles = UserRoles.objects.filter(user=user)
+        userroles = HeimdallUserRole.objects.filter(user=user)
 
         for role in userroles:
-            if role.role.type == 'MANAGER':
+            if role.type == 'MANAGER':
                 allowed = True
                 break
         
@@ -188,8 +188,8 @@ class RoleCheck(template.Node):
         user = resolve_variable(self.oneusername, context)
         role = resolve_variable(self.role, context)
         
-        role = Roles.objects.get(name=role);
-        if UserRoles.objects.filter(user=user, role = role):
+        pool = HeimdallPool.objects.get(name=role);
+        if HeimdallUserRole.objects.filter(user=user, pool = pool):
             print "false"
             return self.nodelist_true.render(context)
         else:

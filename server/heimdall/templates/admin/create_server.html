@@ -1,26 +1,32 @@
 {% extends "layout-page.html" %} {% block content %} {% load tags %} 
 {% if user.is_authenticated %} {% ifusergroup heimdall-admin %}
-<form action="/heimdall/admin/create_server" method="post" accept-charset="utf-8">
 
-	<table>
-		{% csrf_token %}
-		<tr>
-			<td><label for="hostname">hostname</label></td>
-			<td><input type="text" name="hostname" value="{{hostname}}"/></td>
-		</tr>
-
-		<tr>
-			<td><label for="description">Description</label></td>
-			<td><textarea rows="5" cols="20" name="description">{{description}}</textarea></td>
-		</tr>
+<div class="inline-block">
+	<h2>Server configuration</h2>
+	<div class="form default-block">		
+		<form action="/heimdall/admin/create_server" method="post" accept-charset="utf-8">
 		
-		<tr>
-			<td><label for="port">SSH Port</label></td>
-			<td><input type="text" name="port" value="{{port}}"/></td>
-		</tr>
-	</table>
-	<p>
-		<input type="submit" value="Create →">
-	</p>
-</form>
+			<table>
+				{% csrf_token %}
+				<tr>
+					<td><label for="hostname">hostname</label></td>
+					<td><input type="text" name="hostname" value="{{hostname}}"/></td>
+				</tr>
+		
+				<tr>
+					<td><label for="description">Description</label></td>
+					<td><textarea rows="5" cols="20" name="description">{{description}}</textarea></td>
+				</tr>
+				
+				<tr>
+					<td><label for="port">SSH Port</label></td>
+					<td><input type="text" name="port" value="{{port}}"/></td>
+				</tr>
+			</table>
+			<p>
+				<input type="submit" value="Create →">
+			</p>
+		</form>
+	</div>
+</div>
 {% endifusergroup %}{% endif %} {% endblock %}

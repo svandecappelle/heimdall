@@ -3,7 +3,7 @@
 {% block import %}
 	<script type="text/javascript">
 		function showForm(user_target){
-			$("#form-updateuser").slideDown();
+			$("#form-updateuser").fadeIn();
 			$("#form-updateuser-username").val(user_target.username);
 			$("#form-updateuser-firstname").val(user_target.username);
 			//$("#users-updateuser").set_style("left");
@@ -11,8 +11,8 @@
 		}
 		function hideForm(){
 			//$("#users-updateuser").float="none";
-			$("#form-updateuser").slideUp();
-			$("#form-adduser").slideDown();
+			$("#form-updateuser").fadeOut();
+			$("#form-adduser").fadeIn();
 		}
 	</script> 
 {% endblock %}
@@ -21,7 +21,7 @@
  {% block content %}
 <h2>Edit an heimdall's user: </h2>
 
-   <div class="inline-block">
+   <div class="inline-block" style="vertical-align: top; width:30%;">
       <table class="bordered">
       	<thead>
       		<tr>
@@ -47,7 +47,7 @@
       
     </div>
 
-    <div class="inline-block" style="margin-left: 10px;">
+    <div class="inline-block" style="margin-left: 10px; width:30%; position: absolute; left:35%">
 			      <form id="form-updateuser" style="display:none;" action="register_user" method="post" accept-charset="utf-8">
 			      {% csrf_token %}
 					<table class="bordered">
@@ -100,7 +100,7 @@
 <div style="width:100%; display:inline-block;">
 <div id="form-adduser">
 <h2>Add a user on heimdall: </h2>
-<div class="inline-block">
+<div class="inline-block" style="width:30%;">
 			      <form id="form-user" action="register_user" method="post" accept-charset="utf-8">
 			      {% csrf_token %}
 					<table class="bordered">
@@ -139,7 +139,7 @@
 						      <td><select name="role"><option value="ADMIN">Administrator</option><option value="USER">User</option></select></td>
 					      </tr>
 					       <tr>
-						      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
+						      <td colspan="2" style="text-align:right;"><button>Add user</button></td>
 					      </tr>
 					      </tbody>
 				      </table>

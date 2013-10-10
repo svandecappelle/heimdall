@@ -4,9 +4,9 @@
  	{% if not user.is_authenticated %}
  		<h2>Vous devez etre connecté pour voir cette page</h2>
  	{% else %}
-		<div class="inline-block">
+		<div class="inline-block" style="width:40%">
 			<h2>Upload your key</h2>
-			<div class="form default-block">		
+			<div class="form default-block" style="width:100%">		
 				<form style="padding: 3px;" action="deposite" method="post" enctype="multipart/form-data">
 				    {% csrf_token %}
 				    <input type="hidden" name="type" value="upload"/>
@@ -21,13 +21,13 @@
 			</div>
 		</div>
 		{% if key != None %}
-			<div class="inline-block">
+			<div class="inline-block" style="width:50%">
 				<h2>Or update it</h2>
-				<div class="form default-block">
-					<form style="padding: 3px;" action="deposite" method="post" enctype="multipart/form-data">
+				<div class="form default-block" style="width:100%">
+					<form style="padding: 10px;" action="deposite" method="post" enctype="multipart/form-data">
 					    {% csrf_token %}
 						<input type="hidden" name="type" value="update"/>
-						<textarea style="width:500px; height:150px;" name="key" >{{key}}</textarea>
+						<textarea style="width:100%; height:150px;" name="key" >{{key}}</textarea>
 					    <p><input type="submit" value="Update" /></p>
 					</form>
 				</div>

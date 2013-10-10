@@ -1,12 +1,12 @@
-{% extends "layout-page.html" %} {% block content %}
+{% extends "layout-page.html" %} {% block content %} {% load tags %}
 
-<div class="inline-block">
-	<h2>Members of {{rolename}}:</h2>
-	<div class="align-form">
-		<table class="rounded-corner rounded-corner-with-footer">
+<div class="inline-block" style="width:50%">
+	<h2>Members of {{poolname}}:</h2>
+		<table class="bordered">
 			<thead>
 				<tr>
 					<th>Users</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 
@@ -17,7 +17,7 @@
 						accept-charset="utf-8">
 						{% csrf_token%} <input type="hidden" name="type" value="remove" />
 						<input type="hidden" name="username" value="{{ member.user.username }}" />
-						<input type="hidden" name="rolename" value="{{ rolename }}" />
+						<input type="hidden" name="poolname" value="{{ poolname }}" />
 					<td style="with: 100%">{{ member.user }}</td>
 					<td><input type="submit" value="Remove user"></td>
 					</form>
@@ -30,7 +30,7 @@
 					<form action="/heimdall/admin/manage_role" method="post"
 						accept-charset="utf-8">
 						{% csrf_token%} <input type="hidden" name="type" value="add" />
-						<input type="hidden" name="groupname" value="{{ rolename }}" />
+						<input type="hidden" name="groupname" value="{{ poolname }}" />
 					<td><select name="username"> {% for user in users %}
 							<option>{{user.username}}</option> {% endfor %}
 					</select></td>
@@ -39,7 +39,61 @@
 				</form>
 			</tfoot>
 		</table>
-	</div>
 </div>
+
+
+
+<!-- Admins -->
+{% ifusergroup heimdall-admin %}
+<div class="inline-block" style="width:30%">
+   <h2>Managers of group {{groupname}}:</h2>
+	<table class="bordered">
+		<thead>
+			<tr>
+				<th>User</th>
+				<th>Role</th>
+			</tr>
+		</thead>
+		<tbody>
+				{% for users in users_in_pool %}
+				<tr>
+					<td>
+						<span>{{users.user.username}}</span>
+					</td>
+					<td>
+						 <form class="default-block" action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+						 {% csrf_token %}
+						 	<input type="submit" name="remove" value="Remove"/>
+						 </form>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+			<tfoot>
+				
+					<tr>
+						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+						{% csrf_token %}
+						<td>
+							<select name="hostname">
+								{% for users in users_not_in_pool %}
+									<option>{{users.user.username}}</option>
+								{% endfor %}
+							</select>
+						</td>
+						<td>
+								<input type="submit" name="add" value="Change to manager"/>
+								<input type="hidden" name="action" value="setmanager"/>
+								<input type="hidden" name="poolname" value="poolname"/>
+							 </form>
+						</td>
+						</form>
+					</tr>
+			</tfoot>
+		</table>
+	</form>
+</div>	
+{% endifusergroup %}
+
 
 {% endblock %}

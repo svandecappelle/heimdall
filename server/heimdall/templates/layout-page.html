@@ -128,8 +128,9 @@
           		{% ifusergroup heimdall-admin %}
           			<li><a href="/heimdall/users"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/>Utilisateurs</a></li>
           		{% endifusergroup %}
-          		<li><a href="/heimdall/servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/>Serveurs</a></li>
+          		
           		{% if user.is_authenticated %}
+	          		<li><a href="/heimdall/servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/>Serveurs</a></li>
 	          		<li><a href="/heimdall/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/>Permissions</a></li>
 	          		<li><a href="/heimdall/deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/>Dépot</a></li>
 					
