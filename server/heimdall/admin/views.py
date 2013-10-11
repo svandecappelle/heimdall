@@ -83,10 +83,19 @@ def create_server(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 			if request.POST['hostname']:
-				server = Server(hostname=request.POST['hostname'], description= request.POST['description'], port=request.POST['port'])
+				
+				if Server.objects.filter(hostname=request.POST['hostname']).exists():
+					server = Server.objects.get(hostname=request.POST['hostname'])
+					messages.success(request, 'Server updated')
+				
+				else:
+					server = Server(hostname=request.POST['hostname'], description= request.POST['description'], port=request.POST['port'])
+					messages.success(request, 'Server created')
+				
 				server.save()
-				messages.success(request, 'Server created')
+			
 				return HttpResponseRedirect(reverse('servers'))
+
 			messages.success(request, 'Form datas in errors. Check your parameters.')
 			return HttpResponseRedirect(reverse('create-server'))
 		else:
