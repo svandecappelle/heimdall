@@ -10,7 +10,7 @@
 				{% csrf_token %}
 				<tr>
 					<td><label for="hostname">hostname</label></td>
-					<td><input type="text" name="hostname" value="{{hostname}}"/></td>
+					<td><input type="text" name="hostname" value="{{hostname}}" {%if hostname %}readonly{%endif%}/></td>
 				</tr>
 		
 				<tr>

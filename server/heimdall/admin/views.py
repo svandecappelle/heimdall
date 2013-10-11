@@ -86,6 +86,8 @@ def create_server(request):
 				
 				if Server.objects.filter(hostname=request.POST['hostname']).exists():
 					server = Server.objects.get(hostname=request.POST['hostname'])
+					server.description = request.POST['description']
+					server.port = request.POST['port']
 					messages.success(request, 'Server updated')
 				
 				else:
