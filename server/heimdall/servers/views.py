@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib import messages
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
@@ -28,13 +27,13 @@ def permissions(request):
                 permissions_visible = Permission.objects.filter(user=userConnected)
                 
                 args.update({'permissions': convertToIterable(permissions_visible)})
-    return render_to_response('permissions.html', args, context_instance=RequestContext(request))
+    return render_to_response('user/permissions.html', args, context_instance=RequestContext(request))
 
 
 
 def convertToIterable(permissions_visible):
     try:
-        some_object_iterator = iter(permissions_visible)
+        iter(permissions_visible)
         permissions_visible_to_return = permissions_visible
     except TypeError:
         permissions_visible_to_return = [1]

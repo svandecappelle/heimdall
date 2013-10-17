@@ -1,8 +1,8 @@
 from django import template
 from django.template import resolve_variable, NodeList
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 
-from heimdall.models import HeimdallUserRole, HeimdallPool
+from heimdall.models import HeimdallUserRole, HeimdallPool, Server, PoolPerimeter
 
 register = template.Library()
 
@@ -106,11 +106,9 @@ def ifhasroletype(parser, token):
     """
     try:
         tokensp = token.contents.split()
-        user = tokensp[1]
-        roletype = []
-        roletype += tokensp[2:]
+        roletype = tokensp[1]
     except ValueError:
-        raise template.TemplateSyntaxError("Tag 'ifhasroletype' requires at least 2 arguments.")
+        raise template.TemplateSyntaxError("Tag 'ifhasroletype' requires exactly 1 arguments.")
     
     nodelist_true = parser.parse(('else', 'endifhasroletype'))
     token = parser.next_token()
@@ -121,27 +119,140 @@ def ifhasroletype(parser, token):
     else:
         nodelist_false = NodeList()
     
-    return RoleTypeCheck(user, roletype, nodelist_true, nodelist_false)
+    return RoleTypeCheck(roletype, nodelist_true, nodelist_false)
 
 
 
-class RoleTypeCheck(template.Node):
-    def __init__(self, oneusername, groups, nodelist_true, nodelist_false):
-        self.groups = groups
-        self.oneusername = oneusername
+@register.tag()
+def ifpoolandtype(parser, token):
+    """ Check to see if the currently logged in user belongs to one or more groups
+    Requires the Django authentication contrib app and middleware.
+
+    Usage: {% ifhasroletype Admins %} ... {% ifhasroletype %}, or
+           {% ifhasroletype Admins Clients Programmers Managers %} ... {% else %} ... {% endifusergroup %}
+
+    """
+    try:
+        tokensp = token.contents.split()
+        pool = tokensp[1]
+        roletype = tokensp[2]
+    except ValueError:
+        raise template.TemplateSyntaxError("Tag 'ifpoolandtype' requires at least 2 arguments.")
+    
+    nodelist_true = parser.parse(('else', 'endifpoolandtype'))
+    token = parser.next_token()
+    
+    if token.contents == 'else':
+        nodelist_false = parser.parse(('endifpoolandtype',))
+        parser.delete_first_token()
+    else:
+        nodelist_false = NodeList()
+    
+    return PoolNameAndTypeCheck(pool, roletype, nodelist_true, nodelist_false)
+
+@register.tag()
+def ifpoolserverandtype(parser, token):
+    """ Check to see if the currently logged in user belongs to one or more groups
+    Requires the Django authentication contrib app and middleware.
+
+    Usage: {% ifhasroletype Admins %} ... {% ifhasroletype %}, or
+           {% ifhasroletype Admins Clients Programmers Managers %} ... {% else %} ... {% endifusergroup %}
+
+    """
+    try:
+        tokensp = token.contents.split()
+        print tokensp
+        server = tokensp[1]
+        roletype = tokensp[2]
+    except ValueError:
+        raise template.TemplateSyntaxError("Tag 'ifpoolserverandtype' requires at least 2 arguments.")
+    
+    nodelist_true = parser.parse(('else', 'endifpoolserverandtype'))
+    token = parser.next_token()
+    
+    if token.contents == 'else':
+        nodelist_false = parser.parse(('endifpoolserverandtype',))
+        parser.delete_first_token()
+    else:
+        nodelist_false = NodeList()
+    
+    return PoolServerNameAndTypeCheck(server, roletype, nodelist_true, nodelist_false)
+
+
+class PoolServerNameAndTypeCheck(template.Node):
+    def __init__(self, server, roleType, nodelist_true, nodelist_false):
+        self.roleType = roleType
+        self.server = server
+        
+        if "{{" in self.server :
+            self.server = self.server.replace("{","")
+            self.server = self.server.replace("}","")
+            self.server = template.Variable(self.server)
+            self.needToResolve = True
+        else:
+            self.server = self.server
+            self.needToResolve = False
+
         self.nodelist_true = nodelist_true
         self.nodelist_false = nodelist_false
     def render(self, context):
-        allowed = False
-        
         user = resolve_variable('user', context)
-        userroles = HeimdallUserRole.objects.filter(user=user)
-
-        for role in userroles:
-            if role.type == 'MANAGER':
-                allowed = True
-                break
+        print self.server
+        if self.needToResolve:
+            serverNameConcrete = self.server.resolve(context)
+        else:
+            serverNameConcrete = self.server
         
+        serverObject = Server.objects.get(hostname=serverNameConcrete)
+        pools = PoolPerimeter.objects.filter(server=serverObject).values_list('pool')
+        
+        allowed = HeimdallUserRole.objects.filter(user=user,pool__in=pools, type=self.roleType).exists()
+        if allowed:
+            return self.nodelist_true.render(context)
+        else:
+            return self.nodelist_false.render(context)
+
+
+
+class PoolNameAndTypeCheck(template.Node):
+    def __init__(self, pool, roleType, nodelist_true, nodelist_false):
+        self.roleType = roleType
+        self.pool = pool
+          
+        if "{{" in self.pool :
+            self.pool = self.pool.replace("{","")
+            self.pool = self.pool.replace("}","")
+            self.poolname = template.Variable(self.pool)
+            self.needToResolve = True
+        else:
+            self.poolname = self.pool
+            self.needToResolve = False
+
+        self.nodelist_true = nodelist_true
+        self.nodelist_false = nodelist_false
+    def render(self, context):
+        user = resolve_variable('user', context)
+        if self.needToResolve:
+            poolnameConcrete = self.poolname.resolve(context)
+        else:
+            poolnameConcrete = self.poolname
+            
+        print poolnameConcrete
+        poolObject = HeimdallPool.objects.get(name=poolnameConcrete)
+        allowed = HeimdallUserRole.objects.filter(user=user,pool=poolObject, type=self.roleType).exists()
+        if allowed:
+            return self.nodelist_true.render(context)
+        else:
+            return self.nodelist_false.render(context)
+
+class RoleTypeCheck(template.Node):
+    def __init__(self, roleType, nodelist_true, nodelist_false):
+        self.roleType = roleType
+        self.nodelist_true = nodelist_true
+        self.nodelist_false = nodelist_false
+    def render(self, context):
+        user = resolve_variable('user', context)
+        allowed = HeimdallUserRole.objects.filter(user=user, type=self.roleType).exists()
         if allowed:
             return self.nodelist_true.render(context)
         else:
@@ -190,10 +301,8 @@ class RoleCheck(template.Node):
         
         pool = HeimdallPool.objects.get(name=role);
         if HeimdallUserRole.objects.filter(user=user, pool = pool):
-            print "false"
             return self.nodelist_true.render(context)
         else:
-            print "true"
             return self.nodelist_false.render(context)
 
 

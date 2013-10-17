@@ -35,9 +35,18 @@ from heimdall.bastion.lib.utils import Constants
 
 from heimdall.models import Permission
 
+from paramiko import SSHException
+from paramiko import AuthenticationException
+import socket 
+
 logger = Logger("WebController")
 replicator = ReplicationFactory()
-	
+
+class ReplicationError:
+	def __init__(self, err_code, message):
+		self.err_code = err_code
+		self.message = message
+
 def addPermission(user_target, server_target, hostuser_target, sshkey):
 	"""
 	Grant a permission to an existing server and an existing user on database.
@@ -45,10 +54,24 @@ def addPermission(user_target, server_target, hostuser_target, sshkey):
 	his key on the server to instant grant access.
 	"""
 	logger.log("Add permission: " + user_target.username + " for server: ["+server_target.hostname+"]" + " with user: {"+hostuser_target+"}", Constants.INFO)
-	permission = Permission(user=user_target, server=server_target, hostuser=hostuser_target)
-	replicator.replicate_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email, server_target.port)
+	permission = Permission.objects.create(user=user_target, server=server_target, hostuser=hostuser_target)
+	try :
+		replicator.replicate_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email, server_target.port)
+	except AuthenticationException as e:
+		logger.log("Error Authentication: " + str(e), Constants.ERROR)
+		return ReplicationError(1,"Erreur d'authentification au server: "+ server_target.hostname)
+	except SSHException as e:
+		logger.log("Error SSH: " + str(e), Constants.ERROR)
+		return ReplicationError(1,"Erreur d'authentification ssh au server: "+ server_target.hostname)
+	except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
+		logger.log("Error Socket: " + str(e), Constants.ERROR)
+		return ReplicationError(1,"Contact avec le serveur: "+ server_target.hostname+" impossible, no route to host")
+	except Exception as e:
+		logger.log("Not catched error on replication: " + str(e), Constants.ERROR)
+		return ReplicationError(1,"Erreur on replication: [["+ server_target.hostname+"]]"+ str(e))
 	permission.save()
 	logger.log("permission added need replicate", Constants.INFO)
+	return None
 
 def revokePermission(user_target, server_target, hostuser_target, sshkey):
 	"""
@@ -58,6 +81,59 @@ def revokePermission(user_target, server_target, hostuser_target, sshkey):
 	"""
 	logger.log("Revoke permission ", Constants.INFO)
 	permission = Permission.objects.filter(user=user_target, server=server_target, hostuser=hostuser_target)
-	replicator.revoke_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email, server_target.port)
+	try :
+		replicator.revoke_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email, server_target.port)
+	except AuthenticationException as e:
+		logger.log("Error Authentication: " + str(e), Constants.ERROR)
+		return ReplicationError(1,"Erreur d'authentification au server: "+ server_target.hostname)
+	except SSHException as e:
+		logger.log("Error SSH: " + str(e), Constants.ERROR)
+		return ReplicationError(1,"Erreur d'authentification ssh au server: "+ server_target.hostname)
+	except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
+		logger.log("Error Socket: " + str(e), Constants.ERROR)
+		return ReplicationError(1,"Erreur d'authentification au server: "+ server_target.hostname)
+	except Exception as e:
+		logger.log("Not catched error on replication: " + str(e), Constants.ERROR)
+		return ReplicationError(1,"Erreur on replication: [["+ server_target.hostname+"]]"+ str(e))
+
 	permission.delete()
 	logger.log("permission added need replicate", Constants.INFO)
+	
+def revokeAllKeys(permissions, user, sshkey):
+	logger.log("Revoke all permission ", Constants.INFO)
+	for permission in permissions:
+		print permission.server.hostname
+		try :
+			replicator.replicate_one_server(permission.server.hostname, permission.hostuser, sshkey.key, user.username, user.email, permission.server.port)
+		except AuthenticationException as e:
+			logger.log("Error Authentication: " + str(e), Constants.ERROR)
+			return ReplicationError(1,"Erreur d'authentification au server: "+ permission.server.hostname)
+		except SSHException as e:
+			logger.log("Error SSH: " + str(e), Constants.ERROR)
+			return ReplicationError(1,"Erreur d'authentification ssh au server: "+ permission.server.hostname)
+		except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
+			logger.log("Error Socket: " + str(e), Constants.ERROR)
+			return ReplicationError(1,"Contact avec le serveur: "+ permission.server.hostname+" impossible, no route to host")
+		except Exception as e:
+			logger.log("Not catched error on replication: " + str(e), Constants.ERROR)
+			return ReplicationError(1,"Erreur on replication: [["+ permission.server.hostname+"]]"+ str(e))
+	
+def replicateAllKeys(permissions, user, sshkey):
+	logger.log("Replicate all permission ", Constants.INFO)
+	for permission in permissions:
+		print permission.server.hostname
+		try :
+			replicator.revoke_one_server(permission.server.hostname, permission.hostuser, sshkey.key, user.username, user.email, permission.server.port)
+		except AuthenticationException as e:
+			logger.log("Error Authentication: " + str(e), Constants.ERROR)
+			return ReplicationError(1,"Erreur d'authentification au server: "+ permission.server.hostname)
+		except SSHException as e:
+			logger.log("Error SSH: " + str(e), Constants.ERROR)
+			return ReplicationError(1,"Erreur d'authentification ssh au server: "+ permission.server.hostname)
+		except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
+			logger.log("Error Socket: " + str(e), Constants.ERROR)
+			return ReplicationError(1,"Contact avec le serveur: "+ permission.server.hostname+" impossible, no route to host")
+		except Exception as e:
+			logger.log("Not catched error on replication: " + str(e), Constants.ERROR)
+			return ReplicationError(1,"Erreur on replication: [["+ permission.server.hostname+"]]"+ str(e))
+	

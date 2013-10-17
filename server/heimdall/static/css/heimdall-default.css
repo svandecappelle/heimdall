@@ -240,7 +240,7 @@ h2{
 	height:100%;
 	width:20px;
 }
-.high-priority td{
+.high-priority td, .manager{
 	color: rgba(246, 146, 146, 1);
 }
 
@@ -248,5 +248,26 @@ h2{
 }
 
 .low-priority td {
-	color: rgba(130, 150, 150, 1) !important;
+	color: rgba(130, 150, 150, 1);
+}
+
+
+.pending-request{
+	background-color: rgba(50,100,255,0.8);
+}
+
+.high-priority.pending-request td, .high-priority.accepted-request td, .high-priority.rejected-request td {
+	color: red;
+}
+.normal-priority.pending-request td, .normal.accepted-request td, .normal.rejected-request td  {
+	color: black;
+}
+.low-priority.pending-request td, .low-priority.accepted-request td, .low-priority.rejected-request td  {
+	color: green;
+}
+.accepted-request{
+	background-color: rgba(50,255,50,0.8);
+}
+.rejected-request{
+	background-color: rgba(255,100,50,0.8);
 }

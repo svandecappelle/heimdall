@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Create your views here.
-from datetime import date
+from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -63,16 +63,22 @@ def revoke_access(request):
 			host = Server.objects.get(hostname=request.POST['hostname'])
 			hostuser = request.POST['hostuser']
 			
+			
 			message = None
 			
 			if SshKeys.objects.filter(user=user).count == 0:
 				message = 'No RSA saved on database. Contact user to set his RSA key.'
-			elif SshKeys.objects.filter(user=user).count > 1:
+			elif SshKeys.objects.filter(user=user).count() > 1:
 				message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
 			else:
 				rsa_key = SshKeys.objects.get(user=user)
-				Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
-				message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
+				err = Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
+				if err == None:
+					message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')'
+					Demands.objects.get(user=user,server=host,hostuser=hostuser).delete()
+				else:
+					message=err.message
+
 			messages.success(request, message)
 	else:
 		messages.success(request, 'You have not the rights to do this action')
@@ -107,10 +113,7 @@ def create_server(request):
 				
 				args.update({'hostname' : host.hostname, 'description' : host.description, 'port': host.port})
 				return render_to_response('admin/create_server.html', args, context_instance=RequestContext(request))
-			
-			
 			return render_to_response('admin/create_server.html', context_instance=RequestContext(request))
-
 	else:
 		messages.success(request, 'You have not the rights to do this action')
 	return HttpResponseRedirect(reverse('servers'))
@@ -126,7 +129,7 @@ def permissions(request):
 def getarguments_for_admin(user):
 	servers = Server.objects.all()
 	users = User.objects.all()
-	demands = Demands.objects.all();
+	demands = utils.get_demands_filtered_pending(user)
 	permissions = Permission.objects.all()
 	args = utils.give_arguments(user, 'Permissions admin')
 	args.update({'demands' : demands, 'servers': servers, 'users': users, 'permissions' : permissions})
@@ -174,21 +177,30 @@ def add_to_group(request):
 			messages.success(request, 'You have not the rights to do this action')
 	else:
 		messages.success(request, 'You have not the rights to do this action')
-		
 	return HttpResponseRedirect(reverse('admin-group-management'))
 
 def manage_user_role(request):
 	pool = HeimdallPool.objects.filter(name=request.GET['poolname'])	
 	userRoles = HeimdallUserRole.objects.filter(pool=pool)
 	usersToFilter = []
+	notUserSpecialInPool = []
+	userSpecialInPool = []
 	for userRole in HeimdallUserRole.objects.filter(pool=pool):
-		print (userRole.user)
 		usersToFilter.append(userRole.user.username)
-		
+		if not userRole.type == "USER":
+			print 'Not Simple user' 
+			userSpecialInPool.append(userRole.user.username)
+	
+	print notUserSpecialInPool
+	
+	for notSpecialUsers in User.objects.exclude(username__in=userSpecialInPool):
+		notUserSpecialInPool.append(notSpecialUsers)
+
+	print notUserSpecialInPool	
 	users = User.objects.exclude(username__in=usersToFilter)
-	print (users)
+	print 'users:' + str(users)
 	args = utils.give_arguments(request.user, 'Role management')
-	args.update({'userRoles' : userRoles , 'users':users, 'poolname' : request.GET['poolname']})	
+	args.update({'userRoles' : userRoles , 'users':users, 'not_special_users_in_pool':notUserSpecialInPool, 'userSpecialInPool' : userSpecialInPool, 'poolname' : request.GET['poolname']})	
 	
 	return render_to_response('admin/manage_user_role.html',args, context_instance=RequestContext(request))
 
@@ -212,9 +224,9 @@ def manage_role(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		user = User.objects.get(username=request.POST['username'])
 		pool = HeimdallPool.objects.get(name=request.POST['poolname'])
-		
 		if request.POST['type'] == "add":
-			HeimdallUserRole.objects.create(user=user,pool=pool)
+			userRole = HeimdallUserRole.objects.create(user=user,pool=pool,type='USER')
+			userRole.save()
 		else:
 			userRole = HeimdallUserRole.objects.get(user=user,pool=pool)
 			userRole.delete()
@@ -236,6 +248,7 @@ def grant_access(request):
 				
 			if request.POST['username'] != '[[ALL]]':
 				user = User.objects.get(username=request.POST['username'])
+				print user
 			else:
 				print('TODO: look after demands')
 			
@@ -256,24 +269,32 @@ def grant_access(request):
 				
 				if SshKeys.objects.filter(user=user).count == 0:
 					message = 'No RSA saved on database. Contact user to set his RSA key.'
-				elif SshKeys.objects.filter(user=user).count > 1:
+				elif SshKeys.objects.filter(user=user).count() > 1:
 					message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
 				else:
 					rsa_key = SshKeys.objects.get(user=user)
-					Controller.addPermission(user, host, request.POST['hostuser'], rsa_key)
+					err = Controller.addPermission(user, host, request.POST['hostuser'], rsa_key)
 					demand = Demands.objects.get(user=user,server=host,hostuser=hostuser)
-					demand.close_date=date.today()
+					demand.close_date=datetime.today()
+					demand.accepted=True
+					demand.markAsIgnore=False
 					demand.save()
+					
+					if err == None:
+						if request.POST['username'] != '[[ALL]]':
+							message = 'Permission granted on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
+						else:
+							message = 'All requested permissions granted'
+					else:
+						message=err.message
 				
-				if request.POST['username'] != '[[ALL]]':
-					message = 'Permission granted on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
-					messages.success(request, message)
-				else:
-					messages.success(request, 'All requested permissions granted')
+				messages.success(request, message)
 			else:
 				host = Server.objects.get(hostname=request.POST['hostname'])
 				demand = Demands.objects.get(user=user,server=host,hostuser=hostuser)
-				demand.close_date=date.today()
+				demand.close_date=datetime.today()
+				demand.accepted=False
+				demand.markAsIgnore=False
 				demand.save()
 				
 				message = 'Permission rejected on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')' 
@@ -327,7 +348,7 @@ def perimeter_pool(request):
 			pool = HeimdallPool.objects.get(name=request.POST['poolname'])
 			if 'hostname' in request.POST:
 				server = Server.objects.get(hostname=request.POST['hostname'])
-				role_perimeter = PoolPerimeter.objects.filter(pool=HeimdallPool.objects.get(name=request.POST['poolname']))
+				role_perimeter = PoolPerimeter.objects.filter(pool=pool)
 			
 			if request.POST['action'] == 'add':
 				
@@ -336,7 +357,7 @@ def perimeter_pool(request):
 				if is_allow_to_add:
 					new_perimeter = PoolPerimeter(pool=pool, server=server)
 					new_perimeter.save()
-					role_perimeter = PoolPerimeter.objects.filter(pool=HeimdallPool.objects.get(name=request.POST['poolname ']))
+					role_perimeter = PoolPerimeter.objects.filter(pool=pool)
 					messages.success(request, "Group perimeter modified")
 					return HttpResponseRedirect(reverse('admin-group-management'))
 				else:                                                                                                    
@@ -345,7 +366,7 @@ def perimeter_pool(request):
 					return HttpResponseRedirect(reverse('admin-group-management'))
 					
 			elif request.POST['action'] == 'remove':
-				is_allow_to_remove = HeimdallPool.objects.filter(pool=pool, server=server).count() == 1
+				is_allow_to_remove = PoolPerimeter.objects.filter(pool=pool, server=server).count() == 1
 				if is_allow_to_remove:
 					
 					perimeter_to_delete = PoolPerimeter.objects.get(pool=pool, server=server)
@@ -359,13 +380,29 @@ def perimeter_pool(request):
 					return HttpResponseRedirect(reverse('admin-group-management'))
 			elif request.POST['action'] == 'setmanager':
 				user_pool = User.objects.get(username=request.POST['username'])
-				user_pool_role = HeimdallUserRole.objects.get(pool=pool,user=user_pool)
+				
+				if HeimdallUserRole.objects.filter(pool=pool,user=user_pool).exists():
+					user_pool_role = HeimdallUserRole.objects.get(pool=pool,user=user_pool)
+				else:
+					user_pool_role = HeimdallUserRole.objects.create(pool=pool,user=user_pool)
 				user_pool_role.type='MANAGER'
 				user_pool_role.save()
 				
 				messages.success(request, "Manager added")
 				return HttpResponseRedirect(reverse('admin-group-management'))
-			
+			elif request.POST['action'] == 'removemanager':
+				user_pool = User.objects.get(username=request.POST['username'])
+				
+				if HeimdallUserRole.objects.filter(pool=pool,user=user_pool).exists():
+					user_pool_role = HeimdallUserRole.objects.get(pool=pool,user=user_pool)
+				else:
+					user_pool_role = HeimdallUserRole.objects.create(pool=pool,user=user_pool)
+				user_pool_role.type='USER'
+				user_pool_role.save()
+				
+				messages.success(request, "Manager removed")
+				return HttpResponseRedirect(reverse('admin-group-management'))
+		
 			else:
 				messages.success(request, "Action not enabled")
 				return HttpResponseRedirect(reverse('admin-group-management'))

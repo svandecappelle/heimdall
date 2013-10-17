@@ -1,5 +1,5 @@
 {% extends "layout-page.html" %}
-
+{% load tags %}
 
 {% block content %}
 
@@ -59,7 +59,7 @@
 									<input type="hidden" value="[[ALL]]" name="username"/>
 									<input type="hidden" value="[[ALL]]" name="hostname"/>
 									<input type="hidden" value="[[ALL]]" name="hostuser"/>
-									<input type="submit" value="Grant access to all" style="width:100%;"/>
+									<input type="submit" value="Grant access to all" style="width:100%;" disabled/>
 								</form>
 							</td>
 						</tr>
@@ -119,40 +119,59 @@
 		<h2>Revoke an access</h2>
 		
 		<div class="align-form" style="width:100%">
-	      			<table class="bordered" style="width:100%">
-				      	<thead>
-				      		<tr>
-							<th>User</th>
-							<th>Host</th>
-							<th>User in host</th>
-							{% if user.is_authenticated %}
-								<th>Revoke access</th>
-							{% endif %}
-						</tr>
-					</thead>
-					<tbody>
-					{% for permission in permissions %}
+	      	<table class="bordered" style="width:100%">
+				<thead>
 					<tr>
-						<td><span>{{ permission.user.username }}</span></td>
-						<td><span>{{ permission.server.hostname }}</span></td>
-						<td><span>{{ permission.hostuser }}</span></td>
+						<th>User</th>
+						<th>Host</th>
+						<th>User in host</th>
 						{% if user.is_authenticated %}
-							<td>
-								<form id="form-permission" action="/heimdall/admin/revoke_access" method="post" accept-charset="utf-8">
-								{% csrf_token%}									
-								    <input type="hidden" name="username" value="{{ permission.user.username }}"/>
-									<input type="hidden" name="hostname" value="{{ permission.server.hostname }}"/>
-									<input type="hidden" name="hostuser" value="{{ permission.hostuser }}"/>
-									<input type="submit" value="Revoke access"/>
-								</form>
-							</td>
+							<th>Revoke access</th>
 						{% endif %}
 					</tr>
-
+				</thead>
+				<tbody>
+					{% for permission in permissions %}
+						{% ifusergroup heimdall-admin %}
+							<tr>
+									<td><span>{{ permission.user.username }}</span></td>
+									<td><span>{{ permission.server.hostname }}</span></td>
+									<td><span>{{ permission.hostuser }}</span></td>
+									{% if user.is_authenticated %}
+										<td>
+											<form id="form-permission" action="/heimdall/admin/revoke_access" method="post" accept-charset="utf-8">
+											{% csrf_token%}									
+											    <input type="hidden" name="username" value="{{ permission.user.username }}"/>
+												<input type="hidden" name="hostname" value="{{ permission.server.hostname }}"/>
+												<input type="hidden" name="hostuser" value="{{ permission.hostuser }}"/>
+												<input type="submit" value="Revoke access"/>
+											</form>
+										</td>
+									{% endif %}
+								</tr>
+						{% else %}
+							{% ifpoolserverandtype {{permission.server.hostname}} MANAGER %}
+								<tr>
+									<td><span>{{ permission.user.username }}</span></td>
+									<td><span>{{ permission.server.hostname }}</span></td>
+									<td><span>{{ permission.hostuser }}</span></td>
+									{% if user.is_authenticated %}
+										<td>
+											<form id="form-permission" action="/heimdall/admin/revoke_access" method="post" accept-charset="utf-8">
+											{% csrf_token%}									
+											    <input type="hidden" name="username" value="{{ permission.user.username }}"/>
+												<input type="hidden" name="hostname" value="{{ permission.server.hostname }}"/>
+												<input type="hidden" name="hostuser" value="{{ permission.hostuser }}"/>
+												<input type="submit" value="Revoke access"/>
+											</form>
+										</td>
+									{% endif %}
+								</tr>
+							{% endifpoolserverandtype %}
+						{% endifusergroup %}
 					{% endfor %}
-	      				</tbody>
-	      			</table>
+	      		</tbody>
+	      	</table>
 		</div>
-		
 	</div>
 {% endblock %}

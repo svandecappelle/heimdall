@@ -25,10 +25,10 @@ notifyAdminByMail = True
 """Configuration to send file when access is open or close to affected user"""
 notifyUserByEmail = True
 """Not used for the moment. In future version. """
-heimdallEmail = "toto@dlsn.fr"
+heimdallEmail = "heimdall@heimdall.fr"
 """Admin notification email"""
-administratorEmail = "toto@dlsn.fr"
+administratorEmail = "heimdall@heimdall.fr"
 """Admin notification email"""
 ccAdmins = []
-"""Not used for the moment. In future version."""
-mailHost = "host"
+"""Send mail through server mail."""
+mailGateway = "gateway"

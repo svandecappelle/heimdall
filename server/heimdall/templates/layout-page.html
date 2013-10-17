@@ -60,7 +60,7 @@
 		              			<div class="inline-block" style="padding-top:4px; margin-right:4px;">
 		              			{% if user.is_authenticated %}
 						    <span>Welcome, {{ user.username }}.</span>
-							<span><a href="/heimdall/messages">
+							<span><a href="/heimdall/user/messages">
 							 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNpiXLVm/X8GCgATA4WABYvYAijGBhKgGKsBH4BYAKrgQFhI4EJkhUCvxiNphqlF8YIDVALsCqgGZM0LkDQ7YIQB0MaLWAzJB2F0zVC1mIGIxZAJUIxVM9ZYgCowAIUDkjCIbYCuGVcsgAx5CKQcgc6XR+ITHY3oBhGXDshNkRSnRIAAAwCEDDi73FPsUgAAAABJRU5ErkJggg==" class="GCHESSFBNL">
 							{% if inbox_demands_count == None %}
 							    <span>Messages: 0 </span>
@@ -131,8 +131,8 @@
           		
           		{% if user.is_authenticated %}
 	          		<li><a href="/heimdall/servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/>Serveurs</a></li>
-	          		<li><a href="/heimdall/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/>Permissions</a></li>
-	          		<li><a href="/heimdall/deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/>Dépot</a></li>
+	          		<li><a href="/heimdall/user/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/>Permissions</a></li>
+	          		<li><a href="/heimdall/user/deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/>Dépot</a></li>
 					
 					{% ifusergroup heimdall-admin %}
 					<!-- admin panel -->

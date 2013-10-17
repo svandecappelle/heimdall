@@ -30,12 +30,10 @@ Authors:
 """
 
 from paramiko import SSHClient
-from paramiko import SSHException
 from paramiko import AutoAddPolicy
-from paramiko import AuthenticationException
 
 from email.mime.text import MIMEText
-import socket, smtplib
+import smtplib
 
 from heimdall.bastion.lib.utils import Constants
 from heimdall.bastion.lib.utils.Logger import Logger
@@ -46,24 +44,13 @@ logger = Logger("ReplicationFactory", Constants.DEBUG)
 class ReplicationFactory: 
 	def replicate_one_server(self, server, userhost, key_rsa, userName, usermail, port):
 		'''Replicate access on one server for one user'''
-		try:
-			client = SSHClient()
-			client.load_system_host_keys()
-			client.set_missing_host_key_policy(AutoAddPolicy())
-			client.connect('%s' % server, port=port, username=userhost)    
-		
-			# ## Insert permission into server authorized_keys ssh file
-			stdin, stdout, stderr = client.exec_command("echo '%s' >> .ssh/authorized_keys" % key_rsa)
-			
-		except AuthenticationException as e:
-			logger.log("Error Authentication: " + str(e), Constants.ERROR)
-		except SSHException as e:
-			logger.log("Error SSH: " + str(e), Constants.ERROR)
-		except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
-			logger.log("Error Socket: " + str(e), Constants.ERROR)
-		except Exception as e:
-			logger.log("Not catched error on replication: " + str(e), Constants.ERROR)
-			
+		client = SSHClient()
+		client.load_system_host_keys()
+		client.set_missing_host_key_policy(AutoAddPolicy())
+		client.connect('%s' % server, port=port, username=userhost)    
+	
+		# ## Insert permission into server authorized_keys ssh file
+		stdin, stdout, stderr = client.exec_command("echo '%s' >> .ssh/authorized_keys" % key_rsa)
 		client.close()
 		self.notify(server, userName, userhost, False, usermail)
 
@@ -71,30 +58,21 @@ class ReplicationFactory:
 		"""
 		Delete a heimdall replication.
 		"""
-		try:
-			client = SSHClient()
-			client.load_system_host_keys()
-			client.set_missing_host_key_policy(AutoAddPolicy())
-			client.connect('%s' % server, port=port, username=userhost)    
+		client = SSHClient()
+		client.load_system_host_keys()
+		client.set_missing_host_key_policy(AutoAddPolicy())
+		client.connect('%s' % server, port=port, username=userhost)    
+	
+		# ## Insert permission into server authorized_keys ssh file
+		sshconfig_file = "~/.ssh/authorized_keys"
+		rsa_search = str(key_rsa).replace('\r\n', '').replace('\r', '').replace('\n', '') 
 		
-			# ## Insert permission into server authorized_keys ssh file
-			sshconfig_file = "~/.ssh/authorized_keys"
-			rsa_search = str(key_rsa).replace('\r\n', '').replace('\r', '').replace('\n', '') 
-			
-			stdin, stdout, stderr = client.exec_command("grep -v '%s' %s > %s.tmp" % (rsa_search, sshconfig_file, sshconfig_file))
-			stdin, stdout, stderr = client.exec_command("cat %s > %s.bak" % (sshconfig_file, sshconfig_file))
-			stdin, stdout, stderr = client.exec_command("rm %s" % (sshconfig_file))
-			stdin, stdout, stderr = client.exec_command("mv %s.tmp %s" % (sshconfig_file, sshconfig_file))
-			stdin, stdout, stderr = client.exec_command("rm %s.bak" % (sshconfig_file))
-			logger.log("Access revoked", Constants.INFO)
-		except AuthenticationException as e:
-			logger.log(e, Constants.ERROR)
-		except SSHException as e:
-			logger.log(e, Constants.ERROR)
-		except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
-			logger.log(e, Constants.ERROR)
-		except Exception as e:
-			logger.log("Not catched error on replication: " + str(e) , Constants.ERROR)
+		stdin, stdout, stderr = client.exec_command("grep -v '%s' %s > %s.tmp" % (rsa_search, sshconfig_file, sshconfig_file))
+		stdin, stdout, stderr = client.exec_command("cat %s > %s.bak" % (sshconfig_file, sshconfig_file))
+		stdin, stdout, stderr = client.exec_command("rm %s" % (sshconfig_file))
+		stdin, stdout, stderr = client.exec_command("mv %s.tmp %s" % (sshconfig_file, sshconfig_file))
+		stdin, stdout, stderr = client.exec_command("rm %s.bak" % (sshconfig_file))
+		logger.log("Access revoked", Constants.INFO)
 		client.close()	
 		self.notify(server, userName, userhost, True, usermail)
 
@@ -102,51 +80,33 @@ class ReplicationFactory:
 		"""
 		Notify the user and admin if config constant is enable to
 		"""
-		if Constants.notifyAdminByMail:
-			logger.log("Notify admin by email", Constants.INFO)
-			if isRevoke:
-				self.alertToAdmin('An administrator has just revoke access on %s to %s user connected with %s' % (server, trig, user), server);
-			else:
-				self.alertToAdmin('An administrator has just open access on %s to %s user connected with %s' % (server, trig, user), server);
-			
-			
-		if Constants.notifyUserByEmail:
-			logger.log("Notify user by email", Constants.INFO)
-			if isRevoke:
-				self.alertToUser('An administrator has just revoke access for you account on %s to %s user connected with %s' % (server, trig, user), trig, server, usermail);
-			else:
-				self.alertToUser('An administrator has just open access for you account on %s to %s user connected with %s' % (server, trig, user), trig, server, usermail);
-			
+		
+		logger.log("Notify users by email", Constants.INFO)
+		if isRevoke:
+			self.alertToAdmin('An administrator has just revoke access on %s to %s user connected with %s' % (server, trig, user), server, usermail);
+		else:
+			self.alertToAdmin('An administrator has just open access on %s to %s user connected with %s' % (server, trig, user), server, usermail);
 		logger.log("Replication finished", Constants.INFO)
 	
 	
-	def alertToAdmin(self, message, server):
-		'''Alert by email the admins'''
+	def alertToAdmin(self, message, server, userEmail):
+		'''Alert by email the admins and the user if configured'''
 		# Create an html message
 		msg = MIMEText(message,'html')
-
-		s = smtplib.SMTP(Constants.mailHost)
+		s = smtplib.SMTP(Constants.mailGateway)
 		
 		sender = Constants.heimdallEmail
 		recipients = [Constants.administratorEmail] + Constants.ccAdmins
-		msg['Subject'] = 'Heimdall notification access to %s' % server
+		msg['Subject'] = 'Heimdall permissions changed on %s' % server
 		msg['From'] = sender
-		msg['To'] = ", ".join(recipients)
+		
+		if Constants.notifyUserByEmail:
+			msg['To'] = userEmail
+		else:
+			msg['To'] = ", ".join(recipients)
+		
+		if Constants.notifyAdminByMail and not Constants.notifyUserByEmail:
+			msg['Cc'] = ", ".join(recipients)
+		
 		s.sendmail(sender, recipients, msg.as_string())
 		s.quit()
-		
-	def alertToUser(self, message, trig, server, usermail):
-		'''Alert by email the user who granted / revoked'''
-		userEmail = usermail;
-		
-		s = smtplib.SMTP(Constants.mailHost)
-		# Create an html message
-		msg = MIMEText(message,'html')
-		
-		sender = Constants.heimdallEmail
-		msg['Subject'] = 'Heimdall notification access to %s' % server
-		msg['From'] = sender
-		msg['To'] = userEmail
-		s.sendmail(sender, userEmail, msg.as_string())
-		s.quit()
-	

@@ -58,7 +58,7 @@
       </div>
       {% if user.is_authenticated %}
       <div style="float:left;display: block;margin-right:20px;">
-	      <form id="form-server" style="display:none;" action="require_access" method="post" accept-charset="utf-8">
+	      <form id="form-server" style="display:none;" action="/heimdall/user/require_access" method="post" accept-charset="utf-8">
 	      {% csrf_token %}
 	      		<table class="bordered">
 		       	      <thead>

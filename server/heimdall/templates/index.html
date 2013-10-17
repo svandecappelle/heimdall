@@ -19,7 +19,7 @@
       </thead>
       {%for demand in demands%}
       <tr class="{%if demand.priority == "HIGH" %}high-priority{%elif demand.priority == "NORMAL" %}normal-priority{%else%}low-priority{%endif%}">
-      	<td>{{demand.cdate}}</td>
+      	<td>{{demand.cdate|date:"d M Y G:i:s"}}</td>
       	<td>{{demand.user.username}}</td>
       	<td>{{demand.server.hostname}}</td>
       	<td>{{demand.hostuser}}</td>

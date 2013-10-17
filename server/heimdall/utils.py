@@ -12,15 +12,18 @@ def give_arguments(user, page_title):
 # utils
 def get_demands_filtered(user_filter):
 	demands = VoidDemand()
-	
-	#if user_filter.is_anonymous:
-	#	print "anonymous"
-	#	return Demands.objects.filter(close_date__isnull=True,  priority='None')
-
 	if user_filter.groups.filter(name="heimdall-admin").exists():
-		demands = Demands.objects.filter(close_date__isnull=True)
+		demands = Demands.objects.filter(markAsIgnore=False)
 	elif user_filter.groups.filter(name="heimdall").exists():
-		demands = Demands.objects.filter(user=user_filter, close_date__isnull=True)
+		demands = Demands.objects.filter(user=user_filter,markAsIgnore=False)
+	return demands
+
+def get_demands_filtered_pending(user_filter):
+	demands = VoidDemand()
+	if user_filter.groups.filter(name="heimdall-admin").exists():
+		demands = Demands.objects.filter(close_date__isnull=True,markAsIgnore=False)
+	elif user_filter.groups.filter(name="heimdall").exists():
+		demands = Demands.objects.filter(user=user_filter,close_date__isnull=True,markAsIgnore=False)
 	return demands
 
 def handler404(request):

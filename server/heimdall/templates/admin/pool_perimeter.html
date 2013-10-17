@@ -32,10 +32,11 @@
 				{% endfor %}
 			</tbody>
 			<tfoot>
-				
-					<tr>
-						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+				<tr>
+					<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
 						{% csrf_token %}
+							<input type="hidden" name="action" value="add"/>
+							<input type="hidden" name="poolname" value="{{poolname}}"/>
 						<td>
 							<select name="hostname">
 								{% for server in servers %}
@@ -46,14 +47,10 @@
 							</select>
 						</td>
 						<td>
-							 
-								<input type="submit" name="add" value="Add"/>
-								<input type="hidden" name="action" value="add"/>
-								<input type="hidden" name="poolname" value="{{poolname}}"/>
-							 </form>
+							<input type="submit" name="add" value="Add"/>
 						</td>
-						</form>
-					</tr>
+					</form>
+				</tr>
 			</tfoot>
 		</table>
 	</form>

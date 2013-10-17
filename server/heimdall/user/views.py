@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -10,8 +10,10 @@ from django.shortcuts import render_to_response
 
 from heimdall import utils
 from heimdall.form import UploadSshKeyForm
-from heimdall.models import Server, Permission, Demands, SshKeys, HeimdallPool,HeimdallUserRole, PoolPerimeter
+from heimdall.models import Server, Permission, Demands, SshKeys
 from heimdall.objects import Statistics
+
+from heimdall.bastion.runner import Controller
 
 # HTTP views
     
@@ -32,6 +34,18 @@ def deposite(request):
                 sshkey = SshKeys(user=userConnected, key=keysend)
             
             sshkey.save()
+            
+            err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+            if err == None:
+                err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+                
+                if err == None:
+                    message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates' 
+                else:
+                    message=err.message
+            else:
+                message=err.message
+            messages.success(request, message)
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('deposite'))
         else:
@@ -40,11 +54,36 @@ def deposite(request):
                 docfile = request.FILES['docfile']
                 for line in docfile:
                     if SshKeys.objects.filter(user=userConnected).count() > 0:
-                        oldkey = SshKeys.objects.get(user=userConnected)
-                        oldkey.key = line
+                        sshkey = SshKeys.objects.get(user=userConnected)
+                        sshkey.key = line
+                        sshkey.save()
+                        
+                        err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+                        if err == None:
+                            err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+                            
+                            if err == None:
+                                message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates' 
+                            else:
+                                message=err.message
+                        else:
+                            message=err.message
+                        messages.success(request, message)
                     else:
                         sshkey = SshKeys(user=userConnected, key=line)
                         sshkey.save()
+                        
+                        err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+                        if err == None:
+                            err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+                            
+                            if err == None:
+                                message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates' 
+                            else:
+                                message=err.message
+                        else:
+                            message=err.message
+                        messages.success(request, message)
                 # Redirect to the document list after POST
                 return HttpResponseRedirect(reverse('deposite'))
     else:
@@ -57,18 +96,14 @@ def deposite(request):
 
     args = utils.give_arguments(request.user, 'Depot')
     args.update({'documents': docfile, 'form': form, 'key':key})
-    return render_to_response('deposite.html', args, context_instance=RequestContext(request))
+    return render_to_response('user/deposite.html', args, context_instance=RequestContext(request))
     
 # View demands inbox
 def inbox(request):
-    pool_role = HeimdallUserRole.objects.filter(user=request.user, type="MANAGER")
-    poolPerimeters = PoolPerimeter.objects.filter(pool=pool_role).values_list('server')
     demands = utils.get_demands_filtered(request.user)
-   
     args = utils.give_arguments(request.user, 'Messages')
     args.update({'demands': demands})
-    
-    return render_to_response('messages.html', args , context_instance=RequestContext(request))
+    return render_to_response('user/messages.html', args , context_instance=RequestContext(request))
 
 # View Home
 def index(request):
@@ -82,14 +117,14 @@ def index(request):
     stats = Statistics(user_count, server_count, permissions_count, demands_count, keys_count)
     
     args = utils.give_arguments(request.user, 'Acceuil')
-    args.update({'stats': stats, 'demands':utils.get_demands_filtered(request.user)})
+    args.update({'stats': stats, 'demands':utils.get_demands_filtered_pending(request.user)})
 
     return render_to_response('index.html', args, context_instance=RequestContext(request))
 
 # View register user
 def register(request):
     args = utils.give_arguments(request.user, 'Register')
-    return render_to_response('register.html', args, context_instance=RequestContext(request))
+    return render_to_response('user/register.html', args, context_instance=RequestContext(request))
 
 # View users
 def users(request):
@@ -127,6 +162,21 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect('home')
 
+def mark_as_read(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            hostuser = request.POST['hostuser']
+            hostname = request.POST['hostname']
+            server = Server.objects.get(hostname=hostname)
+            demand = Demands.objects.get(user=request.user,server=server,hostuser=hostuser)
+            demand.markAsIgnore = True
+            demand.save()
+            
+        else:
+            messages.success(request, 'User registered successfully.')
+    else:
+        messages.success(request, 'This page is not accessible.')
+    return HttpResponseRedirect(reverse('inbox'))
 
 def register_action(request):
     if request.method == 'POST':
@@ -141,56 +191,28 @@ def require_access(request):
     if request.method == 'POST':
         userConnected = request.user
         if userConnected.is_authenticated:
-            if userConnected.groups.filter(name="heimdall"):
-               
-                
-                serverHost = Server.objects.get(hostname=request.POST['server'])
-                userHost = request.POST['user']
-                
-                print "is already "
-                print Demands.objects.filter(user=request.user,server=serverHost,hostuser=hostuser).exist()
-                
-                if userHost == "":
-                    messages.success(request, 'You must write a user host')
-                    return HttpResponseRedirect(reverse('servers'))
-                elif Demands.objects.filter(user=request.user,server=serverHost,hostuser=hostuser).exist():
-                    messages.success(request, 'Your demand is already pending from manager validation please wait.')
-                    return HttpResponseRedirect(reverse('servers'))
-                elif Permission.objects.filter(user=userConnected).exist():
-                    messages.success(request, 'You already granted for access this server and account.')
-                    return HttpResponseRedirect(reverse('servers'))
-                
-                priority = request.POST['priority']
-                comments = request.POST['comments']
-                cdate = date.today()
-                demand = Demands(user=userConnected, server=serverHost, hostuser=userHost, priority=priority, comments=comments, cdate=cdate)
-                demand.save()
-                
-                messages.success(request, 'Notification sent to an heimdall administrator.')
+            serverHost = Server.objects.get(hostname=request.POST['server'])
+            userHost = request.POST['user']
+            
+            if userHost == "":
+                messages.success(request, 'You must write a user host')
                 return HttpResponseRedirect(reverse('servers'))
-            elif userConnected.groups.filter(name="heimdall-admin"):
-                serverHost = Server.objects.get(hostname=request.POST['server'])
-                userHost = request.POST['user']
-                priority = request.POST['priority']
-                comments = request.POST['comments']
-                cdate = date.today()
-                
-                if userHost == "":
-                    messages.success(request, 'You must write a user host')
-                    return HttpResponseRedirect(reverse('servers'))
-                elif Demands.objects.filter(user=userConnected,server=serverHost,hostuser=userHost).exists():
-                    messages.success(request, 'Your demand is already pending from manager validation please wait.')
-                    return HttpResponseRedirect(reverse('servers'))
-                elif Permission.objects.filter(user=userConnected,server=serverHost,hostuser=userHost).exists():
-                    messages.success(request, 'You already granted for access this server and account.')
-                    return HttpResponseRedirect(reverse('servers'))
-                
-                
-                demand = Demands(user=userConnected, server=serverHost, hostuser=userHost, priority=priority, comments=comments, cdate=cdate)
-                demand.save()
-                
-                messages.success(request, 'Notification sent to an heimdall administrator for: ' + request.user.username)
+            elif Demands.objects.filter(user=request.user,server=serverHost,hostuser=userHost).exists():
+                messages.success(request, 'Your demand is already pending from manager validation please wait.')
                 return HttpResponseRedirect(reverse('servers'))
+            elif Permission.objects.filter(user=userConnected,server=serverHost,hostuser=userHost).exists():
+                messages.success(request, 'You already granted for access this server and account.')
+                return HttpResponseRedirect(reverse('servers'))
+            
+            priority = request.POST['priority']
+            comments = request.POST['comments']
+            cdate = datetime.today()
+            demand = Demands(user=userConnected, server=serverHost, hostuser=userHost, priority=priority, comments=comments, cdate=cdate)
+            demand.markAsIgnore = False;
+            demand.save()
+            
+            messages.success(request, 'Notification sent to an heimdall administrator.')
+            return HttpResponseRedirect(reverse('servers'))
         else:
             messages.success(request, 'You need to be connected to see this page.')
             return HttpResponseRedirect(reverse('index'))

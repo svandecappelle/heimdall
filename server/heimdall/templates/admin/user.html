@@ -6,6 +6,9 @@
 			$("#form-updateuser").fadeIn();
 			$("#form-updateuser-username").val(user_target.username);
 			$("#form-updateuser-firstname").val(user_target.username);
+			$("#form-updateuser-email").val(user_target.email);
+			$("#form-updateuser-lastname").val(user_target.lastname);
+			
 			//$("#users-updateuser").set_style("left");
 			$("#form-adduser").slideUp();
 		}
@@ -67,11 +70,11 @@
 					      </tr>
 					      <tr>
 						      <td>Lastname</td>
-						      <td><input name="lastname" type="text"/></td>
+						      <td><input id="form-updateuser-lastname" name="lastname" type="text"/></td>
 					      </tr>
 						<tr>
 						      <td>E-mail</td>
-						      <td><input name="email"/></td>
+						      <td><input id="form-updateuser-email" name="email"/></td>
 					      </tr>
 						<tr>
 						      <td>Password</td>
@@ -83,7 +86,7 @@
 					      </tr>
 					      <tr>
 						      <td>Role</td>
-						      <td><select name="role"><option value="ADMIN">Administrator</option><option value="USER">User</option></select></td>
+						      <td><select id="form-updateuser-role" name="role"><option value="ADMIN">Administrator</option><option value="USER">User</option></select></td>
 					      </tr>
 					       <tr>
 						      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
