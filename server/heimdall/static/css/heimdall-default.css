@@ -240,3 +240,13 @@ h2{
 	height:100%;
 	width:20px;
 }
+.high-priority td{
+	color: rgba(246, 146, 146, 1);
+}
+
+.normal-priority td{
+}
+
+.low-priority td {
+	color: rgba(130, 150, 150, 1) !important;
+}

@@ -63,7 +63,7 @@ def deposite(request):
 def inbox(request):
     pool_role = HeimdallUserRole.objects.filter(user=request.user, type="MANAGER")
     poolPerimeters = PoolPerimeter.objects.filter(pool=pool_role).values_list('server')
-    demands = Demands.objects.filter(server=poolPerimeters)
+    demands = utils.get_demands_filtered(request.user)
    
     args = utils.give_arguments(request.user, 'Messages')
     args.update({'demands': demands})
@@ -142,11 +142,22 @@ def require_access(request):
         userConnected = request.user
         if userConnected.is_authenticated:
             if userConnected.groups.filter(name="heimdall"):
+               
+                
                 serverHost = Server.objects.get(hostname=request.POST['server'])
                 userHost = request.POST['user']
                 
+                print "is already "
+                print Demands.objects.filter(user=request.user,server=serverHost,hostuser=hostuser).exist()
+                
                 if userHost == "":
                     messages.success(request, 'You must write a user host')
+                    return HttpResponseRedirect(reverse('servers'))
+                elif Demands.objects.filter(user=request.user,server=serverHost,hostuser=hostuser).exist():
+                    messages.success(request, 'Your demand is already pending from manager validation please wait.')
+                    return HttpResponseRedirect(reverse('servers'))
+                elif Permission.objects.filter(user=userConnected).exist():
+                    messages.success(request, 'You already granted for access this server and account.')
                     return HttpResponseRedirect(reverse('servers'))
                 
                 priority = request.POST['priority']
@@ -163,6 +174,18 @@ def require_access(request):
                 priority = request.POST['priority']
                 comments = request.POST['comments']
                 cdate = date.today()
+                
+                if userHost == "":
+                    messages.success(request, 'You must write a user host')
+                    return HttpResponseRedirect(reverse('servers'))
+                elif Demands.objects.filter(user=userConnected,server=serverHost,hostuser=userHost).exists():
+                    messages.success(request, 'Your demand is already pending from manager validation please wait.')
+                    return HttpResponseRedirect(reverse('servers'))
+                elif Permission.objects.filter(user=userConnected,server=serverHost,hostuser=userHost).exists():
+                    messages.success(request, 'You already granted for access this server and account.')
+                    return HttpResponseRedirect(reverse('servers'))
+                
+                
                 demand = Demands(user=userConnected, server=serverHost, hostuser=userHost, priority=priority, comments=comments, cdate=cdate)
                 demand.save()
                 

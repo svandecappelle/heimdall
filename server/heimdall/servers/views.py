@@ -24,9 +24,7 @@ def permissions(request):
         if userConnected.groups.filter(name="heimdall-admin"):
             args.update({'permissions': convertToIterable(all_permissions)})
         elif userConnected.groups.filter(name="heimdall"):
-            if Permission.objects.filter(user=userConnected).count > 0:
-                print (Permission.objects.filter(user=userConnected).count)
-                
+            if Permission.objects.filter(user=userConnected).exists():
                 permissions_visible = Permission.objects.filter(user=userConnected)
                 
                 args.update({'permissions': convertToIterable(permissions_visible)})

@@ -2,8 +2,8 @@
 
 {% block content %}
 <h2>Vos demandes gestionnaires en attente:</h2>
-<div style="width:100%">
-<div style="float:left;display: block; margin-right:20px; width:50%;">
+<div style="width:100%;">
+<div class="inline-block" style="width:90%;">
 	  <table class="bordered" width="100%">
       	<thead>
       	<tr>
@@ -15,7 +15,7 @@
       </tr>
       </thead>
       {%for demand in demands%}
-      <tr>
+      <tr  class="{%if demand.priority == "HIGH" %}high-priority{%elif demand.priority == "NORMAL" %}normal-priority{%else%}low-priority{%endif%}">
       	<td>{{demand.cdate}}</td>
       	<td>{{demand.user.username}}</td>
       	<td>{{demand.server.hostname}}</td>
