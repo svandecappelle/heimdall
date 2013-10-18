@@ -74,6 +74,11 @@ button, input[type="button"], input[type="submit"],input[type="file"]{
 	box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
 }
 
+
+button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled,input[type="file"]:disabled{
+	color:grey;    
+}
+
 button:hover,input[type="button"]:hover, input[type="submit"]:hover,input[type="file"]:hover{
 	background-color: #ddd;        
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#fafafa), to(#ddd));
