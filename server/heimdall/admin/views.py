@@ -424,6 +424,34 @@ def perimeter_pool(request):
 def register_user(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
+			
+
+			if 'type' in request.POST:
+				if request.POST['type'] == 'update':
+					if check_password(request.POST['password'], request.POST['password-confirm']):
+						code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname'])
+						if code_return_check == 2:
+                                        		group = None
+                                        		upd_user = User.objects.get(username=request.POST['username'])
+                                        		upd_user.email=request.POST['email']
+							upd_user.first_name=request.POST['firstname']
+							upd_user.last_name=request.POST['lastname']
+							upd_user.set_password(request.POST['password'])
+							upd_user.save()
+                                        		messages.success(request, "User updated succesfully")
+                                		elif code_return_check == 0:
+                                        		messages.success(request, "You need to fill all the blanks fields")
+                                		elif code_return_check == 1:
+                                        		messages.success(request, "The username doesn't exists")
+                                		elif code_return_check == 3:
+                                        		messages.success(request, "The email you enterred is already associated with another account")
+					else:
+						messages.success(request, "Password and password confirmation does not match")
+					
+					return HttpResponseRedirect(reverse('admin-user'))
+
+
+
 			if check_password(request.POST['password'], request.POST['password-confirm']):
 				code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname']) 
 				print("return code ", str(code_return_check))
@@ -437,7 +465,7 @@ def register_user(request):
 					new_user = User.objects.create_user(username=request.POST['username'], email=request.POST['email'], password=request.POST['password'], first_name=request.POST['firstname'], last_name=request.POST['lastname'])
 					new_user.groups.add(group)
 					new_user.save()
-					messages.success(request, "Server not present in the perimeter")
+					messages.success(request, "User created succesfully")
 				elif code_return_check == 0:
 					messages.success(request, "You need to fill all the blanks fields")
 				elif code_return_check == 2:
@@ -448,7 +476,7 @@ def register_user(request):
 			else:
 				messages.success(request, "Password and password confirmation does not match")
 	else:
-		messages.success(request, "Server not present in the perimeter")
+		messages.success(request, "You have not the right to see this page.")
 		return HttpResponseRedirect(reverse('index'))
 	
 	return HttpResponseRedirect(reverse('admin-user'))
