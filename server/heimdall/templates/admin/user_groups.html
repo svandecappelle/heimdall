@@ -32,9 +32,15 @@
 						accept-charset="utf-8">
 						{% csrf_token%} <input type="hidden" name="type" value="add" />
 						<input type="hidden" name="groupname" value="{{ groupname }}" />
-					<td><select name="username"> {% for user in users %}
-							<option>{{user.username}}</option> {% endfor %}
-					</select></td>
+					<td>
+						<span class="select">
+							<select name="username"> 
+								{% for user in users %}
+									<option>{{user.username}}</option> 
+								{% endfor %}
+							</select>
+						</span>
+					</td>
 					<td><input type="submit" value="Add to group"></td>
 					</form>
 				</tr>

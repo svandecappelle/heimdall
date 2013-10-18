@@ -29,15 +29,17 @@
 							{% csrf_token%} 
 							<input type="hidden" name="type" value="add" />
 							<input type="hidden" name="username" value="{{ usertarget }}" />
-							<select name="groupname">
-								{% for role in groups %}
-									{% ifisa usertarget role.name %}
+							<span class="select">
+								<select name="groupname">
+									{% for role in groups %}
+										{% ifisa usertarget role.name %}
 										
-									{% else %}
-										<option>{{role.name}}</option>
-									{% endifisa %}
-								{% endfor %}
-							</select>
+										{% else %}
+											<option>{{role.name}}</option>
+										{% endifisa %}
+									{% endfor %}
+								</select>
+							</span>
 								
 							<input type="submit" value="→ add to group">
 						</form>
@@ -49,9 +51,8 @@
 					{% endifusergroup %}
 					</td>
 					<td>
-						<form action="/heimdall/admin/manage_group" method="post" accept-charset="utf-8">
+						<form action="/heimdall/admin/add_to_group" method="post" accept-charset="utf-8">
 							{% csrf_token%} 
-							<input type="hidden" name="type" value="add" />
 							<input type="hidden" name="username" value="{{ usertarget }}" />
 							{% for arole in userRoles%} 
 								{% ifequal arole.user.username usertarget.username %}
@@ -69,16 +70,22 @@
 								{% endifequal %} 
 							{% endfor %}
 							<br/>
-							<select name="groupname">
-								{% for arole in roles%}
-									{% ifhasrole usertarget arole.name %}
-									{% else %}
-										{% ifpoolandtype {{arole.name}} MANAGER %}
-											<option>{{arole.name}}</option>
-										{% endifpoolandtype %}
-									{% endifhasrole %}
-								{% endfor %}
-							</select>
+							<span class="select">
+								<select name="poolname">
+									{% for arole in roles%}
+										{% ifhasrole usertarget arole.name %}
+										{% else %}
+											{% ifusergroup heimdall-admin %}
+												<option>{{arole.name}}</option>
+											{%else%}
+												{% ifpoolandtype {{arole.name}} MANAGER %}
+													<option>{{arole.name}}</option>
+												{% endifpoolandtype %}
+											{% endifusergroup %}
+										{% endifhasrole %}
+									{% endfor %}
+								</select>
+							</span>
 							
 							<input type="submit" value="→ Add to pool">
 						</form>
@@ -92,21 +99,29 @@
 						method="post" accept-charset="utf-8">
 						{% csrf_token%}
 						<td>
-							<select name="username"> 
-								{% for usertarget in users %}
-									<option>{{usertarget.username}}</option>
-								{% endfor %}
-							</select>
+							<span class="select">
+								<select name="username"> 
+									{% for usertarget in users %}
+										<option>{{usertarget.username}}</option>
+									{% endfor %}
+								</select>
+							</span>
 						</td>
 						<td></td>
 						<td>
-							<select name="poolname">
-								{% for role in roles %}
-									{% ifpoolandtype {{role.name}} MANAGER %}
-										<option>{{role.name}}</option>
-									{% endifpoolandtype %}
-								{% endfor %}
-							</select>
+							<span class="select">
+								<select name="poolname">
+									{% for role in roles %}
+										{% ifusergroup heimdall-admin %}
+											<option>{{role.name}}</option>
+										{% else %}
+											{% ifpoolandtype {{role.name}} MANAGER %}
+												<option>{{role.name}}</option>
+											{% endifpoolandtype %}
+										{% endifusergroup %}
+									{% endfor %}
+								</select>
+							</span>
 							{% if user.is_authenticated %} 
 								<input type="submit" value="→ Add to pool" /> 
 							{% endif %}

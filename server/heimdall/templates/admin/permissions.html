@@ -81,12 +81,14 @@
 							<td>
 								<label for="hostname">Hostname</label>
 							</td>
-							<td>					
-								<select name="hostname" >
-								{% for server in servers %}				
-									<option value="{{server.hostname}}">{{server.hostname}}</option>
-								{% endfor %}
-								</select>
+							<td>
+								<span class="select">					
+									<select name="hostname" >
+									{% for server in servers %}				
+										<option value="{{server.hostname}}">{{server.hostname}}</option>
+									{% endfor %}
+									</select>
+								</span>
 							</td>
 						</tr>
 						<tr>				
@@ -94,11 +96,13 @@
 								<label for="username">User</label>
 							</td>
 							<td>
-								<select name="username" >
-								{% for user_perm in users %}				
-									<option value="{{user_perm.username}}">{{user_perm.username}}</option>
-								{% endfor %}
-								</select>
+								<span class="select">
+									<select name="username" >
+									{% for user_perm in users %}				
+										<option value="{{user_perm.username}}">{{user_perm.username}}</option>
+									{% endfor %}
+									</select>
+								</span>
 							</td>
 						</tr>					
 						<tr>

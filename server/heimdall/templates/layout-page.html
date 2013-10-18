@@ -100,9 +100,31 @@
 				    <h2>Connexion</h2>
 				    <form action="/heimdall/login" method="post" accept-charset="utf-8">
 				    	{% csrf_token %}
-					<label for="username">Username</label><input type="text" name="username" value="" id="username" />
-					<label for="password">Password</label><input type="password" name="password" value="" id="password" />
-					<p><input type="submit" value="Login →"></p>
+					<table>
+						<tr>
+							<td>
+								<label for="username">Username</label>
+							</td>
+							<td>
+								<input type="text" name="username" value="" id="username" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label for="password">Password</label>
+							</td>
+							<td>
+								<input type="password" name="password" value="" id="password" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<p>
+									<input type="submit" value="Login →">
+								</p>
+							</td>
+						</tr>
+					</table>
 				    </form>
 				    
 				    
@@ -110,7 +132,7 @@
 			    
 			    <div class="register">			    
 				    <h2>Enregistrement</h2>
-				    <a href="register">S'enregister</a>
+				    <a href="#">S'enregister (disabled by administrators)</a>
 			    </div>
 			</div>
 			</div>

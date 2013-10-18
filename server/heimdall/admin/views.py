@@ -168,10 +168,10 @@ def add_to_group(request):
 			user = User.objects.get(username=request.POST['username'])
 			pool = HeimdallPool.objects.get(name=request.POST['poolname'])
 			
-			new_userrole = HeimdallUserRole(user=user, pool=pool, type="USERS")
+			new_userrole = HeimdallUserRole(user=user, pool=pool, type="USER")
 			new_userrole.save()
 			
-			messages.success(request, 'Role associated')
+			messages.success(request, 'Pool associated')
 			return HttpResponseRedirect(reverse('admin-group-management'))
 		else:
 			messages.success(request, 'You have not the rights to do this action')

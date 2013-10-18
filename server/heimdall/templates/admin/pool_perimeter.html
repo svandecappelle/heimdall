@@ -38,13 +38,15 @@
 							<input type="hidden" name="action" value="add"/>
 							<input type="hidden" name="poolname" value="{{poolname}}"/>
 						<td>
-							<select name="hostname">
-								{% for server in servers %}
-									{% if server not in server_perimeter %}
-										<option>{{server.hostname}}</option>
-									{% endif %}
-								{% endfor %}
-							</select>
+							<span class="select">
+								<select name="hostname">
+									{% for server in servers %}
+										{% if server not in server_perimeter %}
+											<option>{{server.hostname}}</option>
+										{% endif %}
+									{% endfor %}
+								</select>
+							</span>
 						</td>
 						<td>
 							<input type="submit" name="add" value="Add"/>
@@ -86,11 +88,13 @@
 						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
 						{% csrf_token %}
 						<td>
-							<select name="username">
-								{% for users in users_not_manager_in_pool %}
-									<option>{{users.user.username}}</option>
-								{% endfor %}
-							</select>
+							<span class="select">
+								<select name="username">
+									{% for users in users_not_manager_in_pool %}
+										<option>{{users.user.username}}</option>
+									{% endfor %}
+								</select>
+							</span>
 						</td>
 						<td>
 								<input type="submit" name="add" value="Change to manager"/>
