@@ -4,7 +4,7 @@ import os
 
 ABSOLUTE_PATH = os.path.dirname(__file__)
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -19,7 +19,7 @@ DATABASES = {
         'NAME': 'heimdall',  # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'heimdall',
-        'PASSWORD': 'heimdall',
+        'PASSWORD': 'heimdall_@R3Pl1C4T0r',
         'HOST': 'localhost',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',  # Set to empty string for default.
     }
@@ -27,7 +27,7 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -69,13 +69,14 @@ STATIC_ROOT = os.path.join(ABSOLUTE_PATH, 'collected_static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = 'http://heimdall/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    "/usr/share/replicator/heimdall/server/heimdall/static/",
 )
 
 # List of finder classes that know how to find static files in
