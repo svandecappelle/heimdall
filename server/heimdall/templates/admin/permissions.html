@@ -6,14 +6,15 @@
  	<div class="inline-block" style="width:50%">
 		<h2>Add a user permission:</h2>
 		<div class="align-form" style="width:100%">
-	      			<table class="bordered" style="width:100%">
+	      			<table class="datagrid bordered" style="width:100%">
 				      	<thead>
 				      		<tr>
 							<th>User</th>
 							<th>Host</th>
 							<th>User in host</th>
 							{% if user.is_authenticated %}
-								<th colspan="2">Access</th>
+								<th colspan="1">Access</th>
+								<th></th>
 							{% endif %}
 						</tr>
 					</thead>
@@ -123,7 +124,7 @@
 		<h2>Revoke an access</h2>
 		
 		<div class="align-form" style="width:100%">
-	      	<table class="bordered" style="width:100%">
+	      	<table class="datagrid bordered" style="width:100%">
 				<thead>
 					<tr>
 						<th>User</th>

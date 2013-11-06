@@ -1,6 +1,7 @@
 {% extends "layout-page.html" %} {% load tags %} 
 
 {% block import %}
+
 	<script type="text/javascript">
 		function showForm(hostname){
 			$("#form-server").slideDown();
@@ -18,13 +19,14 @@
 
  	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
         <div class="inline-block" style="width:80%">
-	      <table class="bordered" style="width:100%">
+	      <table id="servers" class="datagrid bordered" style="width:100%">
 	      	<thead>
 	      		<tr>
 				<th>Host</th>
 				<th>Description</th>
 				{% if user.is_authenticated %}
-					<th colspan="2" >Actions</th>
+					<th colspan="1" >Actions</th>
+					<th></th>
 				{% endif %}
 			</tr>
 			</thead>
