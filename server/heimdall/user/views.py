@@ -102,7 +102,8 @@ def deposite(request):
 def inbox(request):
     demands = utils.get_demands_filtered(request.user)
     args = utils.give_arguments(request.user, 'Messages')
-    args.update({'demands': demands})
+    demands_read = utils.get_demands_filtered_and_read(request.user)
+    args.update({'demands': demands,'demands_read':demands_read})
     return render_to_response('user/messages.html', args , context_instance=RequestContext(request))
 
 # View Home
