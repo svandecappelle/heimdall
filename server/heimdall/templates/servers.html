@@ -26,7 +26,9 @@
 				<th>Description</th>
 				{% if user.is_authenticated %}
 					<th colspan="1" >Actions</th>
-					<th></th>
+					{% ifusergroup heimdall-admin %}
+						<th></th>
+					{% endifusergroup %}
 				{% endif %}
 			</tr>
 			</thead>
