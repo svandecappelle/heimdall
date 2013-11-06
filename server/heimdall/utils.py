@@ -18,6 +18,14 @@ def get_demands_filtered(user_filter):
 		demands = Demands.objects.filter(user=user_filter,markAsIgnore=False)
 	return demands
 
+def get_demands_filtered_and_read(user_filter):
+        demands = VoidDemand()
+        if user_filter.groups.filter(name="heimdall-admin").exists():
+                demands = Demands.objects.filter(markAsIgnore=True)
+        elif user_filter.groups.filter(name="heimdall").exists():
+                demands = Demands.objects.filter(user=user_filter,markAsIgnore=True)
+        return demands
+
 def get_demands_filtered_pending(user_filter):
 	demands = VoidDemand()
 	if user_filter.groups.filter(name="heimdall-admin").exists():

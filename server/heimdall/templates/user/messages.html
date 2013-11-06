@@ -1,61 +1,139 @@
 {% extends "layout-page.html" %}
 
+{% block import%}
+
+	<script>
+			function showReadNotifications(){
+   	 			if( $('.notification-reads-show').hasClass('active') ){
+        				$('.notification-reads-show').removeClass('active');
+					$('.notification-reads-show').find('a').html('Show');
+					$('.read-notifications').slideUp(200);        
+    				} else {
+        				$('.notification-reads-show').addClass('active');
+					$('.notification-reads-show').find('a').html('Hide');
+					$('.read-notifications').slideDown(200);
+    				}
+			}
+	</script>
+
+{% endblock %}
+
+
 {% block content %}
 <h2>Vos demandes gestionnaires en attente:</h2>
 <div style="width:100%;">
-<div class="inline-block" style="width:90%;">
-	  <table class="datagrid bordered" width="100%">
-      	<thead>
-      	<tr>
-      	<th>date</th>
-      	<th>Utilisateur</th>
-      	<th>Serveur</th>
-      	<th>Connection avec utilisateur</th>
-      	<th>Commentaires</th>
-      	<th>Priority</th>
-      	<th>Status</th>
-      	<th>Action</th>
-      </tr>
-      </thead>
-      {%for demand in demands%}
-      <tr  class="{%if demand.priority == "HIGH" %}high-priority{%elif demand.priority == "NORMAL" %}normal-priority{%else%}low-priority{%endif%}  {%ifequal demand.accepted None%}pending-request {%else%}{% if demand.accepted %} accepted-request {%else%}rejected-request {%endif%}{%endifequal%}">
-      	<td>{{demand.cdate}}</td>
-      	<td>{{demand.user.username}}</td>
-      	<td>{{demand.server.hostname}}</td>
-      	<td>{{demand.hostuser}}</td>
-      	<td>{{demand.comments}}</td>
-      	<td>
-      		{%if demand.priority == "HIGH" %}
-      			High priority
-      		{%elif demand.priority == "NORMAL" %}
-      			Normal priority
-      		{%else%}
-      			Low priority
-      		{%endif%}  
+	<div class="inline-block" style="width:90%;">
+		<table class="datagrid bordered" width="100%">
+      			<thead>
+      				<tr>
+      					<th>date</th>
+      					<th>Utilisateur</th>
+      					<th>Serveur</th>
+      					<th>Connection avec utilisateur</th>
+      					<th>Commentaires</th>
+      					<th>Priority</th>
+      					<th>Status</th>
+      					<th>Action</th>
+      				</tr>
+      			</thead>
+      			<tbody>
+
+	
+			{%for demand in demands%}
+      				<tr  class="{%if demand.priority == "HIGH" %}high-priority{%elif demand.priority == "NORMAL" %}normal-priority{%else%}low-priority{%endif%}  {%ifequal demand.accepted None%}pending-request {%else%}{% if demand.accepted %} accepted-request {%else%}rejected-request {%endif%}{%endifequal%}">
+      					<td>{{demand.cdate}}</td>
+      					<td>{{demand.user.username}}</td>
+      					<td>{{demand.server.hostname}}</td>
+      					<td>{{demand.hostuser}}</td>
+      					<td>{{demand.comments}}</td>
+      					<td>
+      						{%if demand.priority == "HIGH" %}
+      							High priority
+      						{%elif demand.priority == "NORMAL" %}
+      							Normal priority
+      						{%else%}
+      							Low priority
+      						{%endif%}  
       	
-      	</td>
-      	<td>
-      		{%ifequal demand.accepted None%}
-      			Pending request...
-      		{%else%}
-      			{% if demand.accepted %} 
-      				Accepted 
-      			{%else%}
-      				Rejected
-      			{%endif%}
-      		{%endifequal%}
-      	</td>
-      	<td>
-      		<form action="/heimdall/user/markasread" method="post">
-      			{% csrf_token %}
-      			<input type="hidden" value="{{demand.hostuser}}" name="hostuser"/>
-      			<input type="hidden" value="{{demand.server.hostname}}" name="hostname"/>
-      			<input type="submit" value="Mark as read"/>
-      		</form>
-      	</td>
-      </tr>
-      {% endfor %}
-      </table>
+      					</td>
+      					<td>
+      						{%ifequal demand.accepted None%}
+      							Pending request...
+      						{%else%}
+      							{% if demand.accepted %} 
+      								Accepted 
+      							{%else%}
+      								Rejected
+      							{%endif%}
+      						{%endifequal%}
+      					</td>
+      					<td>
+      						<form action="/heimdall/user/markasread" method="post">
+      						{% csrf_token %}
+      							<input type="hidden" value="{{demand.hostuser}}" name="hostuser"/>
+      							<input type="hidden" value="{{demand.server.hostname}}" name="hostname"/>
+      							<input type="submit" value="Mark as read"/>
+      						</form>
+      					</td>
+      				</tr>
+      			{% endfor %}
+		</tbody>  
+  	</table>
+</div>
+
+
+<h2 class="notification-reads-show"> Read notifications:<a style="cursor:pointer;" onClick="showReadNotifications()">Show</a></h2>
+
+<div class="inline-block read-notifications" style="width:90%; display:none;">
+	<table class="datagrid bordered" width="100%">
+		<thead>
+			<tr>
+				<th>date</th>
+                                <th>Utilisateur</th>
+                                        <th>Serveur</th>
+                                        <th>Connection avec utilisateur</th>
+                                        <th>Commentaires</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                </tr>
+                        </thead>
+                        <tbody>
+
+
+                        {%for demand in demands_read%}
+                                <tr  class="{%if demand.priority == "HIGH" %}high-priority{%elif demand.priority == "NORMAL" %}normal-priority{%else%}low-priority{%endif%}  {%ifequal demand.accepted None%}pending-request {%else%}{% if demand.accepted %} accepted-request {%else%}rejected-request {%endif%}{%endifequal%}">
+                                        <td>{{demand.cdate}}</td>
+                                        <td>{{demand.user.username}}</td>
+                                        <td>{{demand.server.hostname}}</td>
+                                        <td>{{demand.hostuser}}</td>
+                                        <td>{{demand.comments}}</td>
+                                        <td>
+                                                {%if demand.priority == "HIGH" %}
+                                                        High priority
+                                                {%elif demand.priority == "NORMAL" %}
+                                                        Normal priority
+                                                {%else%}
+                                                        Low priority
+                                                {%endif%}
+
+                                        </td>
+                                        <td>
+                                                {%ifequal demand.accepted None%}
+                                                        Pending request...
+                                                {%else%}
+                                                        {% if demand.accepted %}
+                                                                Accepted
+                                                        {%else%}
+                                                                Rejected
+                                                        {%endif%}
+                                                {%endifequal%}
+                                        </td>
+                                </tr>
+                        {% endfor %}
+                </tbody>
+
+	</table>
+
 </div>
 </div>
 {% endblock %}
