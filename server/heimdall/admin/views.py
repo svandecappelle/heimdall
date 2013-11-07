@@ -137,18 +137,8 @@ def getarguments_for_admin(user):
 
 def getarguments_for_manager(request,user):
 	pools = HeimdallUserRole.objects.filter(user__exact=user, type__exact='MANAGER').values_list('pool')
-	
-	message_debug='pools: '
-	for one_role in HeimdallUserRole.objects.filter(user=user,type__exact='MANAGER'):
-		for one_pool in PoolPerimeter.objects.filter(pool__exact=one_role.pool):
-			message_debug = message_debug + str(one_pool)
-
-
-	
 	perimeters = PoolPerimeter.objects.filter(pool__exact=pools)
-	
 
-	messages.success(request, message_debug)
 	servers=[]
 	for one_perimeter in perimeters:	
 		servers.append(one_perimeter.server)
