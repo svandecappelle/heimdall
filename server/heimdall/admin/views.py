@@ -122,7 +122,7 @@ def permissions(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		args = getarguments_for_admin(request.user)
 	else:
-		args = getarguments_for_manager(request.user)
+		args = getarguments_for_manager(request,request.user)
 
 	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
 
@@ -135,19 +135,28 @@ def getarguments_for_admin(user):
 	args.update({'demands' : demands, 'servers': servers, 'users': users, 'permissions' : permissions})
 	return args
 
-def getarguments_for_manager(user):
-	pools = HeimdallUserRole.objects.filter(user=user)
-	perimeters = PoolPerimeter.objects.filter(pool = pools)
+def getarguments_for_manager(request,user):
+	pools = HeimdallUserRole.objects.filter(user__exact=user, type__exact='MANAGER').values_list('pool')
+	
+	message_debug='pools: '
+	for one_role in HeimdallUserRole.objects.filter(user=user,type__exact='MANAGER'):
+		for one_pool in PoolPerimeter.objects.filter(pool__exact=one_role.pool):
+			message_debug = message_debug + str(one_pool)
 
+
+	
+	perimeters = PoolPerimeter.objects.filter(pool__exact=pools)
+	
+
+	messages.success(request, message_debug)
 	servers=[]
 	for one_perimeter in perimeters:	
 		servers.append(one_perimeter.server)
 
 	users=[]
-	for one_role_pool in pools:
-		user_role = HeimdallUserRole.objects.filter(pool=one_role_pool.pool)
-		for users_roles in user_role:
-			users.append(users_roles.user)
+	user_role = HeimdallUserRole.objects.filter(pool__in=pools)
+	for users_roles in user_role:
+		users.append(users_roles.user)
 	
 	demands = Demands.objects.filter(close_date__isnull=True, user__in= users, server__in =servers)
 	for filtered_demands in demands:
@@ -182,6 +191,8 @@ def add_to_group(request):
 def manage_user_role(request):
 	pool = HeimdallPool.objects.filter(name=request.GET['poolname'])	
 	userRoles = HeimdallUserRole.objects.filter(pool=pool)
+	
+	
 	usersToFilter = []
 	notUserSpecialInPool = []
 	userSpecialInPool = []
