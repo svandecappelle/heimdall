@@ -4,7 +4,7 @@ import os
 
 ABSOLUTE_PATH = os.path.dirname(__file__)
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -19,7 +19,7 @@ DATABASES = {
         'NAME': 'heimdall',  # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'heimdall',
-        'PASSWORD': 'heimdall_@R3Pl1C4T0r',
+        'PASSWORD': 'heimdall',
         'HOST': 'localhost',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',  # Set to empty string for default.
     }
@@ -69,14 +69,14 @@ STATIC_ROOT = os.path.join(ABSOLUTE_PATH, 'collected_static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = 'http://heimdall/static/'
+STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/usr/share/replicator/heimdall/server/heimdall/static/",
+    #"path to heimdall  heimdall/heimdall/static/",
 )
 
 # List of finder classes that know how to find static files in
