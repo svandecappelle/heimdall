@@ -95,10 +95,9 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<form action="/heimdall/admin/add_to_group"
-						method="post" accept-charset="utf-8">
-						{% csrf_token%}
 						<td>
+							<form action="/heimdall/admin/add_to_group" method="post" accept-charset="utf-8">
+								{% csrf_token%}
 							<span class="select">
 								<select name="username"> 
 									{% for usertarget in users %}
@@ -106,9 +105,8 @@
 									{% endfor %}
 								</select>
 							</span>
-						</td>
-						<td></td>
-						<td>
+
+
 							<span class="select">
 								<select name="poolname">
 									{% for role in roles %}
@@ -123,11 +121,12 @@
 								</select>
 							</span>
 							{% if user.is_authenticated %} 
-								<input type="submit" value="→ Add to pool" /> 
+								<input type="submit" value="→ Add to pool" />
 							{% endif %}
+						</form>
 						</td>
-
-					</form>
+						<td></td>
+						<td></td>
 				</tr>
 			</tfoot>
 		</table>

@@ -47,37 +47,38 @@
 			{% ifusergroup heimdall-admin %}
 				<tfoot>
                                                 <tr>
-                                                        <form action="/heimdall/admin/manage_role" method="post"
-                                                                accept-charset="utf-8">
-                                                                {% csrf_token%}
-                                                                <input type="hidden" name="type" value="add" />
-                                                                <input type="hidden" name="poolname" value="{{ poolname }}" />
-                                                                <td>
-                                                                        <span class="select">
-                                                                                <select name="username">
-                                                                                        {% for user in users %}
-                                                                                                <option>{{user.username}}</option>
-                                                                                        {% endfor %}
-                                                                                </select>
-                                                                        </span>
-                                                                </td>
+								<td>
+									<form action="/heimdall/admin/manage_role" method="post" accept-charset="utf-8">
+										{% csrf_token%}
+										<input type="hidden" name="type" value="add" />
+										<input type="hidden" name="poolname" value="{{ poolname }}" />
+
+                                                                        	<span class="select">
+                                                                                	<select name="username">
+                                                                                        	{% for user in users %}
+                                                                                                	<option>{{user.username}}</option>
+                                                                                        	{% endfor %}
+                                                                                	</select>
+                                                                        	</span>
+								
+										<input type="submit" value="Add to group" />
+									</form>
+								</td>
 
                                                                 <td>    
-                                                                        <input type="submit" value="Add to group" />
                                                                 </td>
-                                                        </form> 
                                                 </tr>   
                                    </tfoot>
 			{% else %}
 				{% ifpoolandtype {{poolname}} MANAGER %}
 					<tfoot>
 						<tr>
-							<form action="/heimdall/admin/manage_role" method="post"
-								accept-charset="utf-8">
-								{% csrf_token%} 
-								<input type="hidden" name="type" value="add" />
 								<input type="hidden" name="poolname" value="{{ poolname }}" />
 								<td>
+									<form action="/heimdall/admin/manage_role" method="post" accept-charset="utf-8">
+										{% csrf_token%}
+										 <input type="hidden" name="type" value="add" />
+										 <input type="hidden" name="poolname" value="{{ poolname }}" />
 									<span class="select">
 										<select name="username"> 
 											{% for user in users %}
@@ -85,12 +86,13 @@
 											{% endfor %}
 										</select>
 									</span>
+									<input type="submit" value="Add to group" />
+
+									</form>
 								</td>
 							
 								<td>
-									<input type="submit" value="Add to group" />
 								</td>
-							</form>	
 						</tr>
 					</tfoot>
 				{% endifpoolandtype %}
@@ -132,23 +134,23 @@
 			<tfoot>
 				
 					<tr>
-						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
-						{% csrf_token %}
 						<td>
-							<span class="select">
-								<select name="username">
-									{% for users in not_special_users_in_pool %}
-										<option>{{users.username}}</option>
-									{% endfor %}
-								</select>
-							</span>
+							<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+								{% csrf_token %}
+								<span class="select">
+									<select name="username">
+										{% for users in not_special_users_in_pool %}
+											<option>{{users.username}}</option>
+										{% endfor %}
+									</select>
+								</span>
+								<input type="submit" name="add" value="Change to manager"/>
+								<input type="hidden" name="action" value="setmanager"/>
+								<input type="hidden" name="poolname" value="{{poolname}}"/>
+							</form>
 						</td>
 						<td>
-							<input type="submit" name="add" value="Change to manager"/>
-							<input type="hidden" name="action" value="setmanager"/>
-							<input type="hidden" name="poolname" value="{{poolname}}"/>
 						</td>
-						</form>
 					</tr>
 			</tfoot>
 		</table>

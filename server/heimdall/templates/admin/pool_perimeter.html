@@ -31,13 +31,15 @@
 				</tr>
 				{% endfor %}
 			</tbody>
-			<tfoot>
+			<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+				 {% csrf_token %}
+				<tfoot>
 				<tr>
-					<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
-						{% csrf_token %}
+					<td>
+						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+							{% csrf_token %}
 							<input type="hidden" name="action" value="add"/>
 							<input type="hidden" name="poolname" value="{{poolname}}"/>
-						<td>
 							<span class="select">
 								<select name="hostname">
 									{% for server in servers %}
@@ -47,15 +49,15 @@
 									{% endfor %}
 								</select>
 							</span>
+							<input type="submit" name="add" value="Add"/>
+							</form>	
 						</td>
 						<td>
-							<input type="submit" name="add" value="Add"/>
 						</td>
-					</form>
-				</tr>
-			</tfoot>
-		</table>
-	</form>
+					</tr>
+				
+				</tfoot>
+			</table>
 </div>	
 <!-- managers -->
 
@@ -85,24 +87,22 @@
 			</tbody>
 			<tfoot>
 					<tr>
-						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
-						{% csrf_token %}
 						<td>
-							<span class="select">
+							<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+								 {% csrf_token %}
+								 <span class="select">
 								<select name="username">
 									{% for users in users_not_manager_in_pool %}
 										<option>{{users.user.username}}</option>
 									{% endfor %}
 								</select>
 							</span>
-						</td>
-						<td>
-								<input type="submit" name="add" value="Change to manager"/>
+							<input type="submit" name="add" value="Change to manager"/>
 								<input type="hidden" name="action" value="setmanager"/>
 								<input type="hidden" name="poolname" value="{{poolname}}"/>
 							 </form>
 						</td>
-						</form>
+						<td></td>
 					</tr>
 			</tfoot>
 		</table>
