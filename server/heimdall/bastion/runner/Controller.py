@@ -53,6 +53,7 @@ def addPermission(user_target, server_target, hostuser_target, sshkey):
 	If the user has already uploaded his rsa key, then the replicator replicate 
 	his key on the server to instant grant access.
 	"""
+	warn = None
 	logger.log("Add permission: " + user_target.username + " for server: ["+server_target.hostname+"]" + " with user: {"+hostuser_target+"}", Constants.INFO)
 	permission = Permission.objects.create(user=user_target, server=server_target, hostuser=hostuser_target)
 	try :
@@ -64,14 +65,14 @@ def addPermission(user_target, server_target, hostuser_target, sshkey):
 		logger.log("Error SSH: " + str(e), Constants.ERROR)
 		return ReplicationError(1,"Erreur d'authentification ssh au server: "+ server_target.hostname)
 	except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
-		logger.log("Error Socket: " + str(e), Constants.ERROR)
-		return ReplicationError(1,"Contact avec le serveur: "+ server_target.hostname+" impossible, no route to host")
+		#logger.log("Error Socket: " + str(e), Constants.ERROR)
+		warn = ReplicationError(1,"WARN:: Contact avec le serveur: "+ server_target.hostname+" a genere un warning")
 	except Exception as e:
 		logger.log("Not catched error on replication: " + str(e), Constants.ERROR)
 		return ReplicationError(1,"Erreur on replication: [["+ server_target.hostname+"]]"+ str(e))
 	permission.save()
 	logger.log("permission added need replicate", Constants.INFO)
-	return None
+	return warn
 
 def revokePermission(user_target, server_target, hostuser_target, sshkey):
 	"""
@@ -79,26 +80,27 @@ def revokePermission(user_target, server_target, hostuser_target, sshkey):
 	If the user has already uploaded his rsa key, then the replicator revoke 
 	his key on the server.
 	"""
+	warn = None
 	logger.log("Revoke permission ", Constants.INFO)
 	permission = Permission.objects.filter(user=user_target, server=server_target, hostuser=hostuser_target)
 	try :
 		replicator.revoke_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email, server_target.port)
 	except AuthenticationException as e:
 		logger.log("Error Authentication: " + str(e), Constants.ERROR)
-		return ReplicationError(1,"Erreur d'authentification au server: "+ server_target.hostname)
+		return ReplicationError(1,"Erreur d'authentification au server: "+ str(e)+ " " + server_target.hostname)
 	except SSHException as e:
 		logger.log("Error SSH: " + str(e), Constants.ERROR)
 		return ReplicationError(1,"Erreur d'authentification ssh au server: "+ server_target.hostname)
 	except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
-		logger.log("Error Socket: " + str(e), Constants.ERROR)
-		return ReplicationError(1,"Erreur d'authentification au server: "+ server_target.hostname)
+		#logger.log("Error Socket: " + str(e), Constants.ERROR)
+		warn = ReplicationError(1,"Contact avec le server: "+str(e)+" " +server_target.hostname + " a genere un warning")
 	except Exception as e:
 		logger.log("Not catched error on replication: " + str(e), Constants.ERROR)
 		return ReplicationError(1,"Erreur on replication: [["+ server_target.hostname+"]]"+ str(e))
 
 	permission.delete()
 	logger.log("permission added need replicate", Constants.INFO)
-	
+	return warn
 def revokeAllKeys(permissions, user, sshkey):
 	logger.log("Revoke all permission ", Constants.INFO)
 	for permission in permissions:

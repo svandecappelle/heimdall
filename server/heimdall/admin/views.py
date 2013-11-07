@@ -57,29 +57,28 @@ def user(request):
 		return HttpResponseRedirect(reverse('admin'))
 	
 def revoke_access(request):
-	if request.user.groups.filter(name="heimdall-admin"):
-		if request.method == 'POST':
-			user = User.objects.get(username=request.POST['username'])
-			host = Server.objects.get(hostname=request.POST['hostname'])
-			hostuser = request.POST['hostuser']
+	if request.method == 'POST':
+		user = User.objects.get(username=request.POST['username'])
+		host = Server.objects.get(hostname=request.POST['hostname'])
+		hostuser = request.POST['hostuser']
 			
 			
-			message = None
+		message = None
 			
-			if SshKeys.objects.filter(user=user).count == 0:
-				message = 'No RSA saved on database. Contact user to set his RSA key.'
-			elif SshKeys.objects.filter(user=user).count() > 1:
-				message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
+		if SshKeys.objects.filter(user=user).count == 0:
+			message = 'No RSA saved on database. Contact user to set his RSA key.'
+		elif SshKeys.objects.filter(user=user).count() > 1:
+			message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
+		else:
+			rsa_key = SshKeys.objects.get(user=user)
+			err = Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
+			if err == None:
+				message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')'
+				Demands.objects.get(user=user,server=host,hostuser=hostuser).delete()
 			else:
-				rsa_key = SshKeys.objects.get(user=user)
-				err = Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
-				if err == None:
-					message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')'
-					Demands.objects.get(user=user,server=host,hostuser=hostuser).delete()
-				else:
-					message=err.message
+				message=err.message
 
-			messages.success(request, message)
+		messages.success(request, message)
 	else:
 		messages.success(request, 'You have not the rights to do this action')
 
@@ -242,7 +241,7 @@ def manage_role(request):
 	
 
 def grant_access(request):
-	if request.user.groups.filter(name="heimdall-admin"):
+	if request.user.groups.filter(name__in=["heimdall-admin","heimdall"]):
 		if request.method == 'POST':
 			user = None
 			host = None
@@ -275,11 +274,13 @@ def grant_access(request):
 				else:
 					rsa_key = SshKeys.objects.get(user=user)
 					err = Controller.addPermission(user, host, request.POST['hostuser'], rsa_key)
-					demand = Demands.objects.get(user=user,server=host,hostuser=hostuser)
-					demand.close_date=datetime.today()
-					demand.accepted=True
-					demand.markAsIgnore=False
-					demand.save()
+					
+					if Demands.objects.filter(user=user,server=host,hostuser=hostuser).exists():
+						demand = Demands.objects.get(user=user,server=host,hostuser=hostuser)
+						demand.close_date=datetime.today()
+						demand.accepted=True
+						demand.markAsIgnore=False
+						demand.save()
 					
 					if err == None:
 						if request.POST['username'] != '[[ALL]]':

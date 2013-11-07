@@ -69,7 +69,8 @@ class ReplicationFactory:
 		
 		stdin, stdout, stderr = client.exec_command("grep -v '%s' %s > %s.tmp" % (rsa_search, sshconfig_file, sshconfig_file))
 		stdin, stdout, stderr = client.exec_command("cat %s > %s.bak" % (sshconfig_file, sshconfig_file))
-		stdin, stdout, stderr = client.exec_command("rm %s" % (sshconfig_file))
+		stdin, stdout, stderr = client.exec_command("chmod 0600 %s.tmp" % (sshconfig_file))
+		#stdin, stdout, stderr = client.exec_command("rm %s" % (sshconfig_file))
 		stdin, stdout, stderr = client.exec_command("mv %s.tmp %s" % (sshconfig_file, sshconfig_file))
 		stdin, stdout, stderr = client.exec_command("rm %s.bak" % (sshconfig_file))
 		logger.log("Access revoked", Constants.INFO)
