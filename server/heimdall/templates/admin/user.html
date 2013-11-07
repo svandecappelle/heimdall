@@ -1,4 +1,4 @@
-{% extends "layout-page.html" %}
+{% extends "layout-page.html" %} {% load tags%}
 
 {% block import %}
 	<script type="text/javascript">
@@ -96,7 +96,7 @@
 
 
 
-
+{% ifusergroup heimdall-admin %}
 <div style="width:100%; display:inline-block;">
 <div id="form-adduser">
 <h2>Add a user on heimdall: </h2>
@@ -156,4 +156,5 @@
 
 </div>
 </div>
- {% endblock %}
+{% endifusergroup %}
+{% endblock %}

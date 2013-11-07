@@ -129,8 +129,12 @@ def register(request):
 
 # View users
 def users(request):
-    list_users = User.objects.all()
     
+    if request.user.groups.filter(name="heimdall-admin"):
+    	list_users = User.objects.all()
+    else:
+	list_users = [request.user]
+
     args = utils.give_arguments(request.user, 'Utilisateurs')
     args.update({'list_users': list_users})
     

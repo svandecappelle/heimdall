@@ -53,8 +53,9 @@ def user(request):
 		args.update({'list_users': users})
 		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	else:
-		messages.success(request, 'You have not the rights to see this page')
-		return HttpResponseRedirect(reverse('admin'))
+		users = [request.user]
+		args.update({'list_users': users})
+		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	
 def revoke_access(request):
 	if request.method == 'POST':
@@ -221,7 +222,7 @@ def manage_group(request):
 	return HttpResponseRedirect(reverse('admin-group-management'))
 
 def manage_role(request):
-	if request.user.groups.filter(name="heimdall-admin"):
+	if request.method == 'POST':
 		user = User.objects.get(username=request.POST['username'])
 		pool = HeimdallPool.objects.get(name=request.POST['poolname'])
 		if request.POST['type'] == "add":
@@ -478,8 +479,28 @@ def register_user(request):
 			else:
 				messages.success(request, "Password and password confirmation does not match")
 	else:
-		messages.success(request, "You have not the right to see this page.")
-		return HttpResponseRedirect(reverse('index'))
+		
+		if check_password(request.POST['password'], request.POST['password-confirm']):
+			code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname'])
+			if code_return_check == 2:
+				group = None
+				upd_user = request.user
+				upd_user.email=request.POST['email']
+				upd_user.first_name=request.POST['firstname']
+				upd_user.last_name=request.POST['lastname']
+				upd_user.set_password(request.POST['password'])
+				upd_user.save()
+			elif code_return_check == 0:
+				messages.success(request, "You need to fill all the blanks fields")
+			elif code_return_check == 1:
+				messages.success(request, "The username doesn't exists")
+			elif code_return_check == 3:
+				messages.success(request, "The email you enterred is already associated with another account")
+		else:
+			messages.success(request, "Password and password confirmation does not match")
+		
+		
+		return HttpResponseRedirect(reverse('admin-user'))
 	
 	return HttpResponseRedirect(reverse('admin-user'))
 

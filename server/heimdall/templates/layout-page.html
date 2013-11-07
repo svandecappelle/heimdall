@@ -161,12 +161,11 @@
 	          		<li><a href="/heimdall/servers"><img src="{% static "img/icons/servers-32x32.png" %}" title="Serveurs"/>Serveurs</a></li>
 	          		<li><a href="/heimdall/user/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/>Permissions</a></li>
 	          		<li><a href="/heimdall/user/deposite"><img src="{% static "img/icons/deposite-32x32.png" %}" title="Depot"/>Dépot</a></li>
-					
+				<li><a href="/heimdall/admin/user"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/>Utilisateurs</a></li>	
 					{% ifusergroup heimdall-admin %}
 					<!-- admin panel -->
 						<hr class="separate-token"/>
 						<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/permissions-32x32.png" %}" title="Permissions"/>Permissions</a></li>
-				  		<li><a href="/heimdall/admin/user"><img src="{% static "img/icons/users-32x32.png" %}" title="Utilisateurs"/>Utilisateurs</a></li>
 						<li><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/users-32x32.png" %}" title="Manage Groups"/>Manage Groups</a></li>
 					{%else%}
 						{% ifhasroletype MANAGER %}
