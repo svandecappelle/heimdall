@@ -164,7 +164,9 @@ table {
     border-radius: 0 0 6px 6px
 }
 
-
+.datagrid{
+    float:left;
+}
 /*
  *  File:         demo_table.css
  *  CVS:          $Id$
@@ -196,7 +198,6 @@ table {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DataTables features
  */
-
 .dataTables_wrapper {
 	position: relative;
 	clear: both;
