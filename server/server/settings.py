@@ -1,14 +1,42 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Django settings for www project.
+"""
+
+This file is part of Heimdall.
+
+Heimdall is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Heimdall is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+
+Authors: 
+- Vandecappelle Steeve<svandecappelle@vekia.fr>
+- Sobczak Arnaud<asobczack@vekia.fr>
+
+# Name:         server/settings.py
+# Author:       Vandecappelle Steeve & Sobczak Arnaud
+# Copyright:    (C) 2013-2014 Vandecappelle Steeve & Sobczak Arnaud
+# Licence:      GNU General Public Licence version 3
+# Website:      http://vekia.github.io/heimdall/
+# Email:        svandecappelle at vekia.fr
+"""
 import os
 
 ABSOLUTE_PATH = os.path.dirname(__file__)
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    #('Your Name', 'your_email@example.com'),
 )
 
 MANAGERS = ADMINS
@@ -19,7 +47,7 @@ DATABASES = {
         'NAME': 'heimdall',  # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'heimdall',
-        'PASSWORD': 'heimdall',
+        'PASSWORD': '$heimdallpasswd',
         'HOST': 'localhost',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',  # Set to empty string for default.
     }
@@ -27,7 +55,7 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -76,6 +104,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    '$installdir/server/heimdall/static/',
 )
 
 # List of finder classes that know how to find static files in
@@ -126,7 +155,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'heimdall',
     # Uncomment the next line to enable the admin:
-    'django.contrib.admin',
+    #'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )

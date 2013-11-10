@@ -28,6 +28,7 @@ Authors:
 # Website:      http://vekia.github.io/heimdall/
 # Email:        svandecappelle at vekia.fr
 """
+
 from django.contrib import admin
 from heimdall.models import Server, Permission, Demands, Roles, RolePerimeter, UserRoles, SshKeys
 

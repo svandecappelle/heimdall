@@ -21,7 +21,7 @@ Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
-# Name:         Messager.py
+# Name:         bastion/lib/utils/Messager.py
 # Author:       Vandecappelle Steeve & Sobczak Arnaud
 # Copyright:    (C) 2013-2014 Vandecappelle Steeve & Sobczak Arnaud
 # Licence:      GNU General Public Licence version 3

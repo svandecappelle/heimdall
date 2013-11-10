@@ -21,7 +21,7 @@ Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
-# Name:         Logger.py
+# Name:         bastion/lib/utils/Logger.py
 # Author:       Vandecappelle Steeve & Sobczak Arnaud
 # Copyright:    (C) 2013-2014 Vandecappelle Steeve & Sobczak Arnaud
 # Licence:      GNU General Public Licence version 3
