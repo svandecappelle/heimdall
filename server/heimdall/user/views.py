@@ -134,7 +134,8 @@ def deposite(request):
 def inbox(request):
     demands = utils.get_demands_filtered(request.user)
     args = utils.give_arguments(request.user, 'Messages')
-    args.update({'demands': demands})
+    demands_read = utils.get_demands_filtered_and_read(request.user)
+    args.update({'demands': demands,'demands_read':demands_read})
     return render_to_response('user/messages.html', args , context_instance=RequestContext(request))
 
 # View Home
@@ -160,8 +161,12 @@ def register(request):
 
 # View users
 def users(request):
-    list_users = User.objects.all()
     
+    if request.user.groups.filter(name="heimdall-admin"):
+    	list_users = User.objects.all()
+    else:
+	list_users = [request.user]
+
     args = utils.give_arguments(request.user, 'Utilisateurs')
     args.update({'list_users': list_users})
     
@@ -200,10 +205,13 @@ def mark_as_read(request):
             hostuser = request.POST['hostuser']
             hostname = request.POST['hostname']
             server = Server.objects.get(hostname=hostname)
-            demand = Demands.objects.get(user=request.user,server=server,hostuser=hostuser)
-            demand.markAsIgnore = True
-            demand.save()
             
+	    if Demands.objects.filter(user=request.user, server=server, hostuser=hostuser).exists():
+	    	demand = Demands.objects.get(user=request.user,server=server,hostuser=hostuser)
+            	demand.markAsIgnore = True
+            	demand.save()
+            else:
+		messages.success(request, 'You are not the user who made the demand, you cannot mark it as read.')
         else:
             messages.success(request, 'User registered successfully.')
     else:

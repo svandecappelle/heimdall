@@ -2,13 +2,17 @@
 
 <div class="inline-block" style="width:50%">
 	<h2>Members of {{poolname}}:</h2>
-		<table class="bordered">
+		<table class="datagrid bordered">
 			<thead>
 				<tr>
 					<th>Users</th>
-					{%ifpoolandtype {{poolname}} MANAGER %}
+					{% ifusergroup heimdall-admin %}
 						<th>Action</th>
-					{%endifpoolandtype%}
+					{% else %}
+						{%ifpoolandtype {{poolname}} MANAGER %}
+							<th>Action</th>
+						{%endifpoolandtype%}
+					{% endifusergroup %}
 				</tr>
 			</thead>
 
@@ -21,44 +25,78 @@
 						<input type="hidden" name="username" value="{{ member.user.username }}" />
 						<input type="hidden" name="poolname" value="{{ poolname }}" />
 						<td style="with: 100%" class="{%if member.type == 'MANAGER'%}manager{%endif%}">{{ member.user }}</td>
-						
-						{%ifpoolandtype {{poolname}} MANAGER %}
-							{% ifnotequal user member.user %}
-								<td>
-									<input type="submit" value="Remove user">
-								</td>
-							{% else %}
-							<td>You cannot manage yourself.</td>
-							{% endifnotequal %}
-						{%endifpoolandtype%}
+					 	{% ifusergroup heimdall-admin %}
+							<td>
+                                                        	<input type="submit" value="Remove user">
+                                                        </td>
+						{% else %}	
+							{%ifpoolandtype {{poolname}} MANAGER %}
+								{% ifnotequal user member.user %}
+									<td>
+										<input type="submit" value="Remove user">
+									</td>
+								{% else %}
+									<td>You cannot manage yourself.</td>
+								{% endifnotequal %}
+							{%endifpoolandtype%}
+						{% endifusergroup %}
 					</form>
 				</tr>
 				{% endfor %}
 			</tbody>
-			{% ifpoolandtype {{poolname}} MANAGER %}
+			{% ifusergroup heimdall-admin %}
 				<tfoot>
-					<tr>
-						<form action="/heimdall/admin/manage_role" method="post"
-							accept-charset="utf-8">
-							{% csrf_token%} 
-							<input type="hidden" name="type" value="add" />
-							<input type="hidden" name="poolname" value="{{ poolname }}" />
-							<td>
-								<select name="username"> 
-									{% for user in users %}
-										<option>{{user.username}}</option> 
-									{% endfor %}
-								</select>
-							</td>
-							
+                                                <tr>
 								<td>
+									<form action="/heimdall/admin/manage_role" method="post" accept-charset="utf-8">
+										{% csrf_token%}
+										<input type="hidden" name="type" value="add" />
+										<input type="hidden" name="poolname" value="{{ poolname }}" />
+
+                                                                        	<span class="select">
+                                                                                	<select name="username">
+                                                                                        	{% for user in users %}
+                                                                                                	<option>{{user.username}}</option>
+                                                                                        	{% endfor %}
+                                                                                	</select>
+                                                                        	</span>
+								
+										<input type="submit" value="Add to group" />
+									</form>
+								</td>
+
+                                                                <td>    
+                                                                </td>
+                                                </tr>   
+                                   </tfoot>
+			{% else %}
+				{% ifpoolandtype {{poolname}} MANAGER %}
+					<tfoot>
+						<tr>
+								<input type="hidden" name="poolname" value="{{ poolname }}" />
+								<td>
+									<form action="/heimdall/admin/manage_role" method="post" accept-charset="utf-8">
+										{% csrf_token%}
+										 <input type="hidden" name="type" value="add" />
+										 <input type="hidden" name="poolname" value="{{ poolname }}" />
+									<span class="select">
+										<select name="username"> 
+											{% for user in users %}
+												<option>{{user.username}}</option> 
+											{% endfor %}
+										</select>
+									</span>
 									<input type="submit" value="Add to group" />
+
+									</form>
 								</td>
 							
-					</tr>
-					</form>
-				</tfoot>
-			{% endifpoolandtype %}
+								<td>
+								</td>
+						</tr>
+					</tfoot>
+				{% endifpoolandtype %}
+			{% endifusergroup %}
 		</table>
 </div>
 
@@ -68,7 +106,7 @@
 {% ifusergroup heimdall-admin %}
 <div class="inline-block" style="width:30%">
    <h2>Managers of group {{groupname}}:</h2>
-	<table class="bordered">
+	<table class="datagrid bordered">
 		<thead>
 			<tr>
 				<th>User</th>
@@ -96,22 +134,23 @@
 			<tfoot>
 				
 					<tr>
-						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
-						{% csrf_token %}
 						<td>
-							<select name="username">
-								{% for users in not_special_users_in_pool %}
-									<option>{{users.username}}</option>
-								{% endfor %}
-							</select>
-						</td>
-						<td>
+							<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+								{% csrf_token %}
+								<span class="select">
+									<select name="username">
+										{% for users in not_special_users_in_pool %}
+											<option>{{users.username}}</option>
+										{% endfor %}
+									</select>
+								</span>
 								<input type="submit" name="add" value="Change to manager"/>
 								<input type="hidden" name="action" value="setmanager"/>
 								<input type="hidden" name="poolname" value="{{poolname}}"/>
-							 </form>
+							</form>
 						</td>
-						</form>
+						<td>
+						</td>
 					</tr>
 			</tfoot>
 		</table>

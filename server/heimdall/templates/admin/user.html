@@ -1,11 +1,11 @@
-{% extends "layout-page.html" %}
+{% extends "layout-page.html" %} {% load tags%}
 
 {% block import %}
 	<script type="text/javascript">
 		function showForm(user_target){
 			$("#form-updateuser").fadeIn();
 			$("#form-updateuser-username").val(user_target.username);
-			$("#form-updateuser-firstname").val(user_target.username);
+			$("#form-updateuser-firstname").val(user_target.firstname);
 			$("#form-updateuser-email").val(user_target.email);
 			$("#form-updateuser-lastname").val(user_target.lastname);
 			
@@ -25,7 +25,7 @@
 <h2>Edit an heimdall's user: </h2>
 
    <div class="inline-block" style="vertical-align: top; width:30%;">
-      <table class="bordered">
+      <table class="datagrid bordered">
       	<thead>
       		<tr>
 			<th>Username</th>
@@ -40,7 +40,7 @@
 		<tr>
 			<td>{{ user_target.username }}</td>
 			{% if user.is_authenticated %}
-				<td><button onClick="showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}'})">Modifier les propriétés</button></td>
+				<td><button onClick="showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}', email: '{{user_target.email}}',lastname:'{{ user_target.last_name}}'})">Modifier les propriétés</button></td>
 			{% endif %}
 		</tr>
         
@@ -53,6 +53,7 @@
     <div class="inline-block" style="margin-left: 10px; width:30%; position: absolute; left:35%">
 			      <form id="form-updateuser" style="display:none;" action="register_user" method="post" accept-charset="utf-8">
 			      {% csrf_token %}
+				<input type="hidden" value="update" name="type"/>
 					<table class="bordered">
 					      <thead>
 						<tr>
@@ -62,7 +63,7 @@
 					      <tbody>
 					      <tr>
 						      <td>Username</td>
-						      <td><input id="form-updateuser-username" name="username"/></td>
+						      <td><input id="form-updateuser-username" name="username" readonly/></td>
 					      </tr>
 					      <tr>
 						      <td>Firstname</td>
@@ -84,10 +85,6 @@
 						      <td>Password confirm</td>
 						      <td><input type="password" name="password-confirm"/></td>
 					      </tr>
-					      <tr>
-						      <td>Role</td>
-						      <td><select id="form-updateuser-role" name="role"><option value="ADMIN">Administrator</option><option value="USER">User</option></select></td>
-					      </tr>
 					       <tr>
 						      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
 					      </tr>
@@ -99,7 +96,7 @@
 
 
 
-
+{% ifusergroup heimdall-admin %}
 <div style="width:100%; display:inline-block;">
 <div id="form-adduser">
 <h2>Add a user on heimdall: </h2>
@@ -139,7 +136,15 @@
 					      </tr>
 					      <tr>
 						      <td>Role</td>
-						      <td><select name="role"><option value="ADMIN">Administrator</option><option value="USER">User</option></select></td>
+						      <td>
+								<span class="select">
+									<select name="role">
+										<option value="USER">User</option>
+										<option value="ADMIN">Administrator</option>
+									</select>
+								</span>
+						      </td>
+                                       
 					      </tr>
 					       <tr>
 						      <td colspan="2" style="text-align:right;"><button>Add user</button></td>
@@ -151,4 +156,5 @@
 
 </div>
 </div>
- {% endblock %}
+{% endifusergroup %}
+{% endblock %}

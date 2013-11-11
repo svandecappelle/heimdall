@@ -6,7 +6,7 @@
 
 <div class="inline-block">
    <h2>Manage the perimeter of group {{poolname}}:</h2>
-	<table class="bordered">
+	<table class="datagrid bordered">
 		<thead>
 			<tr>
 				<th>Serveur</th>
@@ -31,35 +31,37 @@
 				</tr>
 				{% endfor %}
 			</tbody>
-			<tfoot>
+				<tfoot>
 				<tr>
-					<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
-						{% csrf_token %}
+					<td>
+						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+							{% csrf_token %}
 							<input type="hidden" name="action" value="add"/>
 							<input type="hidden" name="poolname" value="{{poolname}}"/>
-						<td>
-							<select name="hostname">
-								{% for server in servers %}
-									{% if server not in server_perimeter %}
-										<option>{{server.hostname}}</option>
-									{% endif %}
-								{% endfor %}
-							</select>
-						</td>
-						<td>
+							<span class="select">
+								<select name="hostname">
+									{% for server in servers %}
+										{% if server not in server_perimeter %}
+											<option>{{server.hostname}}</option>
+										{% endif %}
+									{% endfor %}
+								</select>
+							</span>
 							<input type="submit" name="add" value="Add"/>
+							</form>	
 						</td>
-					</form>
-				</tr>
-			</tfoot>
-		</table>
-	</form>
+						<td>
+						</td>
+					</tr>
+				
+				</tfoot>
+			</table>
 </div>	
 <!-- managers -->
 
 <div class="inline-block">
    <h2>Managers of group {{poolname}}:</h2>
-	<table class="bordered">
+	<table class="datagrid bordered">
 		<thead>
 			<tr>
 				<th>User</th>
@@ -83,22 +85,22 @@
 			</tbody>
 			<tfoot>
 					<tr>
-						<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
-						{% csrf_token %}
 						<td>
-							<select name="username">
-								{% for users in users_not_manager_in_pool %}
-									<option>{{users.user.username}}</option>
-								{% endfor %}
-							</select>
-						</td>
-						<td>
-								<input type="submit" name="add" value="Change to manager"/>
+							<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
+								 {% csrf_token %}
+								 <span class="select">
+								<select name="username">
+									{% for users in users_not_manager_in_pool %}
+										<option>{{users.user.username}}</option>
+									{% endfor %}
+								</select>
+							</span>
+							<input type="submit" name="add" value="Change to manager"/>
 								<input type="hidden" name="action" value="setmanager"/>
 								<input type="hidden" name="poolname" value="{{poolname}}"/>
 							 </form>
 						</td>
-						</form>
+						<td></td>
 					</tr>
 			</tfoot>
 		</table>

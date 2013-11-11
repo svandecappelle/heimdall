@@ -82,33 +82,33 @@ def user(request):
 		args.update({'list_users': users})
 		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	else:
-		messages.success(request, 'You have not the rights to see this page')
-		return HttpResponseRedirect(reverse('admin'))
+		users = [request.user]
+		args.update({'list_users': users})
+		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	
 def revoke_access(request):
-	if request.user.groups.filter(name="heimdall-admin"):
-		if request.method == 'POST':
-			user = User.objects.get(username=request.POST['username'])
-			host = Server.objects.get(hostname=request.POST['hostname'])
-			hostuser = request.POST['hostuser']
+	if request.method == 'POST':
+		user = User.objects.get(username=request.POST['username'])
+		host = Server.objects.get(hostname=request.POST['hostname'])
+		hostuser = request.POST['hostuser']
 			
 			
-			message = None
+		message = None
 			
-			if SshKeys.objects.filter(user=user).count == 0:
-				message = 'No RSA saved on database. Contact user to set his RSA key.'
-			elif SshKeys.objects.filter(user=user).count() > 1:
-				message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
+		if SshKeys.objects.filter(user=user).count == 0:
+			message = 'No RSA saved on database. Contact user to set his RSA key.'
+		elif SshKeys.objects.filter(user=user).count() > 1:
+			message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
+		else:
+			rsa_key = SshKeys.objects.get(user=user)
+			err = Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
+			if err == None:
+				message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')'
+				Demands.objects.get(user=user,server=host,hostuser=hostuser).delete()
 			else:
-				rsa_key = SshKeys.objects.get(user=user)
-				err = Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
-				if err == None:
-					message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')'
-					Demands.objects.get(user=user,server=host,hostuser=hostuser).delete()
-				else:
-					message=err.message
+				message=err.message
 
-			messages.success(request, message)
+		messages.success(request, message)
 	else:
 		messages.success(request, 'You have not the rights to do this action')
 
@@ -151,7 +151,7 @@ def permissions(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		args = getarguments_for_admin(request.user)
 	else:
-		args = getarguments_for_manager(request.user)
+		args = getarguments_for_manager(request,request.user)
 
 	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
 
@@ -164,19 +164,18 @@ def getarguments_for_admin(user):
 	args.update({'demands' : demands, 'servers': servers, 'users': users, 'permissions' : permissions})
 	return args
 
-def getarguments_for_manager(user):
-	pools = HeimdallUserRole.objects.filter(user=user)
-	perimeters = PoolPerimeter.objects.filter(pool = pools)
+def getarguments_for_manager(request,user):
+	pools = HeimdallUserRole.objects.filter(user__exact=user, type__exact='MANAGER').values_list('pool')
+	perimeters = PoolPerimeter.objects.filter(pool__exact=pools)
 
 	servers=[]
 	for one_perimeter in perimeters:	
 		servers.append(one_perimeter.server)
 
 	users=[]
-	for one_role_pool in pools:
-		user_role = HeimdallUserRole.objects.filter(pool=one_role_pool.pool)
-		for users_roles in user_role:
-			users.append(users_roles.user)
+	user_role = HeimdallUserRole.objects.filter(pool__in=pools)
+	for users_roles in user_role:
+		users.append(users_roles.user)
 	
 	demands = Demands.objects.filter(close_date__isnull=True, user__in= users, server__in =servers)
 	for filtered_demands in demands:
@@ -197,10 +196,10 @@ def add_to_group(request):
 			user = User.objects.get(username=request.POST['username'])
 			pool = HeimdallPool.objects.get(name=request.POST['poolname'])
 			
-			new_userrole = HeimdallUserRole(user=user, pool=pool, type="USERS")
+			new_userrole = HeimdallUserRole(user=user, pool=pool, type="USER")
 			new_userrole.save()
 			
-			messages.success(request, 'Role associated')
+			messages.success(request, 'Pool associated')
 			return HttpResponseRedirect(reverse('admin-group-management'))
 		else:
 			messages.success(request, 'You have not the rights to do this action')
@@ -211,6 +210,8 @@ def add_to_group(request):
 def manage_user_role(request):
 	pool = HeimdallPool.objects.filter(name=request.GET['poolname'])	
 	userRoles = HeimdallUserRole.objects.filter(pool=pool)
+	
+	
 	usersToFilter = []
 	notUserSpecialInPool = []
 	userSpecialInPool = []
@@ -250,7 +251,7 @@ def manage_group(request):
 	return HttpResponseRedirect(reverse('admin-group-management'))
 
 def manage_role(request):
-	if request.user.groups.filter(name="heimdall-admin"):
+	if request.method == 'POST':
 		user = User.objects.get(username=request.POST['username'])
 		pool = HeimdallPool.objects.get(name=request.POST['poolname'])
 		if request.POST['type'] == "add":
@@ -270,7 +271,7 @@ def manage_role(request):
 	
 
 def grant_access(request):
-	if request.user.groups.filter(name="heimdall-admin"):
+	if request.user.groups.filter(name__in=["heimdall-admin","heimdall"]):
 		if request.method == 'POST':
 			user = None
 			host = None
@@ -303,11 +304,13 @@ def grant_access(request):
 				else:
 					rsa_key = SshKeys.objects.get(user=user)
 					err = Controller.addPermission(user, host, request.POST['hostuser'], rsa_key)
-					demand = Demands.objects.get(user=user,server=host,hostuser=hostuser)
-					demand.close_date=datetime.today()
-					demand.accepted=True
-					demand.markAsIgnore=False
-					demand.save()
+					
+					if Demands.objects.filter(user=user,server=host,hostuser=hostuser).exists():
+						demand = Demands.objects.get(user=user,server=host,hostuser=hostuser)
+						demand.close_date=datetime.today()
+						demand.accepted=True
+						demand.markAsIgnore=False
+						demand.save()
 					
 					if err == None:
 						if request.POST['username'] != '[[ALL]]':
@@ -453,6 +456,34 @@ def perimeter_pool(request):
 def register_user(request):
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
+			
+
+			if 'type' in request.POST:
+				if request.POST['type'] == 'update':
+					if check_password(request.POST['password'], request.POST['password-confirm']):
+						code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname'])
+						if code_return_check == 2:
+                                        		group = None
+                                        		upd_user = User.objects.get(username=request.POST['username'])
+                                        		upd_user.email=request.POST['email']
+							upd_user.first_name=request.POST['firstname']
+							upd_user.last_name=request.POST['lastname']
+							upd_user.set_password(request.POST['password'])
+							upd_user.save()
+                                        		messages.success(request, "User updated succesfully")
+                                		elif code_return_check == 0:
+                                        		messages.success(request, "You need to fill all the blanks fields")
+                                		elif code_return_check == 1:
+                                        		messages.success(request, "The username doesn't exists")
+                                		elif code_return_check == 3:
+                                        		messages.success(request, "The email you enterred is already associated with another account")
+					else:
+						messages.success(request, "Password and password confirmation does not match")
+					
+					return HttpResponseRedirect(reverse('admin-user'))
+
+
+
 			if check_password(request.POST['password'], request.POST['password-confirm']):
 				code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname']) 
 				print("return code ", str(code_return_check))
@@ -466,7 +497,7 @@ def register_user(request):
 					new_user = User.objects.create_user(username=request.POST['username'], email=request.POST['email'], password=request.POST['password'], first_name=request.POST['firstname'], last_name=request.POST['lastname'])
 					new_user.groups.add(group)
 					new_user.save()
-					messages.success(request, "Server not present in the perimeter")
+					messages.success(request, "User created succesfully")
 				elif code_return_check == 0:
 					messages.success(request, "You need to fill all the blanks fields")
 				elif code_return_check == 2:
@@ -477,8 +508,28 @@ def register_user(request):
 			else:
 				messages.success(request, "Password and password confirmation does not match")
 	else:
-		messages.success(request, "Server not present in the perimeter")
-		return HttpResponseRedirect(reverse('index'))
+		
+		if check_password(request.POST['password'], request.POST['password-confirm']):
+			code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname'])
+			if code_return_check == 2:
+				group = None
+				upd_user = request.user
+				upd_user.email=request.POST['email']
+				upd_user.first_name=request.POST['firstname']
+				upd_user.last_name=request.POST['lastname']
+				upd_user.set_password(request.POST['password'])
+				upd_user.save()
+			elif code_return_check == 0:
+				messages.success(request, "You need to fill all the blanks fields")
+			elif code_return_check == 1:
+				messages.success(request, "The username doesn't exists")
+			elif code_return_check == 3:
+				messages.success(request, "The email you enterred is already associated with another account")
+		else:
+			messages.success(request, "Password and password confirmation does not match")
+		
+		
+		return HttpResponseRedirect(reverse('admin-user'))
 	
 	return HttpResponseRedirect(reverse('admin-user'))
 

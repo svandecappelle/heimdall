@@ -1,6 +1,7 @@
 {% extends "layout-page.html" %} {% load tags %} 
 
 {% block import %}
+
 	<script type="text/javascript">
 		function showForm(hostname){
 			$("#form-server").slideDown();
@@ -18,13 +19,16 @@
 
  	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
         <div class="inline-block" style="width:80%">
-	      <table class="bordered" style="width:100%">
+	      <table id="servers" class="datagrid bordered" style="width:100%">
 	      	<thead>
 	      		<tr>
 				<th>Host</th>
 				<th>Description</th>
 				{% if user.is_authenticated %}
-					<th colspan="2" >Actions</th>
+					<th colspan="1" >Actions</th>
+					{% ifusergroup heimdall-admin %}
+						<th></th>
+					{% endifusergroup %}
 				{% endif %}
 			</tr>
 			</thead>
@@ -69,7 +73,15 @@
 		       	      <tbody>
 			      <tr>
 				      <td>Priorité</td>
-				      <td><select name="priority"><option value="LOW">Mineure</option><option value="NORMAL">Normal</option><option value="HIGH">Haute</option><</select></td>
+				      <td>
+						<span class="select">
+							<select name="priority">
+								<option value="LOW">Mineure</option>
+								<option value="NORMAL">Normal</option>
+								<option value="HIGH">Haute</option>
+							</select>
+						</span>
+					</td>
 			      </tr>
 			      <tr>
 				      <td>Serveur cible</td>

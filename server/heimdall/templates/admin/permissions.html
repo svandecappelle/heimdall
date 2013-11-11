@@ -6,14 +6,15 @@
  	<div class="inline-block" style="width:50%">
 		<h2>Add a user permission:</h2>
 		<div class="align-form" style="width:100%">
-	      			<table class="bordered" style="width:100%">
+	      			<table class="datagrid bordered" style="width:100%">
 				      	<thead>
 				      		<tr>
 							<th>User</th>
 							<th>Host</th>
 							<th>User in host</th>
 							{% if user.is_authenticated %}
-								<th colspan="2">Access</th>
+								<th colspan="1">Access</th>
+								<th></th>
 							{% endif %}
 						</tr>
 					</thead>
@@ -81,12 +82,14 @@
 							<td>
 								<label for="hostname">Hostname</label>
 							</td>
-							<td>					
-								<select name="hostname" >
-								{% for server in servers %}				
-									<option value="{{server.hostname}}">{{server.hostname}}</option>
-								{% endfor %}
-								</select>
+							<td>
+								<span class="select">					
+									<select name="hostname" >
+									{% for server in servers %}				
+										<option value="{{server.hostname}}">{{server.hostname}}</option>
+									{% endfor %}
+									</select>
+								</span>
 							</td>
 						</tr>
 						<tr>				
@@ -94,11 +97,13 @@
 								<label for="username">User</label>
 							</td>
 							<td>
-								<select name="username" >
-								{% for user_perm in users %}				
-									<option value="{{user_perm.username}}">{{user_perm.username}}</option>
-								{% endfor %}
-								</select>
+								<span class="select">
+									<select name="username" >
+									{% for user_perm in users %}				
+										<option value="{{user_perm.username}}">{{user_perm.username}}</option>
+									{% endfor %}
+									</select>
+								</span>
 							</td>
 						</tr>					
 						<tr>
@@ -111,6 +116,7 @@
 						</tr>
 					</tbody>
 				</table>
+				<input type="hidden" name="type" value="grant"/>
 			</form>
 		</div>
 	</div>
@@ -119,7 +125,7 @@
 		<h2>Revoke an access</h2>
 		
 		<div class="align-form" style="width:100%">
-	      	<table class="bordered" style="width:100%">
+	      	<table class="datagrid bordered" style="width:100%">
 				<thead>
 					<tr>
 						<th>User</th>
