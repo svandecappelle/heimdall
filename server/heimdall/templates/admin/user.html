@@ -22,36 +22,57 @@
 
 
  {% block content %}
-<h2>Edit an heimdall's user: </h2>
-
-   <div class="inline-block" style="vertical-align: top; width:30%;">
-      <table class="datagrid bordered">
-      	<thead>
-      		<tr>
-			<th>Username</th>
-			{% if user.is_authenticated %}
-				<th>Action</th>
-			{% endif %}
-		</tr>
-	</thead>
-	 <tbody>
-        {% for user_target in list_users %}
-       
-		<tr>
-			<td>{{ user_target.username }}</td>
-			{% if user.is_authenticated %}
-				<td><button onClick="showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}', email: '{{user_target.email}}',lastname:'{{ user_target.last_name}}'})">Modifier les propriétés</button></td>
-			{% endif %}
-		</tr>
-        
-      {% endfor %}
-      </tbody>
-      </table>
-      
-    </div>
+ 
+{% ifusergroup heimdall-admin %}
+	{% if not myaccount %}  
+	<h2>Edit an heimdall's user: </h2>
+	
+	   <div class="inline-block" style="vertical-align: top; width:30%;">
+	      <table class="datagrid bordered">
+	      	<thead>
+	      		<tr>
+				<th>Username</th>
+				{% if user.is_authenticated %}
+					<th>Action</th>
+				{% endif %}
+			</tr>
+		</thead>
+		 <tbody>
+	        {% for user_target in list_users %}
+	       
+			<tr>
+				<td>{{ user_target.username }}</td>
+				{% if user.is_authenticated %}
+					<td><button onClick="showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}', email: '{{user_target.email}}',lastname:'{{ user_target.last_name}}'})">Modifier les propriétés</button></td>
+				{% endif %}
+			</tr>
+	        
+	      {% endfor %}
+	      </tbody>
+	      </table>
+	    </div>
+	{% else %}
+	   {% for user_target in list_users %}
+			<script type="text/javascript">
+			 $(document).ready(function(){
+				 showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}', email: '{{user_target.email}}',lastname:'{{ user_target.last_name}}'})
+			 });
+			</script>
+		{% endfor %}
+	{% endif %}
+{% else %}
+	
+	{% for user_target in list_users %}
+		<script type="text/javascript">
+		 $(document).ready(function(){
+			 showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}', email: '{{user_target.email}}',lastname:'{{ user_target.last_name}}'})
+		 });
+		</script>
+	{% endfor %}
+{% endifusergroup %}
 
     <div class="inline-block" style="margin-left: 10px; width:30%;">
-			      <form id="form-updateuser" style="display:none;" action="register_user" method="post" accept-charset="utf-8">
+			      <form id="form-updateuser" {% ifusergroup heimdall-admin %}style="display:none;"{% endifusergroup %} action="register_user" method="post" accept-charset="utf-8">
 			      {% csrf_token %}
 				<input type="hidden" value="update" name="type"/>
 					<table class="bordered">
@@ -86,7 +107,7 @@
 						      <td><input type="password" name="password-confirm"/></td>
 					      </tr>
 					       <tr>
-						      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
+						      <td colspan="2" style="text-align:right;">{% ifusergroup heimdall-admin %}<input type="button" onClick="hideForm()" value="Annuler"/>{% endifusergroup %}<button>Valider</button></td>
 					      </tr>
 					      </tbody>
 				      </table>
@@ -97,64 +118,66 @@
 
 
 {% ifusergroup heimdall-admin %}
-<div style="width:100%; display:inline-block;">
-<div id="form-adduser">
-<h2>Add a user on heimdall: </h2>
-<div class="inline-block" style="width:30%;">
-			      <form id="form-user" action="register_user" method="post" accept-charset="utf-8">
-			      {% csrf_token %}
-					<table class="bordered">
-					      <thead>
-						<tr>
-						<th colspan="2">Add a user to heimdall: </th>
-						</tr>
-					      </thead>
-					      <tbody>
-					      <tr>
-						      <td>Username</td>
-						      <td><input name="username"/></td>
-					      </tr>
-					      <tr>
-						      <td>Firstname</td>
-						      <td><input name="firstname" type="text"/></td>
-					      </tr>
-					      <tr>
-						      <td>Lastname</td>
-						      <td><input name="lastname" type="text"/></td>
-					      </tr>
-						<tr>
-						      <td>E-mail</td>
-						      <td><input name="email"/></td>
-					      </tr>
-						<tr>
-						      <td>Password</td>
-						      <td><input type="password" name="password"/></td>
-					      </tr>
-						<tr>
-						      <td>Password confirm</td>
-						      <td><input type="password" name="password-confirm"/></td>
-					      </tr>
-					      <tr>
-						      <td>Role</td>
-						      <td>
-								<span class="select">
-									<select name="role">
-										<option value="USER">User</option>
-										<option value="ADMIN">Administrator</option>
-									</select>
-								</span>
-						      </td>
-                                       
-					      </tr>
-					       <tr>
-						      <td colspan="2" style="text-align:right;"><button>Add user</button></td>
-					      </tr>
-					      </tbody>
-				      </table>
-			      </form>
-			</div>
-
-</div>
-</div>
+	{% if not myaccount %}
+	<div style="width:100%; display:inline-block;">
+	<div id="form-adduser">
+	<h2>Add a user on heimdall: </h2>
+	<div class="inline-block" style="width:30%;">
+				      <form id="form-user" action="register_user" method="post" accept-charset="utf-8">
+				      {% csrf_token %}
+						<table class="bordered">
+						      <thead>
+							<tr>
+							<th colspan="2">Add a user to heimdall: </th>
+							</tr>
+						      </thead>
+						      <tbody>
+						      <tr>
+							      <td>Username</td>
+							      <td><input name="username"/></td>
+						      </tr>
+						      <tr>
+							      <td>Firstname</td>
+							      <td><input name="firstname" type="text"/></td>
+						      </tr>
+						      <tr>
+							      <td>Lastname</td>
+							      <td><input name="lastname" type="text"/></td>
+						      </tr>
+							<tr>
+							      <td>E-mail</td>
+							      <td><input name="email"/></td>
+						      </tr>
+							<tr>
+							      <td>Password</td>
+							      <td><input type="password" name="password"/></td>
+						      </tr>
+							<tr>
+							      <td>Password confirm</td>
+							      <td><input type="password" name="password-confirm"/></td>
+						      </tr>
+						      <tr>
+							      <td>Role</td>
+							      <td>
+									<span class="select">
+										<select name="role">
+											<option value="USER">User</option>
+											<option value="ADMIN">Administrator</option>
+										</select>
+									</span>
+							      </td>
+	                                       
+						      </tr>
+						       <tr>
+							      <td colspan="2" style="text-align:right;"><button>Add user</button></td>
+						      </tr>
+						      </tbody>
+					      </table>
+				      </form>
+				</div>
+	
+	</div>
+	</div>
+{% endif %}
 {% endifusergroup %}
 {% endblock %}

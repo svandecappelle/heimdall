@@ -206,12 +206,12 @@ def mark_as_read(request):
             hostname = request.POST['hostname']
             server = Server.objects.get(hostname=hostname)
             
-	    if Demands.objects.filter(user=request.user, server=server, hostuser=hostuser).exists():
-	    	demand = Demands.objects.get(user=request.user,server=server,hostuser=hostuser)
-            	demand.markAsIgnore = True
-            	demand.save()
+            if Demands.objects.filter(user=request.user, server=server, hostuser=hostuser).exists():
+                demand = Demands.objects.get(user=request.user,server=server,hostuser=hostuser)
+                demand.markAsIgnore = True
+                demand.save()
             else:
-		messages.success(request, 'You are not the user who made the demand, you cannot mark it as read.')
+                messages.success(request, 'You are not the user who made the demand, you cannot mark it as read.')
         else:
             messages.success(request, 'User registered successfully.')
     else:

@@ -50,12 +50,12 @@ def get_demands_filtered(user_filter):
 	return demands
 
 def get_demands_filtered_and_read(user_filter):
-        demands = VoidDemand()
-        if user_filter.groups.filter(name="heimdall-admin").exists():
-                demands = Demands.objects.filter(markAsIgnore=True)
-        elif user_filter.groups.filter(name="heimdall").exists():
-                demands = Demands.objects.filter(user=user_filter,markAsIgnore=True)
-        return demands
+	demands = VoidDemand()
+	if user_filter.groups.filter(name="heimdall-admin").exists():
+		demands = Demands.objects.filter(markAsIgnore=True)
+	elif user_filter.groups.filter(name="heimdall").exists():
+		demands = Demands.objects.filter(user=user_filter,markAsIgnore=True)
+	return demands
 
 def get_demands_filtered_pending(user_filter):
 	demands = VoidDemand()
@@ -64,6 +64,15 @@ def get_demands_filtered_pending(user_filter):
 	elif user_filter.groups.filter(name="heimdall").exists():
 		demands = Demands.objects.filter(user=user_filter,close_date__isnull=True,markAsIgnore=False)
 	return demands
+
+def get_all_demands_filtered_pending(user_filter):
+	demands = VoidDemand()
+	if user_filter.groups.filter(name="heimdall-admin").exists():
+		demands = Demands.objects.filter(close_date__isnull=True)
+	elif user_filter.groups.filter(name="heimdall").exists():
+		demands = Demands.objects.filter(user=user_filter,close_date__isnull=True)
+	return demands
+
 
 def handler404(request):
 	#args = give_arguments(request.user, 'Not found')

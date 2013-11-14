@@ -71,7 +71,12 @@ def install(request):
 
 def user(request):
 	args = utils.give_arguments(request.user, 'Users admin')
-	if request.user.groups.filter(name="heimdall-admin"):
+	only_me = True
+	if 'me' in request.GET:
+		if request.GET['me'] == 'n':
+			only_me = False
+	
+	if request.user.groups.filter(name="heimdall-admin") and not only_me:
 		users = list(Group.objects.get(name="heimdall").user_set.all())
 		admin_users = Group.objects.get(name="heimdall-admin").user_set.all()
 		
@@ -79,11 +84,11 @@ def user(request):
 			if user not in users:
 				users.append(user)
 		
-		args.update({'list_users': users})
+		args.update({'list_users': users, 'myaccount':only_me})
 		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	else:
 		users = [request.user]
-		args.update({'list_users': users})
+		args.update({'list_users': users, 'myaccount':only_me})
 		return render_to_response('admin/user.html', args, context_instance=RequestContext(request))
 	
 def revoke_access(request):
@@ -158,7 +163,7 @@ def permissions(request):
 def getarguments_for_admin(user):
 	servers = Server.objects.all()
 	users = User.objects.all()
-	demands = utils.get_demands_filtered_pending(user)
+	demands = utils.get_all_demands_filtered_pending(user)
 	permissions = Permission.objects.all()
 	args = utils.give_arguments(user, 'Permissions admin')
 	args.update({'demands' : demands, 'servers': servers, 'users': users, 'permissions' : permissions})
@@ -463,20 +468,20 @@ def register_user(request):
 					if check_password(request.POST['password'], request.POST['password-confirm']):
 						code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname'])
 						if code_return_check == 2:
-                                        		group = None
-                                        		upd_user = User.objects.get(username=request.POST['username'])
-                                        		upd_user.email=request.POST['email']
+							group = None
+							upd_user = User.objects.get(username=request.POST['username'])
+							upd_user.email=request.POST['email']
 							upd_user.first_name=request.POST['firstname']
 							upd_user.last_name=request.POST['lastname']
 							upd_user.set_password(request.POST['password'])
 							upd_user.save()
-                                        		messages.success(request, "User updated succesfully")
-                                		elif code_return_check == 0:
-                                        		messages.success(request, "You need to fill all the blanks fields")
-                                		elif code_return_check == 1:
-                                        		messages.success(request, "The username doesn't exists")
-                                		elif code_return_check == 3:
-                                        		messages.success(request, "The email you enterred is already associated with another account")
+							messages.success(request, "User updated succesfully")
+						elif code_return_check == 0:
+							messages.success(request, "You need to fill all the blanks fields")
+						elif code_return_check == 1:
+							messages.success(request, "The username doesn't exists")
+						elif code_return_check == 3:
+							messages.success(request, "The email you enterred is already associated with another account")
 					else:
 						messages.success(request, "Password and password confirmation does not match")
 					
