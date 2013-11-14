@@ -308,7 +308,7 @@ nav #tabs{
 	position: fixed; 
 	right: 0; 
 	top: 50px;
-	z-index: 1;
+	z-index: 1; 
 }
 .notification{
 	position: relative;
@@ -350,7 +350,7 @@ header #connection-form .header-connection-container{
 	height: 0px;
 	float: left;
 	background-color: #404040;
-	margin-left: 50px;
+	margin-left: 41px;
 	padding-left: 100px;
 	-webkit-transition: height 1s;
 	transition:height 1s;
