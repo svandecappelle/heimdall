@@ -378,9 +378,12 @@ header #connection-form .header-connection-container .register{
 	width:auto;
 }
 footer{
-	position: fixed;
+	position: relative;
 	bottom: 0px;
 	right: 0px;	
+}
+footer>p{
+	text-align:right;
 }
 h1{
 	color: #4a5a5a;
