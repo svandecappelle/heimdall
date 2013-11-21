@@ -302,7 +302,7 @@ def grant_access(request):
 				
 				message = None
 				
-				if SshKeys.objects.filter(user=user).count == 0:
+				if not SshKeys.objects.filter(user=user).exists():
 					message = 'No RSA saved on database. Contact user to set his RSA key.'
 				elif SshKeys.objects.filter(user=user).count() > 1:
 					message = 'More than one RSA saved on database. Contact administrator to set his RSA key.'
