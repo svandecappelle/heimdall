@@ -2,9 +2,10 @@
 {% load tags %}
 
 {% block content %}
-
+<section>
+<h2>Add a user permission:</h2>
  	<div class="inline-block" style="width:50%">
-		<h2>Add a user permission:</h2>
+		<h3>Accept a user permission:</h3>
 		<div class="align-form" style="width:100%">
 	      			<table class="datagrid bordered" style="width:100%">
 				      	<thead>
@@ -71,7 +72,7 @@
 	</div>
 
 	<div class="inline-block">
-		<h2>Add a permission without demand:</h2>
+		<h3>Add a permission without demand:</h3>
 		<div class="form">
 			<form id="form-permission-from-scratch" class="default-block" action="/heimdall/admin/grant_access" method="post" accept-charset="utf-8">
 			{% csrf_token %}
@@ -120,7 +121,8 @@
 			</form>
 		</div>
 	</div>
-	
+</section>
+<section>
 	<div class="inline-block" style="width:50%">
 		<h2>Revoke an access</h2>
 		
@@ -180,4 +182,5 @@
 	      	</table>
 		</div>
 	</div>
+</section>
 {% endblock %}

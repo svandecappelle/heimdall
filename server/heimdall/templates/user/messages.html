@@ -20,6 +20,7 @@
 
 
 {% block content %}
+<section>
 <h2>Vos demandes gestionnaires en attente:</h2>
 <div style="width:100%;">
 	<div class="inline-block" style="width:90%;">
@@ -80,8 +81,9 @@
 		</tbody>  
   	</table>
 </div>
+</section>
 
-
+<section>
 <h2 class="notification-reads-show"> Read notifications:<a style="cursor:pointer;" onClick="showReadNotifications()">Show</a></h2>
 
 <div class="inline-block read-notifications" style="width:90%; display:none;">
@@ -136,4 +138,5 @@
 
 </div>
 </div>
+</section>
 {% endblock %}

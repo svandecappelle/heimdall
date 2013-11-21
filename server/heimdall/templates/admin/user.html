@@ -24,10 +24,11 @@
  {% block content %}
  
 {% ifusergroup heimdall-admin %}
-	{% if not myaccount %}  
+	{% if not myaccount %}
+	<section style="width:30%;">  
 	<h2>Edit an heimdall's user: </h2>
 	
-	   <div class="inline-block" style="vertical-align: top; width:30%;">
+	   <div class="inline-block">
 	      <table class="datagrid bordered">
 	      	<thead>
 	      		<tr>
@@ -51,6 +52,7 @@
 	      </tbody>
 	      </table>
 	    </div>
+	 </section>
 	{% else %}
 	   {% for user_target in list_users %}
 			<script type="text/javascript">
@@ -70,9 +72,10 @@
 		</script>
 	{% endfor %}
 {% endifusergroup %}
-
-    <div class="inline-block" style="margin-left: 10px; width:30%;">
-			      <form id="form-updateuser" {% ifusergroup heimdall-admin %}style="display:none;"{% endifusergroup %} action="register_user" method="post" accept-charset="utf-8">
+<section id="form-updateuser" class="hidden">
+<h2>Modify user account: </h2>
+    <div class="inline-block">
+			      <form  action="register_user" method="post" accept-charset="utf-8">
 			      {% csrf_token %}
 				<input type="hidden" value="update" name="type"/>
 					<table class="bordered">
@@ -113,17 +116,18 @@
 				      </table>
 			      </form>
 			</div>
-
+</section>
 
 
 
 {% ifusergroup heimdall-admin %}
 	{% if not myaccount %}
+	<section id="form-adduser">
 	<div style="width:100%; display:inline-block;">
-	<div id="form-adduser">
+	<div>
 	<h2>Add a user on heimdall: </h2>
-	<div class="inline-block" style="width:30%;">
-				      <form id="form-user" action="register_user" method="post" accept-charset="utf-8">
+	<div class="inline-block">
+				      <form action="register_user" method="post" accept-charset="utf-8">
 				      {% csrf_token %}
 						<table class="bordered">
 						      <thead>
@@ -178,6 +182,7 @@
 	
 	</div>
 	</div>
+	</section>
 {% endif %}
 {% endifusergroup %}
 {% endblock %}

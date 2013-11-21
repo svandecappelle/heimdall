@@ -378,9 +378,10 @@ header #connection-form .header-connection-container .register{
 	width:auto;
 }
 footer{
-	position: relative;
+	position: fixed;
 	bottom: 0px;
 	right: 0px;	
+	z-index: -1;
 }
 footer>p{
 	text-align:right;
@@ -504,6 +505,7 @@ h2{
 
 section{
 	width: auto;
+	float:left;
 	margin:10px;
 	padding: 10px;
 	text-align:center;

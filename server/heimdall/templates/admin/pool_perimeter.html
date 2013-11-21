@@ -3,7 +3,7 @@
 
 {% block content %}
    {% load tags %}
-
+<section>
 <div class="inline-block">
    <h2>Manage the perimeter of group {{poolname}}:</h2>
 	<table class="datagrid bordered">
@@ -57,8 +57,9 @@
 				</tfoot>
 			</table>
 </div>	
+</section>
 <!-- managers -->
-
+<section>
 <div class="inline-block">
    <h2>Managers of group {{poolname}}:</h2>
 	<table class="datagrid bordered">
@@ -106,5 +107,5 @@
 		</table>
 	</form>
 </div>	
-			
+</section>
 {% endblock %}
