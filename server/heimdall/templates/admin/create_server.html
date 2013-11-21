@@ -1,6 +1,6 @@
 {% extends "layout-page.html" %} {% block content %} {% load tags %} 
 {% if user.is_authenticated %} {% ifusergroup heimdall-admin %}
-
+<section>
 <div class="inline-block">
 	<h2>Server configuration</h2>
 	<div class="form default-block">		
@@ -29,4 +29,5 @@
 		</form>
 	</div>
 </div>
+</section>
 {% endifusergroup %}{% endif %} {% endblock %}

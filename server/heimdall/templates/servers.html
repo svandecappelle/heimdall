@@ -4,11 +4,11 @@
 
 	<script type="text/javascript">
 		function showForm(hostname){
-			$("#form-server").slideDown();
+			$("#require_access").slideDown();
 			$("#server-target-input").val(hostname);
 		}
 		function hideForm(){
-			$("#form-server").slideUp();
+			$("#require_access").slideUp();
 		}
 	</script> 
 {% endblock %}
@@ -16,9 +16,9 @@
 {% block content %}
       
 
-
+<section style="width:50%">
  	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
-        <div class="inline-block" style="width:80%">
+        <div class="inline-block">
 	      <table id="servers" class="datagrid bordered" style="width:100%">
 	      	<thead>
 	      		<tr>
@@ -60,9 +60,12 @@
 	      </table>
       
       </div>
+      </section>
+      
+      <section id="require_access" class="hidden">
       {% if user.is_authenticated %}
-      <div style="float:left;display: block;margin-right:20px;">
-	      <form id="form-server" style="display:none;" action="/heimdall/user/require_access" method="post" accept-charset="utf-8">
+      <div>
+	      <form id="form-server" action="/heimdall/user/require_access" method="post" accept-charset="utf-8">
 	      {% csrf_token %}
 	      		<table class="bordered">
 		       	      <thead>
@@ -102,11 +105,7 @@
 		      </table>
 	      </form>
 	</div>
-      
-	<div>
-		<h2></h2>
-	</div>
-      
+</section>
       {% endif %}
         
  {% endblock %}

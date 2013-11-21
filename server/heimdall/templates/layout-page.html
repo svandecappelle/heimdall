@@ -44,7 +44,10 @@
       }
       $(document).ready(function(){
          $(".datagrid" ).each(function( index ) {
-              $( this ).dataTable();
+              $( this ).dataTable({
+        		"bJQueryUI": true,
+        		"sPaginationType": "full_numbers"
+    		});
           });
        });
        </script>
@@ -206,11 +209,11 @@
       {% block maincontent %}
 
       <!-- Content -->
-      <section id="main-content">
+      <main id="main-content">
         {% block content %}
         
         {% endblock %}
-      </section>
+      </main>
       {% endblock %}
       
       

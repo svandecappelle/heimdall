@@ -378,7 +378,7 @@ header #connection-form .header-connection-container .register{
 	width:auto;
 }
 footer{
-	position: fixed;
+	position: absolute;
 	bottom: 0px;
 	right: 0px;	
 }
@@ -496,4 +496,21 @@ h2{
 }
 .rejected-request{
 	background-color: rgba(255,100,50,0.8);
+}
+
+
+section{
+	width: auto;
+	margin:10px;
+	padding: 10px;
+	text-align:center;
+	-moz-box-shadow: 2px 2px 7px 4px #c0c0c0;
+	-webkit-box-shadow: 2px 2px 7px 4px #c0c0c0;
+	-o-box-shadow: 2px 2px 7px 4px #c0c0c0;
+	box-shadow: 2px 2px 7px 4px #c0c0c0;
+	filter:progid:DXImageTransform.Microsoft.Shadow(color=#c0c0c0, Direction=134, Strength=7);
+}
+
+section.hidden{
+	display: none;
 }

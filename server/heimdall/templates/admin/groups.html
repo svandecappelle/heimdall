@@ -1,5 +1,5 @@
 {% extends "layout-page.html" %} {% block content %} {% load tags %}
-
+<section>
 <div class="inline-block" style="width:100%">
 	<h2>Grant acces group to:</h2>
 	<div class="align-form" style="width:100%">
@@ -132,8 +132,9 @@
 		</table>
 	</div>
 </div>
-
+</section>
 {% ifusergroup heimdall-admin %}
+<section>
 <div class="inline-block" style="width:50%">
 	<h2>Create a pool:</h2>
 	<div class="form" style="width:100%">
@@ -156,8 +157,9 @@
 		</form>
 	</div>
 </div>
+</section>
 
-
+<section>
 <div class="inline-block" style="width:49%">
 	<h2>Modify the role perimeter:</h2>
 	<div class="align-form" style="width:100%">
@@ -181,6 +183,7 @@
 		</table>
 	</div>
 </div>
+</section>
 
 
 {% endifusergroup %} {% endblock %}
