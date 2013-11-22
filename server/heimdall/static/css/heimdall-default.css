@@ -332,6 +332,7 @@ nav #tabs{
 #main-content{
 	margin-top:55px;
 	margin-left:50px;
+	overflow: auto;
 }
 
 header{
@@ -340,6 +341,7 @@ header{
 	position: fixed;
 	z-index: 1;
 	top: 0;
+	overflow: auto;
 }
 
 header #connection-form{
@@ -378,7 +380,7 @@ header #connection-form .header-connection-container .register{
 	width:auto;
 }
 footer{
-	position: fixed;
+	position: relative;
 	bottom: 0px;
 	right: 0px;	
 	z-index: -1;
@@ -411,7 +413,6 @@ h2{
 	background-repeat: repeat-x;
 	min-height: 49px;
 	width: 100%;
-	min-width: 680px;
 	color: #cacaca;
 	border-bottom: 1px solid #1c1c1c;
 	overflow: visible;
@@ -419,13 +420,13 @@ h2{
 }
 
 .app {
-	float: left;
-	position: absolute;
 	padding-top: 5px;
 	padding-left: 20px;
 	overflow: hidden;
 	cursor: pointer;
 	height:45px;
+	display: inline-block;
+	white-space: nowrap;
 }
 
 .header-actions {
@@ -434,6 +435,8 @@ h2{
 	height: 30px;
 	margin-top: 10px;
 	padding-right: 20px;
+	white-space: nowrap;
+	display: inline-block;
 }
 
 
