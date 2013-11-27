@@ -1,0 +1,400 @@
+/*
+This file is part of Heimdall.
+
+Heimdall is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Heimdall is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+
+Authors: 
+- Vandecappelle Steeve<svandecappelle@vekia.fr>
+- Sobczak Arnaud<asobczack@vekia.fr>
+
+# Name:         static/css/heimdall-default.css
+# Author:       Vandecappelle Steeve & Sobczak Arnaud
+# Copyright:    (C) 2013-2014 Vandecappelle Steeve & Sobczak Arnaud
+# Licence:      GNU General Public Licence version 3
+# Website:      http://vekia.github.io/heimdall/
+# Email:        svandecappelle at vekia.fr
+*/
+
+ul{
+	list-style: none;	
+	-webkit-padding-start: 2px;
+	display: inline;
+}
+
+body{
+	margin: 0px;
+	background-image: url('../../img/greysnow.png');
+	font-family: monospace;
+	font-size: 12px;
+	text-align: left;
+	border-collapse: collapse;
+}
+
+
+input[type="text"],textarea,input[type="password"]{
+    
+    padding: 5px;   
+    border: 1px solid #DDDDDD;
+    
+    /*Applying CSS3 gradient*/
+    background: -moz-linear-gradient(center top , #FFFFFF,  #EEEEEE 1px, #FFFFFF 20px);    
+    background: -webkit-gradient(linear, left top, left 20, from(#FFFFFF), color-stop(5%, #EEEEEE) to(#FFFFFF));
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FBFBFB', endColorstr='#FFFFFF');
+    
+    /*Applying CSS 3radius*/   
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    
+    /*Applying CSS3 box shadow*/
+    -moz-box-shadow: 0 0 2px #DDDDDD;
+    -webkit-box-shadow: 0 0 2px #DDDDDD;
+    box-shadow: 0 0 2px #DDDDDD;
+
+}
+input[type="text"]:hover,textarea:hover,input[type="password"]:hover{
+    border:1px solid #cccccc;
+}
+input[type="text"]:focus,textarea:focus,input[type="password"]:focus{
+    box-shadow:0 0 2px #FFFE00;
+}
+
+input[readonly]{
+	border: 0px;
+	background-color: transparent;
+}
+
+
+button, input[type="button"], input[type="submit"],input[type="file"]{        
+	display: inline-block;
+	white-space: nowrap;
+	background-color: #ccc;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc));
+	background-image: -webkit-linear-gradient(top, #eee, #ccc);
+	background-image: -moz-linear-gradient(top, #eee, #ccc);
+	background-image: -ms-linear-gradient(top, #eee, #ccc);
+	background-image: -o-linear-gradient(top, #eee, #ccc);
+	background-image: linear-gradient(top, #eee, #ccc);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eeeeee', EndColorStr='#cccccc');
+	border: 1px solid #777;
+	padding: 0 1.5em;
+	margin: 0.5em;
+	font: bold 1em/2em Arial, Helvetica;
+	text-decoration: none;
+	color: #333;
+	text-shadow: 0 1px 0 rgba(255,255,255,.8);
+	-moz-border-radius: .2em;
+	-webkit-border-radius: .2em;
+	border-radius: .2em;
+	-moz-box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
+	-webkit-box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
+	box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
+}
+
+
+button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled,input[type="file"]:disabled{
+	color:grey;    
+}
+
+button:hover,input[type="button"]:hover, input[type="submit"]:hover,input[type="file"]:hover{
+	background-color: #ddd;        
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#fafafa), to(#ddd));
+	background-image: -webkit-linear-gradient(top, #fafafa, #ddd);
+	background-image: -moz-linear-gradient(top, #fafafa, #ddd);
+	background-image: -ms-linear-gradient(top, #fafafa, #ddd);
+	background-image: -o-linear-gradient(top, #fafafa, #ddd);
+	background-image: linear-gradient(top, #fafafa, #ddd);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fafafa', EndColorStr='#dddddd');        
+}
+
+button:active,input[type="button"]:active, input[type="submit"]:active,input[type="file"]:active{
+	-moz-box-shadow: 0 0 4px 2px rgba(0,0,0,.3) inset;
+	-webkit-box-shadow: 0 0 4px 2px rgba(0,0,0,.3) inset;
+	box-shadow: 0 0 4px 2px rgba(0,0,0,.3) inset;
+	position: relative;
+	top: 1px;
+}
+
+button:focus,input[type="button"]:focus, input[type="submit"]:focus,input[type="file"]:focus{
+	outline: 0;
+	background: #fafafa;
+}    
+
+button:before,input[type="button"]:before, input[type="submit"]:before,input[type="file"]:before{
+	background: #ccc;
+	background: rgba(0,0,0,.1);
+	float: left;        
+	width: 1em;
+	text-align: center;
+	font-size: 1.5em;
+	margin: 0 1em 0 -1em;
+	padding: 0 .2em;
+	-moz-box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
+	-webkit-box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
+	box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
+	-moz-border-radius: .15em 0 0 .15em;
+	-webkit-border-radius: .15em 0 0 .15em;
+	border-radius: .15em 0 0 .15em;
+    pointer-events: none;        
+}
+
+/* Hexadecimal entities for the icons */
+
+.add:before{
+	content: "\271A";
+}
+
+.edit:before{
+	content: "\270E";        
+}
+
+.delete:before{
+	content: "\2718";        
+}
+
+.save:before{
+	content: "\2714";        
+}
+
+.email:before{
+	content: "\2709";        
+}
+
+.like:before{
+	content: "\2764";        
+}
+
+.next:before{
+	content: "\279C";
+}
+
+.star:before{
+	content: "\2605";
+}
+
+.spark:before{
+	content: "\2737";
+}
+
+.play:before{
+	content: "\25B6";
+} 
+
+
+select {
+    padding:3px;
+    margin: 0;
+    -webkit-border-radius:4px;
+    -moz-border-radius:4px;
+    border-radius:4px;
+    -webkit-box-shadow: 0 2px 0 #ccc, 0 -1px #fff inset;
+    -moz-box-shadow: 0 2px 0 #ccc, 0 -1px #fff inset;
+    box-shadow: 0 2px 0 #ccc, 0 -1px #fff inset;
+    background: #f8f8f8;
+    color:#000;
+    border:none;
+    outline:none;
+    display: inline-block;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    cursor:pointer;
+}
+
+/* Targetting Webkit browsers only. FF will show the dropdown arrow with so much padding. */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    select {padding-right:18px}
+}
+
+.select {position:relative}
+.select:after {
+    content:'<>';
+    font:11px "Consolas", monospace;
+    color:#aaa;
+    -webkit-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+    -ms-transform:rotate(90deg);
+    transform:rotate(90deg);
+    right:8px; top:2px;
+    padding:0 0 2px;
+    border-bottom:1px solid #ddd;
+    position:absolute;
+    pointer-events:none;
+}
+.select:before {
+    content:'';
+    right:6px; top:0px;
+    width:20px; height:20px;
+    background:#f8f8f8;
+    position:absolute;
+    pointer-events:none;
+    display:block;
+}
+
+html *{
+	outline : none;	
+}
+
+.inline-block{
+	display:inline-block;
+	vertical-align:top;
+}
+
+.default-block{
+	/*padding: 3px;*/
+	min-width: 480px;
+}
+.separate-token{
+	background-color:#cacaca;
+	height:1px;
+	border: 0px;
+}
+.mini-title{
+	font-size: 0.7em;
+	margin-top: 17px;
+	margin-left: 3px;
+}
+
+a{
+	color: #cacaca;
+	text-decoration: none;	
+}
+
+a:hover{
+	color: #AC6969;
+	text-decoration: none;	
+}
+
+a:active{
+	color: #AC9970;
+	text-decoration: none;	
+}
+
+.notifications-layout{
+	position: fixed; 
+	right: 0; 
+	top: 50px;
+	z-index: 1; 
+}
+.notification{
+	position: relative;
+	color: white; 
+	background-color:rgba(0,0,0,0.5); 
+	margin:10px;  
+	max-width:400px; 
+	min-width:400px;
+	overflow:auto;	
+	border-radius:5px;
+	padding: 5px;
+	padding-right:20px;
+}
+.close-button{
+	margin-right:5px;
+	position: absolute;
+	right: 0px;
+	cursor: pointer; 
+}
+
+h1{
+	color: #4a5a5a;
+	font-size: 1.5em;
+}
+
+h2{
+	color: #4a5a5a;
+	font-size: 1.3em;
+}
+
+.form{
+	float: left;
+	display: inline-block; 
+	background-color: rgba(255,255,255,0.5); 
+	margin:3px; 
+	border-radius:7px; 
+	border: 1px solid #ccc;
+}
+
+.form label{
+	color: rgba(13, 49, 124, 0.5);
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.align-form{
+	margin:3px;
+	float: left;
+	display: inline-block; 
+}
+
+.legend-permission{
+	position:absolute; 
+	top:55px;
+	right:50px;
+	user-select:none;
+}
+
+.legend-block{
+	display:inline-block; 
+	height:100%;
+	width:20px;
+}
+.high-priority td, .manager{
+	color: rgba(246, 146, 146, 1);
+}
+
+.normal-priority td{
+}
+
+.low-priority td {
+	color: rgba(130, 150, 150, 1);
+}
+
+
+.pending-request{
+	background-color: rgba(50,100,255,0.8);
+}
+
+.high-priority.pending-request td, .high-priority.accepted-request td, .high-priority.rejected-request td {
+	color: red;
+}
+.normal-priority.pending-request td, .normal.accepted-request td, .normal.rejected-request td  {
+	color: black;
+}
+.low-priority.pending-request td, .low-priority.accepted-request td, .low-priority.rejected-request td  {
+	color: green;
+}
+.accepted-request{
+	background-color: rgba(50,255,50,0.8);
+}
+.rejected-request{
+	background-color: rgba(255,100,50,0.8);
+}
+
+
+section{
+	width: auto;
+	float:left;
+	margin:10px;
+	padding: 10px;
+	text-align:center;
+	-moz-box-shadow: 2px 2px 7px 4px #c0c0c0;
+	-webkit-box-shadow: 2px 2px 7px 4px #c0c0c0;
+	-o-box-shadow: 2px 2px 7px 4px #c0c0c0;
+	box-shadow: 2px 2px 7px 4px #c0c0c0;
+	filter:progid:DXImageTransform.Microsoft.Shadow(color=#c0c0c0, Direction=134, Strength=7);
+}
+
+section.hidden{
+	display: none;
+}
