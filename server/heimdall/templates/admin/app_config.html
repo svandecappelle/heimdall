@@ -1,8 +1,39 @@
 {% extends "layout-page.html" %} {% block content %} {% load tags %} 
-{% if user.is_authenticated %} {% ifusergroup heimdall-admin %}
+{% if user.is_authenticated %} 
+
+{% ifusergroup heimdall-admin %}
 <section>
 	<div class="inline-block">
 		<h2>Heimdall configuration</h2>
+		<div class="form default-block">		
+			<form action="/heimdall/admin/app_config_save" method="post" accept-charset="utf-8">
+				{% csrf_token %}
+				<input type="hidden" name="type" value="global"/>
+				<table>	
+					<tr>
+						<td><label for="theme">Theme</label></td>
+						<td>
+							<span class="select">
+								<select name="theme">
+									<option value="default">Default</option>
+									<option value="clean">Clean</option>
+								</select>
+							</span>
+						</td>
+					</tr>
+				</table>
+				<p>
+					<input type="submit" value="Save →">
+				</p>
+			</form>
+		</div>
+	</div>
+</section>
+{% endifusergroup %}
+
+<section>
+	<div class="inline-block">
+		<h2>My configuration</h2>
 		<div class="form default-block">		
 			<form action="/heimdall/admin/app_config_save" method="post" accept-charset="utf-8">
 
@@ -27,4 +58,5 @@
 		</div>
 	</div>
 </section>
-{% endifusergroup %}{% endif %} {% endblock %}
+
+{% endif %} {% endblock %}

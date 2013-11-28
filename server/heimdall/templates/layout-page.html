@@ -194,13 +194,14 @@
 						<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/grant.png" %}" title="Gerer les permissions"/>Gerer les permissions</a></li>
 				  		
 						<li><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/groups.png" %}" title="Gerer les groupes"/>Gerer les groupes</a></li>
-            <li><a href="/heimdall/admin/app_config"><img src="{% static "img/icons/wrench.png" %}" title="Manage Heimdall"/>Configuration</a></li>
+
 					{%else%}
 						{% ifhasroletype MANAGER %}
 							<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/grant.png" %}" title="Gerer les permissions"/>Gerer les permissions</a></li>
 							<li><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/groups.png" %}" title="Gerer les groupes"/>Gerer les groupes</a></li>
 						{% endifhasroletype %}
 					{% endifusergroup %}
+              <li><a href="/heimdall/admin/app_config"><img src="{% static "img/icons/wrench.png" %}" title="Manage Heimdall"/>Configuration</a></li>
 				{% endif %}
           	</ul>
           </div>

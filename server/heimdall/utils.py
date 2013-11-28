@@ -38,17 +38,27 @@ class VoidDemand(tuple):
 	count = 0	
 
 
-def theme():
+def theme(user):
+	output = None
 	if GeneralConfiguration.objects.filter(key='theme').exists():
 		if GeneralConfiguration.objects.get(key='theme').value == 'default':
-			return None
+			output = None
 		else:
-			return GeneralConfiguration.objects.get(key='theme').value
+			output = GeneralConfiguration.objects.get(key='theme').value
 	else:
-		return None
+		output = None
+	if user:
+		if user.is_authenticated():
+			if UserConfiguration.objects.filter(user=user,key='theme').exists():
+				if UserConfiguration.objects.get(user=user,key='theme').value == 'default':
+					output = None
+				else:
+					output = UserConfiguration.objects.get(user=user,key='theme').value
+
+	return output
 
 def give_arguments(user, page_title):
-	return {'PAGE_TITLE': page_title, 'theme' : theme(), 'APP_TITLE' : "Heimdall", 'inbox_demands_count':get_demands_filtered(user).count}
+	return {'PAGE_TITLE': page_title, 'theme' : theme(user), 'APP_TITLE' : "Heimdall", 'inbox_demands_count':get_demands_filtered(user).count}
 
 # utils
 def get_demands_filtered(user_filter):

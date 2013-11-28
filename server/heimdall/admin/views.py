@@ -40,7 +40,7 @@ from django.template import RequestContext
 
 from heimdall import utils
 from heimdall.bastion.runner import Controller
-from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission, GeneralConfiguration
+from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission, GeneralConfiguration, UserConfiguration
 
 
 #Installation
@@ -69,32 +69,56 @@ def install(request):
 
 def app_config(request):
 	args = utils.give_arguments(request.user, 'Users admin')
-	if request.user.groups.filter(name="heimdall-admin"):
+	if request.user.is_authenticated():
 		return render_to_response('admin/app_config.html', args, context_instance=RequestContext(request))
 	else:
 		messages.success(request, 'You have not the rights to do this action')
 	return HttpResponseRedirect(reverse('index'))
 
 def app_config_save(request):
-	if request.user.groups.filter(name="heimdall-admin"):
-		if request.method == 'POST':
-			if 'theme' in request.POST:
-				if GeneralConfiguration.objects.filter(key='theme').exists():
-					theme = GeneralConfiguration.objects.get(key='theme')
-					theme.value = request.POST['theme']
+	if request.method != 'POST':
+		messages.success(request, 'This page is not accessible.')
+		return HttpResponseRedirect(reverse('index'))
+
+	globalConfiguredFields = ['theme']
+	userConfiguredFields = ['theme']
+	if 'type' in request.POST:
+		if request.POST['type'] == 'global':
+			for field in globalConfiguredFields:
+				if field in request.POST:
+					if request.user.groups.filter(name="heimdall-admin"):
+						updateGeneralConfig('theme',request.POST['theme'])
+						messages.success(request, 'Saved global heimdall configurations.')
+					else:
+						messages.success(request, 'You have not the rights to do this action.')
 				else:
-					theme = GeneralConfiguration(key='theme')
-					theme.value = request.POST['theme']
-
-				theme.save()
-
-			messages.success(request, 'Saved global heimdall configurations.')
-		else:
-			messages.success(request, 'This page is not accessible.')
+					messages.success(request, 'Configuration cannot be saved. Not a parametrized config.')
 	else:
-		messages.success(request, 'You have not the rights to do this action.')
-		
+		for field in userConfiguredFields:
+			if field in request.POST:
+				updateUserConfig(request.user, 'theme',request.POST['theme'])
+				messages.success(request, 'Saved user heimdall configurations.')
+			else:
+				messages.success(request, 'Configuration cannot be saved. Not a parametrized config.')
 	return HttpResponseRedirect(reverse('index'))
+
+def updateGeneralConfig(key_str,value_str):
+	if GeneralConfiguration.objects.filter(key=key_str).exists():
+		config = GeneralConfiguration.objects.get(key=key_str)
+		config.value = value_str
+	else:
+		config = GeneralConfiguration(key=key_str)
+		config.value = value_str
+	config.save()
+
+def updateUserConfig(user, key_str,value_str):
+	if UserConfiguration.objects.filter(user=user, key=key_str).exists():
+		config = UserConfiguration.objects.get(user=user,key=key_str)
+		config.value = value_str
+	else:
+		config = UserConfiguration(user=user,key=key_str)
+		config.value = value_str
+	config.save()
 
 def user(request):
 	args = utils.give_arguments(request.user, 'Users admin')
