@@ -403,7 +403,9 @@ header h1 {
 header h2 {
 	color: #cacaca;
 } 
-
+header{
+	color: #cacaca;
+}
 .header {
 	width: 125px;
 	overflow: hidden;
