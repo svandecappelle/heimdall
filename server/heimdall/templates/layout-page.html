@@ -44,16 +44,27 @@
        {% endblock %}
        
        <script>
-      function closenotification($id){
-      	$('#'+$id).toggle();
-      }
-      $(document).ready(function(){
-         $(".datagrid" ).each(function( index ) {
-              $( this ).dataTable({
-        		"sPaginationType": "full_numbers"
-    		});
-          });
-       });
+        function closenotification($id){
+        	$('#'+$id).toggle();
+        }
+        $(document).ready(function(){
+            $(".datagrid" ).each(function( index ) {
+                $( this ).dataTable({
+          		    "sPaginationType": "full_numbers"
+      		      });
+            });
+
+            docUrl = document.URL;
+            splitDoc = docUrl.toString().split("/");
+            view = splitDoc[splitDoc.length-1];
+            if (docUrl.toString().indexOf("admin") !== -1){
+              $("li.admin."+view).addClass("active");
+            }else if(view!==''){
+              $("li:not(.admin)."+view).addClass("active");
+            }else if(view===''){
+              $("li:not(.admin).home").addClass("active");
+            }
+         });
        </script>
       
       <meta charset="utf-8">
@@ -177,32 +188,32 @@
         {% block navigation %}
           <div id="tabs">
           	<ul>
-          		<li><a href="/heimdall/home"><img src="{% static "img/icons/home.png" %}" title="Acceuil"/>Accueil</a></li>
+          		<li class="home"><a href="/heimdall/home"><img src="{% static "img/icons/home.png" %}" title="Acceuil"/>Accueil</a></li>
           	
           		{% ifusergroup heimdall-admin %}
-          			<li><a href="/heimdall/users"><img src="{% static "img/icons/users.png" %}" title="Utilisateurs"/>Utilisateurs</a></li>
-          			<li><a href="/heimdall/admin/user?me=n"><img src="{% static "img/icons/group_user.png" %}" title="Gerer les utilisateurs"/>Gerer les utilisateurs</a></li>
+          			<li class="users"><a href="/heimdall/users"><img src="{% static "img/icons/users.png" %}" title="Utilisateurs"/>Utilisateurs</a></li>
+          			<li class="admin user"><a href="/heimdall/admin/user?me=n"><img src="{% static "img/icons/group_user.png" %}" title="Gerer les utilisateurs"/>Gerer les utilisateurs</a></li>
           		{% endifusergroup %}
           		
           		{% if user.is_authenticated %}
-	          		<li><a href="/heimdall/servers"><img src="{% static "img/icons/servers.png" %}" title="Serveurs"/>Serveurs</a></li>
-	          		<li><a href="/heimdall/user/permissions"><img src="{% static "img/icons/permissions.png" %}" title="Permissions"/>Permissions</a></li>
-	          		<li><a href="/heimdall/user/deposite"><img src="{% static "img/icons/deposite.png" %}" title="Dépot"/>Dépot</a></li>
-					{% ifusergroup heimdall-admin %}
-					<!-- admin panel -->
-						<hr class="separate-token"/>
-						<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/grant.png" %}" title="Gerer les permissions"/>Gerer les permissions</a></li>
-				  		
-						<li><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/groups.png" %}" title="Gerer les groupes"/>Gerer les groupes</a></li>
-
-					{%else%}
-						{% ifhasroletype MANAGER %}
-							<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/grant.png" %}" title="Gerer les permissions"/>Gerer les permissions</a></li>
-							<li><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/groups.png" %}" title="Gerer les groupes"/>Gerer les groupes</a></li>
-						{% endifhasroletype %}
-					{% endifusergroup %}
-              <li><a href="/heimdall/admin/app_config"><img src="{% static "img/icons/wrench.png" %}" title="Manage Heimdall"/>Configuration</a></li>
-				{% endif %}
+	          		<li class="servers"><a href="/heimdall/servers"><img src="{% static "img/icons/servers.png" %}" title="Serveurs"/>Serveurs</a></li>
+	          		<li class="permissions"><a href="/heimdall/user/permissions"><img src="{% static "img/icons/permissions.png" %}" title="Permissions"/>Permissions</a></li>
+	          		<li class="deposite"><a href="/heimdall/user/deposite"><img src="{% static "img/icons/deposite.png" %}" title="Dépot"/>Dépot</a></li>
+                {% ifusergroup heimdall-admin %}
+                <!-- admin panel -->
+      						<!--<hr class="separate-token"/>-->
+                  <div class="separate-token"></div>
+      						<li class="admin permissions"><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/grant.png" %}" title="Gerer les permissions"/>Gerer les permissions</a></li>
+      				  		
+      						<li class="admin manage_groups"><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/groups.png" %}" title="Gerer les groupes"/>Gerer les groupes</a></li>
+                {%else%}
+						      {% ifhasroletype MANAGER %}
+  							   <li class="admin permissions"><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/grant.png" %}" title="Gerer les permissions"/>Gerer les permissions</a></li>
+  							   <li class="admin manage_groups"><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/groups.png" %}" title="Gerer les groupes"/>Gerer les groupes</a></li>
+						      {% endifhasroletype %}
+                {% endifusergroup %}
+                <li class="admin app_config"><a href="/heimdall/admin/app_config"><img src="{% static "img/icons/wrench.png" %}" title="Manage Heimdall"/>Configuration</a></li>
+				      {% endif %}
           	</ul>
           </div>
         {% endblock %}

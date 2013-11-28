@@ -255,11 +255,7 @@ html *{
 	/*padding: 3px;*/
 	min-width: 480px;
 }
-.separate-token{
-	background-color:#cacaca;
-	height:1px;
-	border: 0px;
-}
+
 .mini-title{
 	font-size: 0.7em;
 	margin-top: 17px;

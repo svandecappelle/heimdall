@@ -50,13 +50,15 @@ nav img{
 }
 
 nav #tabs{
-	margin: 6px;	
+	margin-top: 6px;
+	border-bottom: 1px solid rgba(119,119,119,0.4);
 }
 
 nav ul{
 	display: inline-block;
 	width: 100%;
 	text-align: center;
+	margin-bottom: 0px;
 }
 
 nav ul li{
@@ -70,6 +72,27 @@ nav ul li a{
 	line-height: 0;
 	font-size: 0;
 	color: transparent;
+}
+
+nav ul li.active a:after {
+	content: '';
+	display: block;
+	position: relative;
+	bottom: 0px;
+	left: 32%;
+	width: 0;
+	height: 0;
+	border-color: transparent transparent #777 transparent;
+	border-style: solid;
+	border-width: 6px;
+	margin-left: -6px;
+}
+
+.separate-token{
+	border-left: 1px solid #cacaca;
+	width: 1px;
+	height: 24px;
+	display: inline-block;
 }
 
 header{
