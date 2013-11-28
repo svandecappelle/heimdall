@@ -27,7 +27,12 @@
     {% block head %}
       <title>{{ PAGE_TITLE }} - {{ APP_TITLE }}</title>
       {% load staticfiles %}
-      <link href="{% static "css/heimdall-default.css" %}" rel="stylesheet"/>
+      {% if theme %}
+        <link href="{{STATIC_URL}}css/{{theme}}/theme.css" rel="stylesheet"/>
+        <link href="{{STATIC_URL}}css/commons/style.css" rel="stylesheet"/>
+      {% else %}
+        <link href="{% static "css/heimdall-default.css" %}" rel="stylesheet"/>
+      {% endif %}
       <link href="{% static "css/tables.css" %}" rel="stylesheet"/>
       <script src="{% static "js/jquery/jquery.min.js" %}" type="text/javascript"></script>
       <script src="{% static "js/arbor/arbor.js" %}" ></script>
@@ -81,93 +86,90 @@
 				<!-- DESACTIVATE LOGO for the moment -->
                       		<!--<img src="{% static "images/logo.png"%}">-->
                       	</div>
-                      <div class="header-actions">
-                      	<div>
+                        <div class="header-actions">
+                      	 <div>
                       		<div>
                       			<!--messages-->
                       			<div>
-		              			<div class="inline-block" style="padding-top:4px; margin-right:4px;">
-		              			{% if user.is_authenticated %}
-						    <span>Welcome, <a href="/heimdall/admin/user">{{ user.first_name }} {{user.last_name}} [{{user.username}}]</a>.</span>
-							<span><a href="/heimdall/user/messages">
-							 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNpiXLVm/X8GCgATA4WABYvYAijGBhKgGKsBH4BYAKrgQFhI4EJkhUCvxiNphqlF8YIDVALsCqgGZM0LkDQ7YIQB0MaLWAzJB2F0zVC1mIGIxZAJUIxVM9ZYgCowAIUDkjCIbYCuGVcsgAx5CKQcgc6XR+ITHY3oBhGXDshNkRSnRIAAAwCEDDi73FPsUgAAAABJRU5ErkJggg==" class="GCHESSFBNL">
-							{% if inbox_demands_count == None %}
-							    <span>Messages: 0 </span>
-							{% elif inbox_demands_count > 0 %}
-							    <span>Messages:</span>
-							    <span style="font-weight:bolder; font-size:11pt;">{{inbox_demands_count}}</span>
-							{% else %}
-							    <span>Messages: {{inbox_demands_count}}</span>
-							{% endif %}
-							</a></span>	   
-						{% else %}
-						    <span id="connect">Welcome, new user. Please log in or register.</span>
-						{% endif %}
-						</div>
+		              			     <div class="inline-block" style="padding-top:4px; margin-right:4px;">
+		              			     {% if user.is_authenticated %}
+                              <span>Welcome, <a href="/heimdall/admin/user">{{ user.first_name }} {{user.last_name}} [{{user.username}}]</a>.</span>
+                              <span>
+                                <a href="/heimdall/user/messages">
+                                  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNpiXLVm/X8GCgATA4WABYvYAijGBhKgGKsBH4BYAKrgQFhI4EJkhUCvxiNphqlF8YIDVALsCqgGZM0LkDQ7YIQB0MaLWAzJB2F0zVC1mIGIxZAJUIxVM9ZYgCowAIUDkjCIbYCuGVcsgAx5CKQcgc6XR+ITHY3oBhGXDshNkRSnRIAAAwCEDDi73FPsUgAAAABJRU5ErkJggg=="/>
+                  							{% if inbox_demands_count == None %}
+                  							    <span>Messages: 0 </span>
+                  							{% elif inbox_demands_count > 0 %}
+                  							    <span>Messages:</span>
+                  							    <span style="font-weight:bolder; font-size:11pt;">{{inbox_demands_count}}</span>
+                  							{% else %}
+                  							    <span>Messages: {{inbox_demands_count}}</span>
+                  							{% endif %}
+                                </a>
+                              </span>	   
+						                  {% else %}
+						                    <span id="connect">Welcome, new user. Please log in or register.</span>
+						                  {% endif %}
+						                </div>
 						
-						{% if user.is_authenticated %}
-						<div class="inline-block">
-							<form action="/heimdall/logout" method="post">
-							    {% csrf_token %}
-							    <input type="submit" value="Disconect →">
-							</form>
-						</div>
-						{% endif %}
-						
-					</div>
-                      		</div>
+						                {% if user.is_authenticated %}
+                						<div class="inline-block">
+                							<form action="/heimdall/logout" method="post">
+                							    {% csrf_token %}
+                							    <input type="submit" value="Disconect →">
+                							</form>
+                						</div>
+						                {% endif %}
+						              </div>
                       	</div>
+                      </div>
+                    </div>
+                    </div>
+                    <!-- Connection form-->
+                  {% if not user.is_authenticated %}
+                    <div id="connection-form">
+                    <div class="header-connection-container">
                       	
-                      	 </div>
-                      	<!-- Connection form-->
-                      	{% if not user.is_authenticated %}
-                      	
-                      	<div id="connection-form">
-                      	<div class="header-connection-container">
-                      	
-			    <div class="connect">
-				    <h2>Connexion</h2>
-				    <form action="/heimdall/login" method="post" accept-charset="utf-8">
-				    	{% csrf_token %}
-					<table>
-						<tr>
-							<td>
-								<label for="username">Username</label>
-							</td>
-							<td>
-								<input type="text" name="username" value="" id="username" />
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<label for="password">Password</label>
-							</td>
-							<td>
-								<input type="password" name="password" value="" id="password" />
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<p>
-									<input type="submit" value="Login →">
-								</p>
-							</td>
-						</tr>
-					</table>
-				    </form>
-				    
-				    
-			    </div>
-			    
-			    <div class="register">			    
-				    <h2>Enregistrement</h2>
-				    <a href="#">S'enregister (disabled by administrators)</a>
-			    </div>
-			</div>
-			</div>
-			{% endif %}
-                      {% endblock %}
-        </header>
+            			    <div class="connect">
+            				    <h2>Connexion</h2>
+            				    <form action="/heimdall/login" method="post" accept-charset="utf-8">
+            				    	{% csrf_token %}
+                					<table>
+                						<tr>
+                							<td>
+                								<label for="username">Username</label>
+                							</td>
+                							<td>
+                								<input type="text" name="username" value="" id="username" />
+                							</td>
+                						</tr>
+                						<tr>
+                							<td>
+                								<label for="password">Password</label>
+                							</td>
+                							<td>
+                								<input type="password" name="password" value="" id="password" />
+                							</td>
+                						</tr>
+                						<tr>
+                							<td>
+                								<p>
+                									<input type="submit" value="Login →">
+                								</p>
+                							</td>
+                						</tr>
+                					</table>
+            				    </form>
+            			    </div>
+            			    <div class="register">
+            				    <h2>Enregistrement</h2>
+            				    <a href="#">S'enregister (disabled by administrators)</a>
+            			    </div>
+			             </div>
+			           </div>
+			         {% endif %}
+            {% endblock %}
+          </header>
       <!-- End of Header -->
 
       <!-- Navigation -->
@@ -192,6 +194,7 @@
 						<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/grant.png" %}" title="Gerer les permissions"/>Gerer les permissions</a></li>
 				  		
 						<li><a href="/heimdall/admin/manage_groups"><img src="{% static "img/icons/groups.png" %}" title="Gerer les groupes"/>Gerer les groupes</a></li>
+            <li><a href="/heimdall/admin/app_config"><img src="{% static "img/icons/wrench.png" %}" title="Manage Heimdall"/>Configuration</a></li>
 					{%else%}
 						{% ifhasroletype MANAGER %}
 							<li><a href="/heimdall/admin/permissions"><img src="{% static "img/icons/grant.png" %}" title="Gerer les permissions"/>Gerer les permissions</a></li>

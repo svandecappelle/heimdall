@@ -32,13 +32,23 @@ Authors:
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from heimdall.models import Demands
+from heimdall.models import Demands, UserConfiguration, GeneralConfiguration
 
 class VoidDemand(tuple):
 	count = 0	
 
+
+def theme():
+	if GeneralConfiguration.objects.filter(key='theme').exists():
+		if GeneralConfiguration.objects.get(key='theme').value == 'default':
+			return None
+		else:
+			return GeneralConfiguration.objects.get(key='theme').value
+	else:
+		return None
+
 def give_arguments(user, page_title):
-	return {'PAGE_TITLE': page_title, 'APP_TITLE' : "Heimdall", 'inbox_demands_count':get_demands_filtered(user).count}
+	return {'PAGE_TITLE': page_title, 'theme' : theme(), 'APP_TITLE' : "Heimdall", 'inbox_demands_count':get_demands_filtered(user).count}
 
 # utils
 def get_demands_filtered(user_filter):

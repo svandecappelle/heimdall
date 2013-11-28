@@ -47,6 +47,10 @@ from heimdall.objects import Statistics
 
 from heimdall.bastion.runner import Controller
 
+import logging
+
+logger = logging.getLogger("ViewUser")
+
 # HTTP views
     
 # View deposite RSA
@@ -132,6 +136,7 @@ def deposite(request):
     
 # View demands inbox
 def inbox(request):
+    logger.debug("See inbox")
     demands = utils.get_demands_filtered(request.user)
     args = utils.give_arguments(request.user, 'Messages')
     demands_read = utils.get_demands_filtered_and_read(request.user)

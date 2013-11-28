@@ -40,7 +40,7 @@ from django.template import RequestContext
 
 from heimdall import utils
 from heimdall.bastion.runner import Controller
-from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission
+from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission, GeneralConfiguration
 
 
 #Installation
@@ -67,7 +67,34 @@ def install(request):
 	messages.success(request, 'Installation successfull. You can connect with heimdall')
 	return render_to_response('admin/install.html', context_instance=RequestContext(request))
 
+def app_config(request):
+	args = utils.give_arguments(request.user, 'Users admin')
+	if request.user.groups.filter(name="heimdall-admin"):
+		return render_to_response('admin/app_config.html', args, context_instance=RequestContext(request))
+	else:
+		messages.success(request, 'You have not the rights to do this action')
+	return HttpResponseRedirect(reverse('index'))
 
+def app_config_save(request):
+	if request.user.groups.filter(name="heimdall-admin"):
+		if request.method == 'POST':
+			if 'theme' in request.POST:
+				if GeneralConfiguration.objects.filter(key='theme').exists():
+					theme = GeneralConfiguration.objects.get(key='theme')
+					theme.value = request.POST['theme']
+				else:
+					theme = GeneralConfiguration(key='theme')
+					theme.value = request.POST['theme']
+
+				theme.save()
+
+			messages.success(request, 'Saved global heimdall configurations.')
+		else:
+			messages.success(request, 'This page is not accessible.')
+	else:
+		messages.success(request, 'You have not the rights to do this action.')
+		
+	return HttpResponseRedirect(reverse('index'))
 
 def user(request):
 	args = utils.give_arguments(request.user, 'Users admin')
@@ -182,13 +209,8 @@ def getarguments_for_manager(request,user):
 	for users_roles in user_role:
 		users.append(users_roles.user)
 	
-	demands = Demands.objects.filter(close_date__isnull=True, user__in= users, server__in =servers)
-	for filtered_demands in demands:
-		
-		print filtered_demands
+	demands = Demands.objects.filter(close_date__isnull=True, server__in =servers)
 	
-	
-	#users = User.objects.all()
 	permissions = Permission.objects.all()
 	
 	args = utils.give_arguments(user, 'Permissions admin')
@@ -352,9 +374,20 @@ def manage_user_group(request):
 	return render_to_response('admin/user_groups.html', args, context_instance=RequestContext(request))
 
 def manage_groups(request):
-	servers = Server.objects.all()	
-	users = User.objects.all()
-	
+	servers = Server.objects.all()
+
+
+	users=None
+	if request.user.groups.filter(name="heimdall-admin"):
+		users = User.objects.all()
+	else:
+		ownRoles = HeimdallUserRole.objects.filter(user=request.user)
+		poolUsers = HeimdallUserRole.objects.filter(pool__in=ownRoles.values_list('pool'))
+		users = []
+		for managed_user in poolUsers: 
+			if managed_user not in users:
+				users.append(managed_user.user)
+
 	userRoles = HeimdallUserRole.objects.all()
 	pool = HeimdallPool.objects.all()
 	groups = Group.objects.all

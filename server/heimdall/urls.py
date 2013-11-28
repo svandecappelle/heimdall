@@ -70,5 +70,7 @@ urlpatterns = patterns('',
 	url(r'^admin/revoke_access$', heimdall.admin.views.revoke_access, name='revoke-access'),
 	url(r'^admin/manage_role$', heimdall.admin.views.manage_role, name='manage-role'),
 	url(r'^admin/manage_group$', heimdall.admin.views.manage_group, name='manage-group'),
-	
+	url(r'^admin/app_config$', heimdall.admin.views.app_config, name='app-config'),
+	url(r'^admin/app_config_save$', heimdall.admin.views.app_config_save),
+
 )

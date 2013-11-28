@@ -193,7 +193,6 @@ def ifpoolserverandtype(parser, token):
     """
     try:
         tokensp = token.contents.split()
-        print tokensp
         server = tokensp[1]
         roletype = tokensp[2]
     except ValueError:
@@ -229,7 +228,6 @@ class PoolServerNameAndTypeCheck(template.Node):
         self.nodelist_false = nodelist_false
     def render(self, context):
         user = resolve_variable('user', context)
-        print self.server
         if self.needToResolve:
             serverNameConcrete = self.server.resolve(context)
         else:
@@ -269,7 +267,6 @@ class PoolNameAndTypeCheck(template.Node):
         else:
             poolnameConcrete = self.poolname
             
-        print poolnameConcrete
         poolObject = HeimdallPool.objects.get(name=poolnameConcrete)
         allowed = HeimdallUserRole.objects.filter(user=user,pool=poolObject, type=self.roleType).exists()
         if allowed:

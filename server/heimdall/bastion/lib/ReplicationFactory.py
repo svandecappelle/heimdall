@@ -35,11 +35,11 @@ from paramiko import AutoAddPolicy
 from email.mime.text import MIMEText
 import smtplib
 
-from heimdall.bastion.lib.utils import Constants
-from heimdall.bastion.lib.utils.Logger import Logger
+import logging
 
 
-logger = Logger("ReplicationFactory", Constants.DEBUG)
+logger = logging.getLogger("ReplicationFactory")
+
 
 class ReplicationFactory: 
 	def replicate_one_server(self, server, userhost, key_rsa, userName, usermail, port):
@@ -73,7 +73,7 @@ class ReplicationFactory:
 		#stdin, stdout, stderr = client.exec_command("rm %s" % (sshconfig_file))
 		stdin, stdout, stderr = client.exec_command("mv %s.tmp %s" % (sshconfig_file, sshconfig_file))
 		stdin, stdout, stderr = client.exec_command("rm %s.bak" % (sshconfig_file))
-		logger.log("Access revoked", Constants.INFO)
+		logger.info("Access revoked")
 		client.close()	
 		self.notify(server, userName, userhost, True, usermail)
 
@@ -82,12 +82,12 @@ class ReplicationFactory:
 		Notify the user and admin if config constant is enable to
 		"""
 		
-		logger.log("Notify users by email", Constants.INFO)
+		logger.info("Notify users by email")
 		if isRevoke:
 			self.alertToAdmin('An administrator has just revoke access on %s to %s user connected with %s' % (server, trig, user), server, usermail);
 		else:
 			self.alertToAdmin('An administrator has just open access on %s to %s user connected with %s' % (server, trig, user), server, usermail);
-		logger.log("Replication finished", Constants.INFO)
+		logger.info("Replication finished")
 	
 	
 	def alertToAdmin(self, message, server, userEmail):

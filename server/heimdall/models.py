@@ -90,3 +90,15 @@ class Demands(models.Model):
 	close_date = models.DateTimeField(null=True, blank=True)
 	def __unicode__(self):
 		return u"%s->%s->%s" % (self.user.username, self.server.hostname, self.hostuser)
+
+class UserConfiguration(models.Model):
+	user = models.ForeignKey(User)
+	value = models.CharField(max_length=500)
+	key = models.CharField(max_length=150)
+	def __unicode__(self):
+		return u"%s->%s" % (self.user.username, self.key)
+class GeneralConfiguration(models.Model):
+	value = models.CharField(max_length=500)
+	key = models.CharField(max_length=150)
+	def __unicode__(self):
+		return u"%s->%s" % (self.key)
