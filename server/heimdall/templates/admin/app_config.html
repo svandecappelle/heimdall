@@ -2,7 +2,7 @@
 {% block import %}
 <script type="text/javascript">
 	$(document).ready(function(){
-		$( "input" ).change(function() {
+		$( "input[type=checkbox]" ).change(function() {
 			var $input = $( this );
 			$input.attr('value' , ""+$input.is( ":checked" ));
 		});
