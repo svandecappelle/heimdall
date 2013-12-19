@@ -434,7 +434,7 @@
                  //window.status = ''
               }
             }else*/ 
-            if ($.inArray(nearest.node.name, ['Heimdall','georges','PC-SVA','yoda', 'dev2', 'usertest', 'jboss', 'fvcxbfdvcf']) >=0 ){
+            if ($.inArray(nearest.node.name, Permissions) >=0 ){
               selected = (nearest.distance < 50) ? nearest : null
               console.log(nearest.node.name)
               if (nearest.node.name!=_section){
