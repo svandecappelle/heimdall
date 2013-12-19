@@ -1,27 +1,108 @@
-{% extends "layout-page.html" %} {% block content %} {% load tags %} 
+{% extends "layout-page.html" %} 
+{% block import %}
+<script type="text/javascript">
+	$(document).ready(function(){
+		$( "input" ).change(function() {
+			var $input = $( this );
+			$input.attr('value' , ""+$input.is( ":checked" ));
+		});
+	});
+</script>
+
+{% endblock %}
+
+{% block content %} 
+{% load tags %} 
+{% load i18n %}
+
 {% if user.is_authenticated %} 
 
 {% ifusergroup heimdall-admin %}
+{% trans "This" %}
 <section>
 	<div class="inline-block">
-		<h2>Heimdall configuration</h2>
+		<h2>Server configuration</h2>
 		<div class="form default-block">		
 			<form action="/heimdall/admin/app_config_save" method="post" accept-charset="utf-8">
 				{% csrf_token %}
 				<input type="hidden" name="type" value="global"/>
-				<table>	
-					<tr>
-						<td><label for="theme">Theme</label></td>
-						<td>
-							<span class="select">
-								<select name="theme">
-									<option value="default">Default</option>
-									<option value="clean">Clean</option>
-								</select>
-							</span>
-						</td>
-					</tr>
+				
+				<h3>Apparence</h3>
+				<table class="bordered">
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Value</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><label for="theme">Theme</label></td>
+							<td>
+								<span class="select">
+									<select name="theme">
+										<option value="default" {% if default_theme == "default" %} selected {%endif%}>Default</option>
+										<option value="clean" {% if default_theme == "clean" %} selected {%endif%}>Clean</option>
+									</select>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td><label>Language </label><span style="color: rgb(209, 101, 102);">(Not yet translated!)</span></td>
+							<td>
+								<span class="select">
+									<select name="theme" style="color: rgb(160, 160, 160);">
+										<option>Français</option>
+										<option>English</option>
+									</select>
+								</span>
+							</td>
+						</tr>
+					</tbody>
 				</table>
+				<h3>System</h3>
+				<table class="bordered">
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Value</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="2" class="subtitle">Notifications: {{admin_notification}}</td>
+						</tr>
+
+						<!--<tr>
+							<td><label for="admin_notification">Send notifications to admin</label></td>
+							<td><input name="admin_notification" type="checkbox" value="{{admin_notification}}" {%if admin_notification == "true"%} checked {%endif%}/></td>
+						</tr>-->
+						<tr>
+							<td><label>Send notifications to user {{user_notification}}</label></td>
+							<td><input type="checkbox" {%if user_notification == "true" %} checked {%endif%}/>
+							<input type="hidden" name="user_notification" value="{{user_notification}}"/></td>
+						</tr>
+						<tr>
+							<td colspan="2" class="subtitle">Mail server configuration</td>
+						</tr>
+						<tr>
+							<td><label for="mail_server_hostname">Mail server</label></td>
+							<td><input name="mail_server_hostname" type="text" value="{{mail_server_hostname}}"/></td>
+						</tr>
+						<tr>
+							<td><label for="mail_system_user_account">System user account mail</label></td>
+							<td><input name="mail_system_user_account" type="text" value="{{mail_system_user_account}}"/></td>
+						</tr>
+						<!--<tr>
+							<td colspan="2" class="subtitle">SSH server configuration</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+						</tr>-->
+					</tbody>
+				</table>
+
 				<p>
 					<input type="submit" value="Save →">
 				</p>
@@ -33,23 +114,31 @@
 
 <section>
 	<div class="inline-block">
-		<h2>My configuration</h2>
+		<h2>User configuration</h2>
 		<div class="form default-block">		
 			<form action="/heimdall/admin/app_config_save" method="post" accept-charset="utf-8">
 
-				<table>
+				<table class="bordered">
 					{% csrf_token %}
-					<tr>
-						<td><label for="theme">Theme</label></td>
-						<td>
-							<span class="select">
-								<select name="theme">
-									<option value="default">Default</option>
-									<option value="clean">Clean</option>
-								</select>
-							</span>
-						</td>
-					</tr>
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Value</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><label for="theme">Theme</label></td>
+							<td>
+								<span class="select">
+									<select name="theme">
+										<option value="default" {% if theme == "default" %} selected {%endif%}>Default</option>
+										<option value="clean" {% if theme == "clean" %} selected {%endif%}>Clean</option>
+									</select>
+								</span>
+							</td>
+						</tr>
+					</tbody>
 				</table>
 				<p>
 					<input type="submit" value="Save →">
@@ -58,5 +147,4 @@
 		</div>
 	</div>
 </section>
-
 {% endif %} {% endblock %}

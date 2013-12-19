@@ -37,6 +37,35 @@ from heimdall.models import Demands, UserConfiguration, GeneralConfiguration
 class VoidDemand(tuple):
 	count = 0	
 
+def getConfiguration(user, conf_id):
+	output = None
+	if GeneralConfiguration.objects.filter(key=conf_id).exists():
+		if GeneralConfiguration.objects.get(key=conf_id).value == 'default':
+			output = None
+		else:
+			output = GeneralConfiguration.objects.get(key=conf_id).value
+	else:
+		output = None
+	if user:
+		if user.is_authenticated():
+			if UserConfiguration.objects.filter(user=user,key=conf_id).exists():
+				if UserConfiguration.objects.get(user=user,key=conf_id).value == 'default':
+					output = None
+				else:
+					output = UserConfiguration.objects.get(user=user,key=conf_id).value
+
+	return output
+
+def getConfigurationAdmin(conf_id):
+	output = None
+	if GeneralConfiguration.objects.filter(key=conf_id).exists():
+		if GeneralConfiguration.objects.get(key=conf_id).value == 'default':
+			output = None
+		else:
+			output = GeneralConfiguration.objects.get(key=conf_id).value
+	else:
+		output = None
+	return output
 
 def theme(user):
 	output = None

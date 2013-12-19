@@ -45,7 +45,7 @@ urlpatterns = patterns('',
 	url(r'^servers$', heimdall.servers.views.servers, name='servers'),
 	url(r'^login$', heimdall.user.views.user_login),
 	url(r'^logout$', heimdall.user.views.user_logout),
-	
+
 	url(r'^user/messages$', heimdall.user.views.inbox, name='inbox'),
 	url(r'^user/deposite$', heimdall.user.views.deposite, name='deposite'),
 	url(r'^user/require_access$', heimdall.user.views.require_access, name='require_access'),
@@ -53,8 +53,7 @@ urlpatterns = patterns('',
 	url(r'^user/register$', heimdall.user.views.register, name='register'),
 	url(r'^user/register_action$', heimdall.user.views.register_action, name='register_action'),
 	url(r'^user/permissions$', heimdall.servers.views.permissions, name='permissions'),
-	
-	
+
 	url(r'^admin/install$', heimdall.admin.views.install, name='install'),
 	url(r'^admin/user$', heimdall.admin.views.user, name='admin-user'),
 	url(r'^admin/permissions$', heimdall.admin.views.permissions, name='admin-permissions'),
@@ -72,5 +71,4 @@ urlpatterns = patterns('',
 	url(r'^admin/manage_group$', heimdall.admin.views.manage_group, name='manage-group'),
 	url(r'^admin/app_config$', heimdall.admin.views.app_config, name='app-config'),
 	url(r'^admin/app_config_save$', heimdall.admin.views.app_config_save),
-
 )

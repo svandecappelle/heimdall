@@ -15,9 +15,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>.
 
-Authors: 
+Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
@@ -37,18 +37,19 @@ import smtplib
 
 import logging
 
+from heimdall import utils
 
 logger = logging.getLogger("ReplicationFactory")
 
 
-class ReplicationFactory: 
+class ReplicationFactory:
 	def replicate_one_server(self, server, userhost, key_rsa, userName, usermail, port):
 		'''Replicate access on one server for one user'''
 		client = SSHClient()
 		client.load_system_host_keys()
 		client.set_missing_host_key_policy(AutoAddPolicy())
-		client.connect('%s' % server, port=port, username=userhost)    
-	
+		client.connect('%s' % server, port=port, username=userhost)
+
 		# ## Insert permission into server authorized_keys ssh file
 		stdin, stdout, stderr = client.exec_command("echo '%s' >> .ssh/authorized_keys" % key_rsa)
 		client.close()
@@ -61,12 +62,12 @@ class ReplicationFactory:
 		client = SSHClient()
 		client.load_system_host_keys()
 		client.set_missing_host_key_policy(AutoAddPolicy())
-		client.connect('%s' % server, port=port, username=userhost)    
-	
+		client.connect('%s' % server, port=port, username=userhost)
+
 		# ## Insert permission into server authorized_keys ssh file
 		sshconfig_file = "~/.ssh/authorized_keys"
-		rsa_search = str(key_rsa).replace('\r\n', '').replace('\r', '').replace('\n', '') 
-		
+		rsa_search = str(key_rsa).replace('\r\n', '').replace('\r', '').replace('\n', '')
+
 		stdin, stdout, stderr = client.exec_command("grep -v '%s' %s > %s.tmp" % (rsa_search, sshconfig_file, sshconfig_file))
 		stdin, stdout, stderr = client.exec_command("cat %s > %s.bak" % (sshconfig_file, sshconfig_file))
 		stdin, stdout, stderr = client.exec_command("chmod 0600 %s.tmp" % (sshconfig_file))
@@ -74,40 +75,39 @@ class ReplicationFactory:
 		stdin, stdout, stderr = client.exec_command("mv %s.tmp %s" % (sshconfig_file, sshconfig_file))
 		stdin, stdout, stderr = client.exec_command("rm %s.bak" % (sshconfig_file))
 		logger.info("Access revoked")
-		client.close()	
+		client.close()
 		self.notify(server, userName, userhost, True, usermail)
 
 	def notify(self, server, trig, user, isRevoke, usermail):
 		"""
 		Notify the user and admin if config constant is enable to
 		"""
-		
+
 		logger.info("Notify users by email")
 		if isRevoke:
-			self.alertToAdmin('An administrator has just revoke access on %s to %s user connected with %s' % (server, trig, user), server, usermail);
+			self.alertToAdmin('An administrator has just revoke access on %s to %s user connected with %s' % (server, trig, user), server, usermail)
 		else:
-			self.alertToAdmin('An administrator has just open access on %s to %s user connected with %s' % (server, trig, user), server, usermail);
+			self.alertToAdmin('An administrator has just open access on %s to %s user connected with %s' % (server, trig, user), server, usermail)
 		logger.info("Replication finished")
-	
-	
+
 	def alertToAdmin(self, message, server, userEmail):
 		'''Alert by email the admins and the user if configured'''
 		# Create an html message
-		msg = MIMEText(message,'html')
-		s = smtplib.SMTP(Constants.mailGateway)
-		
-		sender = Constants.heimdallEmail
-		recipients = [Constants.administratorEmail] + Constants.ccAdmins
+		msg = MIMEText(message, 'html')
+		s = smtplib.SMTP(utils.getConfigurationAdmin('mail_server_hostname'))
+
+		sender = utils.getConfigurationAdmin('mail_system_user_account')
+		recipients = [utils.getConfigurationAdmin('mail_system_user_account')]
 		msg['Subject'] = 'Heimdall permissions changed on %s' % server
 		msg['From'] = sender
-		
-		if Constants.notifyUserByEmail:
+
+		if utils.getConfigurationAdmin('user_notification') == 'true':
 			msg['To'] = userEmail
 		else:
 			msg['To'] = ", ".join(recipients)
-		
-		if Constants.notifyAdminByMail and not Constants.notifyUserByEmail:
+
+		if utils.getConfigurationAdmin('admin_notification') == 'true' and not utils.getConfigurationAdmin('user_notification') == 'false':
 			msg['Cc'] = ", ".join(recipients)
-		
+
 		s.sendmail(sender, recipients, msg.as_string())
 		s.quit()
