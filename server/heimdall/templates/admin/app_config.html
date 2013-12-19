@@ -5,6 +5,7 @@
 		$( "input[type=checkbox]" ).change(function() {
 			var $input = $( this );
 			$input.attr('value' , ""+$input.is( ":checked" ));
+			$("input[name='"+$input.attr('id')+"'").attr('value', ""+$input.is( ":checked" ));
 		});
 	});
 </script>
@@ -73,13 +74,16 @@
 							<td colspan="2" class="subtitle">Notifications: {{admin_notification}}</td>
 						</tr>
 
-						<!--<tr>
-							<td><label for="admin_notification">Send notifications to admin</label></td>
-							<td><input name="admin_notification" type="checkbox" value="{{admin_notification}}" {%if admin_notification == "true"%} checked {%endif%}/></td>
-						</tr>-->
 						<tr>
-							<td><label>Send notifications to user {{user_notification}}</label></td>
-							<td><input type="checkbox" {%if user_notification == "true" %} checked {%endif%}/>
+							<td><label for="admin_notification">Send notifications to admin</label></td>
+							<td>
+								<input type="checkbox" id="admin_notification" value="{{admin_notification}}" {%if admin_notification == "true"%} checked {%endif%}/>
+								<input type="hidden" name="admin_notification" value="{{admin_notification}}"/>
+							</td>
+						</tr>
+						<tr>
+							<td><label>Send notifications to user</label></td>
+							<td><input type="checkbox" id="user_notification" {%if user_notification == "true" %} checked {%endif%}/>
 							<input type="hidden" name="user_notification" value="{{user_notification}}"/></td>
 						</tr>
 						<tr>

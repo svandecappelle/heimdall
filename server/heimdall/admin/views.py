@@ -87,7 +87,7 @@ def app_config_save(request):
 		messages.success(request, 'This page is not accessible.')
 		return HttpResponseRedirect(reverse('index'))
 
-	globalConfiguredFields = ['theme', 'mail_server_hostname', 'user_notification', 'mail_system_user_account']
+	globalConfiguredFields = ['theme', 'mail_server_hostname', 'admin_notification', 'user_notification', 'mail_system_user_account']
 	userConfiguredFields = ['theme']
 	if 'type' in request.POST:
 		if request.POST['type'] == 'global':
