@@ -378,7 +378,7 @@ def grant_access(request):
 						demand.markAsIgnore = False
 						demand.save()
 
-					if err == None:
+					if err is None:
 						if request.POST['username'] != '[[ALL]]':
 							message = 'Permission granted on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')'
 						else:

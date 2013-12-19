@@ -1,282 +1,516 @@
 (function() {
-	Renderer = function(elt) {
-		var canvas = $(elt).get(0)
-		var dom = $(elt)
-		var ctx = canvas.getContext("2d");
-		var gfx = arbor.Graphics(canvas)
-		var sys = null
 
-		var _vignette = null
-		var selected = null, nearest = null, _mouseP = null;
 
-		var that = {
-			init : function(pSystem) {
-				sys = pSystem
-				sys.screen({
-					size : {
-						width : dom.width(),
-						height : dom.height()
-					},
-					padding : [ 36, 60, 36, 60 ]
-				})
 
-				$(window).resize(that.resize)
-				that.resize()
-				that.initMouseHandling()
-			},
-			resize : function() {
-				canvas.width = $(window).width() - 60
-				canvas.height = $(window).height() - 57
-				sys.screen({
-					size : {
-						width : canvas.width,
-						height : canvas.height
-					}
-				})
-				_vignette = null
-				that.redraw()
-			},
-			redraw : function() {
-				if (!sys)
-					return
 
-                				
+    /*
+    Renderer = function(elt) {
+        var canvas = $(elt).get(0)
+        var dom = $(elt)
+        var ctx = canvas.getContext("2d");
+        var gfx = arbor.Graphics(canvas)
+        var sys = null
 
-				ctx.clearRect(0, 0, canvas.width, canvas.height)
+        var _vignette = null
+        var selected = null,
+            nearest = null,
+            _mouseP = null;
 
-				var nodeBoxes = {}
-				sys
-						.eachNode(function(node, pt) {
-							// node: {mass:#, p:{x,y}, name:"", data:{}}
-							// pt: {x:#, y:#} node position in screen coords
+        var that = {
+            init: function(pSystem) {
+                sys = pSystem
+                sys.screen({
+                    size: {
+                        width: dom.width(),
+                        height: dom.height()
+                    },
+                    padding: [36, 60, 36, 60]
+                })
 
-							// determine the box size and round off the coords
-							// if we'll be
-							// drawing a text label (awful alignment jitter
-							// otherwise...)
-							var label = node.data.label || ""
-							var w = ctx.measureText("" + label).width + 10
-							if (!("" + label).match(/^[ \t]*$/)) {
-								pt.x = Math.floor(pt.x)
-								pt.y = Math.floor(pt.y)
-							} else {
-								label = null
-							}
+                $(window).resize(that.resize)
+                that.resize()
+                that.initMouseHandling()
+            },
+            resize: function() {
+                canvas.width = $(window).width() - 60
+                canvas.height = $(window).height() - 57
+                sys.screen({
+                    size: {
+                        width: canvas.width,
+                        height: canvas.height
+                    }
+                })
+                _vignette = null
+                that.redraw()
+            },
+            redraw: function() {
+                if (!sys)
+                    return
 
-							// draw a rectangle centered at pt
-							if (node.data.color)
-								ctx.fillStyle = node.data.color
-								// else ctx.fillStyle = "#d0d0d0"
-							else
-								ctx.fillStyle = "rgba(0,0,0,.2)"
-							if (node.data.color == 'none')
-								ctx.fillStyle = "white"
 
-								// ctx.fillRect(pt.x-w/2, pt.y-10, w,20)
-							if (node.data.shape == 'dot') {
-								gfx.oval(pt.x - w / 2, pt.y - w / 2, w, w, {
-									fill : ctx.fillStyle
-								})
-								nodeBoxes[node.name] = [ pt.x - w / 2,
-										pt.y - w / 2, w, w ]
-							} else {
-								gfx.rect(pt.x - w / 2, pt.y - 10, w, 20, 4, {
-									fill : ctx.fillStyle
-								})
-								nodeBoxes[node.name] = [ pt.x - w / 2,
-										pt.y - 11, w, 22 ]
-							}
 
-							// w = Math.max(20,w)
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-							// draw the text
-							if (label) {
-								ctx.font = "12px Helvetica"
-								ctx.textAlign = "center"
-								ctx.fillStyle = "white"
-								if (node.data.color == 'none')
-									ctx.fillStyle = '#333333'
-								ctx.fillText(label || "", pt.x, pt.y + 4)
-								ctx.fillText(label || "", pt.x, pt.y + 4)
-							}
-						})
+                var nodeBoxes = {}
+                sys
+                    .eachNode(function(node, pt) {
+                        // node: {mass:#, p:{x,y}, name:"", data:{}}
+                        // pt: {x:#, y:#} node position in screen coords
 
-				ctx.strokeStyle = "#626B6C"
-				ctx.lineWidth = 1
-				ctx.beginPath()
-				sys.eachEdge(function(edge, pt1, pt2) {
-					// edge: {source:Node, target:Node, length:#, data:{}}
-					// pt1: {x:#, y:#} source position in screen coords
-					// pt2: {x:#, y:#} target position in screen coords
+                        // determine the box size and round off the coords
+                        // if we'll be
+                        // drawing a text label (awful alignment jitter
+                        // otherwise...)
+                        var label = node.data.label || ""
+                        var w = ctx.measureText("" + label).width + 10
+                        if (!("" + label).match(/^[ \t]*$/)) {
+                            pt.x = Math.floor(pt.x)
+                            pt.y = Math.floor(pt.y)
+                        } else {
+                            label = null
+                        }
 
-					var weight = edge.data.weight
-					var color = edge.data.color
+                        // draw a rectangle centered at pt
+                        if (node.data.color)
+                            ctx.fillStyle = node.data.color
+                            // else ctx.fillStyle = "#d0d0d0"
+                        else
+                            ctx.fillStyle = "rgba(0,0,0,.2)"
+                        if (node.data.color == 'none')
+                            ctx.fillStyle = "white"
 
-					// trace(color)
-					if (!color || ("" + color).match(/^[ \t]*$/))
-						color = null
+                        // ctx.fillRect(pt.x-w/2, pt.y-10, w,20)
+                        if (node.data.shape == 'dot') {
+                            gfx.oval(pt.x - w / 2, pt.y - w / 2, w, w, {
+                                fill: ctx.fillStyle
+                            })
+                            nodeBoxes[node.name] = [pt.x - w / 2,
+                                pt.y - w / 2, w, w
+                            ]
+                        } else {
+                            gfx.rect(pt.x - w / 2, pt.y - 10, w, 20, 4, {
+                                fill: ctx.fillStyle
+                            })
+                            nodeBoxes[node.name] = [pt.x - w / 2,
+                                pt.y - 11, w, 22
+                            ]
+                        }
 
-						// find the start point
-					var tail = intersect_line_box(pt1, pt2,
-							nodeBoxes[edge.source.name])
-					var head = intersect_line_box(tail, pt2,
-							nodeBoxes[edge.target.name])
+                        // w = Math.max(20,w)
 
-					ctx.save()
-					ctx.beginPath()
+                        // draw the text
+                        if (label) {
+                            ctx.font = "12px Helvetica"
+                            ctx.textAlign = "center"
+                            ctx.fillStyle = "white"
+                            if (node.data.color == 'none')
+                                ctx.fillStyle = '#333333'
+                            ctx.fillText(label || "", pt.x, pt.y + 4)
+                            ctx.fillText(label || "", pt.x, pt.y + 4)
+                        }
+                    })
 
-					if (!isNaN(weight))
-						ctx.lineWidth = weight
-					if (color)
-						ctx.strokeStyle = color
-						// if (color) trace(color)
-					ctx.fillStyle = null
+                ctx.strokeStyle = "#626B6C"
+                ctx.lineWidth = 1
+                ctx.beginPath()
+                sys.eachEdge(function(edge, pt1, pt2) {
+                    // edge: {source:Node, target:Node, length:#, data:{}}
+                    // pt1: {x:#, y:#} source position in screen coords
+                    // pt2: {x:#, y:#} target position in screen coords
 
-					ctx.moveTo(tail.x, tail.y)
-					ctx.lineTo(head.x, head.y)
-					ctx.stroke()
-					ctx.restore()
+                    var weight = edge.data.weight
+                    var color = edge.data.color
 
-					// draw an arrowhead if this is a -> style edge
-					ctx.save()
-					// move to the head position of the edge we just drew
-					var wt = !isNaN(weight) ? parseFloat(weight)
-							: ctx.lineWidth
-					var arrowLength = 6 + wt
-					var arrowWidth = 2 + wt
-					ctx.fillStyle = (color) ? color : ctx.strokeStyle
-					ctx.translate(head.x, head.y);
-					ctx.rotate(Math.atan2(head.y - tail.y, head.x - tail.x));
+                    // trace(color)
+                    if (!color || ("" + color).match(/^[ \t]*$/))
+                        color = null
 
-					// delete some of the edge that's already there (so the
-					// point isn't hidden)
-					ctx.clearRect(-arrowLength / 2, -wt / 2, arrowLength / 2,
-							wt)
+                    // find the start point
+                    var tail = intersect_line_box(pt1, pt2,
+                        nodeBoxes[edge.source.name])
+                    var head = intersect_line_box(tail, pt2,
+                        nodeBoxes[edge.target.name])
 
-					// draw the chevron
-					ctx.beginPath();
-					ctx.moveTo(-arrowLength, arrowWidth);
-					ctx.lineTo(0, 0);
-					ctx.lineTo(-arrowLength, -arrowWidth);
-					ctx.lineTo(-arrowLength * 0.8, -0);
-					ctx.closePath();
-					ctx.fill();
-					ctx.restore()
-				})// end redraw
+                    ctx.save()
+                    ctx.beginPath()
 
-			},
+                    if (!isNaN(weight))
+                        ctx.lineWidth = weight
+                    if (color)
+                        ctx.strokeStyle = color
+                        // if (color) trace(color)
+                    ctx.fillStyle = null
 
-			initMouseHandling : function() {
-				// no-nonsense drag and drop (thanks springy.js)
-				selected = null;
-				nearest = null;
-				var dragged = null;
-				var oldmass = 1
+                    ctx.moveTo(tail.x, tail.y)
+                    ctx.lineTo(head.x, head.y)
+                    ctx.stroke()
+                    ctx.restore()
 
-				// set up a handler object that will initially listen for
-				// mousedowns then
-				// for moves and mouseups while dragging
-				var handler = {
-					clicked : function(e) {
-						var pos = $(canvas).offset();
-						_mouseP = arbor.Point(e.pageX - pos.left, e.pageY
-								- pos.top)
-						selected = nearest = dragged = sys.nearest(_mouseP);
+                    // draw an arrowhead if this is a -> style edge
+                    ctx.save()
+                    // move to the head position of the edge we just drew
+                    var wt = !isNaN(weight) ? parseFloat(weight) : ctx.lineWidth
+                    var arrowLength = 6 + wt
+                    var arrowWidth = 2 + wt
+                    ctx.fillStyle = (color) ? color : ctx.strokeStyle
+                    ctx.translate(head.x, head.y);
+                    ctx.rotate(Math.atan2(head.y - tail.y, head.x - tail.x));
 
-						if (dragged.node !== null)
-							dragged.node.fixed = true
+                    // delete some of the edge that's already there (so the
+                    // point isn't hidden)
+                    ctx.clearRect(-arrowLength / 2, -wt / 2, arrowLength / 2,
+                        wt)
 
-						$(canvas).bind('mousemove', handler.dragged)
-						$(window).bind('mouseup', handler.dropped)
+                    // draw the chevron
+                    ctx.beginPath();
+                    ctx.moveTo(-arrowLength, arrowWidth);
+                    ctx.lineTo(0, 0);
+                    ctx.lineTo(-arrowLength, -arrowWidth);
+                    ctx.lineTo(-arrowLength * 0.8, -0);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore()
+                }) // end redraw
 
-						return false
-					},
-					dragged : function(e) {
-						var old_nearest = nearest && nearest.node._id
-						var pos = $(canvas).offset();
-						var s = arbor.Point(e.pageX - pos.left, e.pageY
-								- pos.top)
+            },
 
-						if (!nearest)
-							return
+            initMouseHandling: function() {
+                // no-nonsense drag and drop (thanks springy.js)
+                selected = null;
+                nearest = null;
+                var dragged = null;
+                var oldmass = 1
 
-						if (dragged !== null && dragged.node !== null) {
-							var p = sys.fromScreen(s)
-							dragged.node.p = p
-						}
+                // set up a handler object that will initially listen for
+                // mousedowns then
+                // for moves and mouseups while dragging
+                var handler = {
+                    clicked: function(e) {
+                        var pos = $(canvas).offset();
+                        _mouseP = arbor.Point(e.pageX - pos.left, e.pageY - pos.top)
+                        selected = nearest = dragged = sys.nearest(_mouseP);
 
-						return false
-					},
+                        if (dragged.node !== null)
+                            dragged.node.fixed = true
 
-					dropped : function(e) {
-						if (dragged === null || dragged.node === undefined)
-							return
+                        $(canvas).bind('mousemove', handler.dragged)
+                        $(window).bind('mouseup', handler.dropped)
 
-						if (dragged.node !== null)
-							dragged.node.fixed = false
-						dragged.node.tempMass = 50
-						dragged = null
-						selected = null
-						$(canvas).unbind('mousemove', handler.dragged)
-						$(window).unbind('mouseup', handler.dropped)
-						_mouseP = null
-						return false
-					}
-				}
-				$(canvas).mousedown(handler.clicked);
+                        return false
+                    },
+                    dragged: function(e) {
+                        var old_nearest = nearest && nearest.node._id
+                        var pos = $(canvas).offset();
+                        var s = arbor.Point(e.pageX - pos.left, e.pageY - pos.top)
 
-			}
+                        if (!nearest)
+                            return
 
-		}
+                        if (dragged !== null && dragged.node !== null) {
+                            var p = sys.fromScreen(s)
+                            dragged.node.p = p
+                        }
 
-		// helpers for figuring out where to draw arrows (thanks springy.js)
-		var intersect_line_line = function(p1, p2, p3, p4) {
-			var denom = ((p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x)
-					* (p2.y - p1.y));
-			if (denom === 0)
-				return false // lines are parallel
-			var ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y)
-					* (p1.x - p3.x))
-					/ denom;
-			var ub = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y)
-					* (p1.x - p3.x))
-					/ denom;
+                        return false
+                    },
 
-			if (ua < 0 || ua > 1 || ub < 0 || ub > 1)
-				return false
-			return arbor.Point(p1.x + ua * (p2.x - p1.x), p1.y + ua
-					* (p2.y - p1.y));
-		}
+                    dropped: function(e) {
+                        if (dragged === null || dragged.node === undefined)
+                            return
 
-		var intersect_line_box = function(p1, p2, boxTuple) {
-			var p3 = {
-				x : boxTuple[0],
-				y : boxTuple[1]
-			}, w = boxTuple[2], h = boxTuple[3]
+                        if (dragged.node !== null)
+                            dragged.node.fixed = false
+                        dragged.node.tempMass = 50
+                        dragged = null
+                        selected = null
+                        $(canvas).unbind('mousemove', handler.dragged)
+                        $(window).unbind('mouseup', handler.dropped)
+                        _mouseP = null
+                        return false
+                    }
+                }
+                $(canvas).mousedown(handler.clicked);
 
-			var tl = {
-				x : p3.x,
-				y : p3.y
-			};
-			var tr = {
-				x : p3.x + w,
-				y : p3.y
-			};
-			var bl = {
-				x : p3.x,
-				y : p3.y + h
-			};
-			var br = {
-				x : p3.x + w,
-				y : p3.y + h
-			};
+            }
 
-			return intersect_line_line(p1, p2, tl, tr)
-					|| intersect_line_line(p1, p2, tr, br)
-					|| intersect_line_line(p1, p2, br, bl)
-					|| intersect_line_line(p1, p2, bl, tl) || false
-		}
+        }
 
-		return that
-	}
+        // helpers for figuring out where to draw arrows (thanks springy.js)
+        var intersect_line_line = function(p1, p2, p3, p4) {
+            var denom = ((p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y));
+            if (denom === 0)
+                return false // lines are parallel
+            var ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denom;
+            var ub = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denom;
+
+            if (ua < 0 || ua > 1 || ub < 0 || ub > 1)
+                return false
+            return arbor.Point(p1.x + ua * (p2.x - p1.x), p1.y + ua * (p2.y - p1.y));
+        }
+
+        var intersect_line_box = function(p1, p2, boxTuple) {
+            var p3 = {
+                x: boxTuple[0],
+                y: boxTuple[1]
+            }, w = boxTuple[2],
+                h = boxTuple[3]
+
+            var tl = {
+                x: p3.x,
+                y: p3.y
+            };
+            var tr = {
+                x: p3.x + w,
+                y: p3.y
+            };
+            var bl = {
+                x: p3.x,
+                y: p3.y + h
+            };
+            var br = {
+                x: p3.x + w,
+                y: p3.y + h
+            };
+
+            return intersect_line_line(p1, p2, tl, tr) || intersect_line_line(p1, p2, tr, br) || intersect_line_line(p1, p2, br, bl) || intersect_line_line(p1, p2, bl, tl) || false
+        }
+
+        return that
+    }*/
+
+    Renderer = function(elt){
+    var dom = $(elt)
+    var canvas = dom.get(0)
+    var ctx = canvas.getContext("2d");
+    var gfx = arbor.Graphics(canvas)
+    var sys = null
+
+    var _vignette = null
+    var selected = null,
+        nearest = null,
+        _mouseP = null;
+
+    
+    var that = {
+      init:function(pSystem){
+        sys = pSystem
+        sys.screen({size:{width:dom.width(), height:dom.height()},
+                    padding:[36,60,36,60]})
+
+        $(window).resize(that.resize)
+        that.resize()
+        that._initMouseHandling()
+
+        if (document.referrer.match(/echolalia|atlas|halfviz/)){
+          // if we got here by hitting the back button in one of the demos, 
+          // start with the demos section pre-selected
+          that.switchSection('demos')
+        }
+      },
+      resize:function(){
+        canvas.width = $(window).width()
+        canvas.height = .75* $(window).height()
+        sys.screen({size:{width:canvas.width, height:canvas.height}})
+        _vignette = null
+        that.redraw()
+      },
+      redraw:function(){
+        gfx.clear()
+        sys.eachEdge(function(edge, p1, p2){
+          if (edge.source.data.alpha * edge.target.data.alpha == 0) return
+          gfx.line(p1, p2, {stroke:"#b2b19d", width:2, alpha:edge.target.data.alpha})
+        })
+        sys.eachNode(function(node, pt){
+          var w = Math.max(20, 20+gfx.textWidth(node.name) )
+          if (node.data.alpha===0) return
+          if (node.data.shape=='dot'){
+            gfx.oval(pt.x-w/2, pt.y-w/2, w, w, {fill:node.data.color, alpha:node.data.alpha})
+            gfx.text(node.name, pt.x, pt.y+7, {color:"white", align:"center", font:"Arial", size:12})
+            gfx.text(node.name, pt.x, pt.y+7, {color:"white", align:"center", font:"Arial", size:12})
+          }else{
+            gfx.rect(pt.x-w/2, pt.y-8, w, 20, 4, {fill:node.data.color, alpha:node.data.alpha})
+            gfx.text(node.name, pt.x, pt.y+9, {color:"white", align:"center", font:"Arial", size:12})
+            gfx.text(node.name, pt.x, pt.y+9, {color:"white", align:"center", font:"Arial", size:12})
+          }
+        })
+        that._drawVignette()
+      },
+      
+      _drawVignette:function(){
+        var w = canvas.width
+        var h = canvas.height
+        var r = 20
+
+        if (!_vignette){
+          var top = ctx.createLinearGradient(0,0,0,r)
+          top.addColorStop(0, "#e0e0e0")
+          top.addColorStop(.7, "rgba(255,255,255,0)")
+
+          var bot = ctx.createLinearGradient(0,h-r,0,h)
+          bot.addColorStop(0, "rgba(255,255,255,0)")
+          bot.addColorStop(1, "white")
+
+          _vignette = {top:top, bot:bot}
+        }
+        
+        // top
+        ctx.fillStyle = _vignette.top
+        ctx.fillRect(0,0, w,r)
+
+        // bot
+        ctx.fillStyle = _vignette.bot
+        ctx.fillRect(0,h-r, w,r)
+      },
+
+      switchMode:function(e){
+        if (e.mode=='hidden'){
+          dom.stop(true).fadeTo(e.dt,0, function(){
+            if (sys) sys.stop()
+            $(this).hide()
+          })
+        }else if (e.mode=='visible'){
+          dom.stop(true).css('opacity',0).show().fadeTo(e.dt,1,function(){
+            that.resize()
+          })
+          if (sys) sys.start()
+        }
+      },
+      
+      switchSection:function(newSection){
+        var parent = sys.getEdgesFrom(newSection)[0].source
+        var children = $.map(sys.getEdgesFrom(newSection), function(edge){
+          return edge.target
+        })
+        
+        sys.eachNode(function(node){
+          if (node.data.shape=='dot') return // skip all but leafnodes
+          if (node == parent) return // skip parent  
+          //var nowVisible = node.data.alpha == 0.2
+          var nowVisible = ($.inArray(node, children)>=0)
+          var newAlpha = (nowVisible) ? 1 : 0
+          var dt = (nowVisible) ? .5 : .5
+
+          //if (node.data.shape=='dot')
+          oldAlpha = node.data.alpha 
+          node.data.alpha = newAlpha
+          
+          //sys.tweenNode(node, dt, {alpha:newAlpha})
+          
+          if (oldAlpha ==0 && newAlpha==1){
+            node.p.x = parent.p.x + .5*Math.random() - .0015
+            node.p.y = parent.p.y + .5*Math.random() - .0015
+            node.tempMass = .001
+          }
+        })
+      },
+      
+      
+      _initMouseHandling:function(){
+        // no-nonsense drag and drop (thanks springy.js)
+        selected = null;
+        nearest = null;
+        var dragged = null;
+        var oldmass = 1
+
+        var _section = null
+
+        var handler = {
+          moved:function(e){
+            var pos = $(canvas).offset();
+            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+            nearest = sys.nearest(_mouseP);
+
+            if (!nearest.node) return false
+/*
+            if (nearest.node.data.shape!='dot'){
+              selected = (nearest.distance < 50) ? nearest : null
+              if (selected){
+                 dom.addClass('linkable')
+                 // LINK
+                 //window.status = selected.node.data.link.replace(/^\//,"http://"+window.location.host+"/").replace(/^#/,'')
+              }
+              else{
+                 dom.removeClass('linkable')
+                 //window.status = ''
+              }
+            }else*/ 
+            if ($.inArray(nearest.node.name, ['Heimdall','georges','PC-SVA','yoda', 'dev2', 'usertest', 'jboss', 'fvcxbfdvcf']) >=0 ){
+              selected = (nearest.distance < 50) ? nearest : null
+              console.log(nearest.node.name)
+              if (nearest.node.name!=_section){
+                _section = nearest.node.name
+                that.switchSection(_section)
+              }
+              //dom.removeClass('linkable')
+              //window.status = ''
+            }
+            
+            return false
+          },
+          clicked:function(e){
+            var pos = $(canvas).offset();
+            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+            nearest = dragged = sys.nearest(_mouseP);
+            
+            if (nearest && selected && nearest.node===selected.node){
+              //var link = selected.node.data.link
+              //if (link.match(/^#/)){
+              //   $(that).trigger({type:"navigate", path:link.substr(1)})
+              //}else{
+              //window.location = link
+              //}
+
+              return false
+            }
+            
+            
+            if (dragged && dragged.node !== null) dragged.node.fixed = true
+
+            $(canvas).unbind('mousemove', handler.moved);
+            $(canvas).bind('mousemove', handler.dragged)
+            $(window).bind('mouseup', handler.dropped)
+
+            return false
+          },
+          dragged:function(e){
+            var old_nearest = nearest && nearest.node._id
+            var pos = $(canvas).offset();
+            var s = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+
+            if (!nearest) return
+            if (dragged !== null && dragged.node !== null){
+              var p = sys.fromScreen(s)
+              dragged.node.p = p
+            }
+
+            return false
+          },
+
+          dropped:function(e){
+            if (dragged===null || dragged.node===undefined) return
+            if (dragged.node !== null) dragged.node.fixed = false
+            dragged.node.tempMass = 1000
+            dragged = null;
+            // selected = null
+            $(canvas).unbind('mousemove', handler.dragged)
+            $(window).unbind('mouseup', handler.dropped)
+            $(canvas).bind('mousemove', handler.moved);
+            _mouseP = null
+            return false
+          }
+
+
+        }
+
+        $(canvas).mousedown(handler.clicked);
+        $(canvas).mousemove(handler.moved);
+
+      }
+    }
+    
+    return that
+  }
+  
+
+
 })(this.jQuery)
