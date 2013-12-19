@@ -14,12 +14,10 @@
 
 {% block content %} 
 {% load tags %} 
-{% load i18n %}
 
 {% if user.is_authenticated %} 
 
 {% ifusergroup heimdall-admin %}
-{% trans "This" %}
 <section>
 	<div class="inline-block">
 		<h2>Server configuration</h2>
@@ -52,7 +50,7 @@
 							<td><label>Language </label><span style="color: rgb(209, 101, 102);">(Not yet translated!)</span></td>
 							<td>
 								<span class="select">
-									<select name="theme" style="color: rgb(160, 160, 160);">
+									<select name="default_language" style="color: rgb(160, 160, 160);">
 										<option>Français</option>
 										<option>English</option>
 									</select>
