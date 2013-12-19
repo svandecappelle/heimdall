@@ -15,9 +15,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>.
 
-Authors: 
+Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
@@ -34,8 +34,10 @@ from django.template import RequestContext
 
 from heimdall.models import Demands, UserConfiguration, GeneralConfiguration
 
+
 class VoidDemand(tuple):
-	count = 0	
+	count = 0
+
 
 def getConfiguration(user, conf_id):
 	output = None
@@ -48,13 +50,14 @@ def getConfiguration(user, conf_id):
 		output = None
 	if user:
 		if user.is_authenticated():
-			if UserConfiguration.objects.filter(user=user,key=conf_id).exists():
-				if UserConfiguration.objects.get(user=user,key=conf_id).value == 'default':
+			if UserConfiguration.objects.filter(user=user, key=conf_id).exists():
+				if UserConfiguration.objects.get(user=user, key=conf_id).value == 'default':
 					output = None
 				else:
-					output = UserConfiguration.objects.get(user=user,key=conf_id).value
+					output = UserConfiguration.objects.get(user=user, key=conf_id).value
 
 	return output
+
 
 def getConfigurationAdmin(conf_id):
 	output = None
@@ -67,6 +70,7 @@ def getConfigurationAdmin(conf_id):
 		output = None
 	return output
 
+
 def theme(user):
 	output = None
 	if GeneralConfiguration.objects.filter(key='theme').exists():
@@ -78,16 +82,18 @@ def theme(user):
 		output = None
 	if user:
 		if user.is_authenticated():
-			if UserConfiguration.objects.filter(user=user,key='theme').exists():
-				if UserConfiguration.objects.get(user=user,key='theme').value == 'default':
+			if UserConfiguration.objects.filter(user=user, key='theme').exists():
+				if UserConfiguration.objects.get(user=user, key='theme').value == 'default':
 					output = None
 				else:
-					output = UserConfiguration.objects.get(user=user,key='theme').value
+					output = UserConfiguration.objects.get(user=user, key='theme').value
 
 	return output
 
+
 def give_arguments(user, page_title):
-	return {'PAGE_TITLE': page_title, 'theme' : theme(user), 'APP_TITLE' : "Heimdall", 'inbox_demands_count':get_demands_filtered(user).count}
+	return {'PAGE_TITLE': page_title, 'theme': theme(user), 'APP_TITLE': "Heimdall", 'inbox_demands_count': get_demands_filtered(user).count}
+
 
 # utils
 def get_demands_filtered(user_filter):
@@ -95,38 +101,42 @@ def get_demands_filtered(user_filter):
 	if user_filter.groups.filter(name="heimdall-admin").exists():
 		demands = Demands.objects.filter(markAsIgnore=False)
 	elif user_filter.groups.filter(name="heimdall").exists():
-		demands = Demands.objects.filter(user=user_filter,markAsIgnore=False)
+		demands = Demands.objects.filter(user=user_filter, markAsIgnore=False)
 	return demands
+
 
 def get_demands_filtered_and_read(user_filter):
 	demands = VoidDemand()
 	if user_filter.groups.filter(name="heimdall-admin").exists():
 		demands = Demands.objects.filter(markAsIgnore=True)
 	elif user_filter.groups.filter(name="heimdall").exists():
-		demands = Demands.objects.filter(user=user_filter,markAsIgnore=True)
+		demands = Demands.objects.filter(user=user_filter, markAsIgnore=True)
 	return demands
+
 
 def get_demands_filtered_pending(user_filter):
 	demands = VoidDemand()
 	if user_filter.groups.filter(name="heimdall-admin").exists():
-		demands = Demands.objects.filter(close_date__isnull=True,markAsIgnore=False)
+		demands = Demands.objects.filter(close_date__isnull=True, markAsIgnore=False)
 	elif user_filter.groups.filter(name="heimdall").exists():
-		demands = Demands.objects.filter(user=user_filter,close_date__isnull=True,markAsIgnore=False)
+		demands = Demands.objects.filter(user=user_filter, close_date__isnull=True, markAsIgnore=False)
 	return demands
+
 
 def get_all_demands_filtered_pending(user_filter):
 	demands = VoidDemand()
 	if user_filter.groups.filter(name="heimdall-admin").exists():
 		demands = Demands.objects.filter(close_date__isnull=True)
 	elif user_filter.groups.filter(name="heimdall").exists():
-		demands = Demands.objects.filter(user=user_filter,close_date__isnull=True)
+		demands = Demands.objects.filter(user=user_filter, close_date__isnull=True)
 	return demands
 
 
 def handler404(request):
 	#args = give_arguments(request.user, 'Not found')
-	return render_to_response('errors/404.html', {'PAGE_TITLE': "404", 'APP_TITLE' : "Heimdall"}, context_instance=RequestContext(request))
+	return render_to_response('errors/404.html', {'PAGE_TITLE': "404", 'APP_TITLE': "Heimdall"}, context_instance=RequestContext(request))
+
 
 def handler500(request):
 	#args = give_arguments(request.user, 'Internal error')
-	return render_to_response('errors/500.html', {'PAGE_TITLE': "500", 'APP_TITLE' : "Heimdall"}, context_instance=RequestContext(request))
+	return render_to_response('errors/500.html', {'PAGE_TITLE': "500", 'APP_TITLE': "Heimdall"}, context_instance=RequestContext(request))

@@ -15,9 +15,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>.
 
-Authors: 
+Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
@@ -52,9 +52,14 @@ import logging
 logger = logging.getLogger("ViewUser")
 
 # HTTP views
-    
+
 # View deposite RSA
+
+
 def deposite(request):
+    '''
+    Deposite a new rsa key.
+    '''
     userConnected = request.user
     # Handle file upload
     docfile = []
@@ -68,19 +73,19 @@ def deposite(request):
                 print("send key: " + keysend)
             else:
                 sshkey = SshKeys(user=userConnected, key=keysend)
-            
+
             sshkey.save()
-            
-            err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+
+            err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
             if err == None:
-                err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
-                
+                err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
+
                 if err == None:
-                    message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates' 
+                    message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates'
                 else:
-                    message=err.message
+                    message = err.message
             else:
-                message=err.message
+                message = err.message
             messages.success(request, message)
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('deposite'))
@@ -93,32 +98,32 @@ def deposite(request):
                         sshkey = SshKeys.objects.get(user=userConnected)
                         sshkey.key = line
                         sshkey.save()
-                        
-                        err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+
+                        err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
                         if err == None:
-                            err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
-                            
+                            err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
+
                             if err == None:
-                                message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates' 
+                                message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates'
                             else:
-                                message=err.message
+                                message = err.message
                         else:
-                            message=err.message
+                            message = err.message
                         messages.success(request, message)
                     else:
                         sshkey = SshKeys(user=userConnected, key=line)
                         sshkey.save()
-                        
-                        err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
+
+                        err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user), userConnected,sshkey)
                         if err == None:
-                            err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user),userConnected,sshkey)
-                            
+                            err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user), userConnected,sshkey)
+
                             if err == None:
                                 message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates' 
                             else:
-                                message=err.message
+                                message = err.message
                         else:
-                            message=err.message
+                            message = err.message
                         messages.success(request, message)
                 # Redirect to the document list after POST
                 return HttpResponseRedirect(reverse('deposite'))
@@ -127,60 +132,72 @@ def deposite(request):
             key = SshKeys.objects.get(user=userConnected).key
         else:
             key = ''
-            
+
         form = UploadSshKeyForm()
 
     args = utils.give_arguments(request.user, 'Depot')
-    args.update({'documents': docfile, 'form': form, 'key':key})
+    args.update({'documents': docfile, 'form': form, 'key': key})
     return render_to_response('user/deposite.html', args, context_instance=RequestContext(request))
-    
-# View demands inbox
+
+
 def inbox(request):
+    '''
+    View demands inbox
+    '''
     logger.debug("See inbox")
     demands = utils.get_demands_filtered(request.user)
     args = utils.give_arguments(request.user, 'Messages')
     demands_read = utils.get_demands_filtered_and_read(request.user)
-    args.update({'demands': demands,'demands_read':demands_read})
-    return render_to_response('user/messages.html', args , context_instance=RequestContext(request))
+    args.update({'demands': demands, 'demands_read': demands_read})
+    return render_to_response('user/messages.html', args, context_instance=RequestContext(request))
 
-# View Home
+
 def index(request):
+    '''
+    View Home
+    '''
     user_count = Group.objects.get(name="heimdall").user_set.all().count()
     user_count += Group.objects.get(name="heimdall-admin").user_set.all().count()
     server_count = Server.objects.all().count()
     keys_count = SshKeys.objects.all().count()
     demands_count = Demands.objects.filter(close_date__isnull=True).all().count()
-    
+
     permissions_count = Permission.objects.all().count()
     stats = Statistics(user_count, server_count, permissions_count, demands_count, keys_count)
-    
+
     args = utils.give_arguments(request.user, 'Acceuil')
-    args.update({'stats': stats, 'demands':utils.get_demands_filtered_pending(request.user)})
+    args.update({'stats': stats, 'demands': utils.get_demands_filtered_pending(request.user)})
 
     return render_to_response('index.html', args, context_instance=RequestContext(request))
 
-# View register user
+
 def register(request):
+    '''
+    View register user
+    '''
     args = utils.give_arguments(request.user, 'Register')
     return render_to_response('user/register.html', args, context_instance=RequestContext(request))
 
-# View users
+
 def users(request):
-    
+    '''
+    View users
+    '''
     if request.user.groups.filter(name="heimdall-admin"):
-    	list_users = User.objects.all()
+        list_users = User.objects.all()
     else:
-	list_users = [request.user]
+        list_users = [request.user]
 
     args = utils.give_arguments(request.user, 'Utilisateurs')
     args.update({'list_users': list_users})
-    
-    return render_to_response('users.html', args , context_instance=RequestContext(request))
 
+    return render_to_response('users.html', args, context_instance=RequestContext(request))
 
-# HTTPS POST forms
 
 def user_login(request):
+    '''
+    HTTPS POST forms
+    '''
     if request.method == 'POST':
         user = authenticate(username=request.POST['username'], password=request.POST['password'])
         if user is not None:
@@ -200,9 +217,11 @@ def user_login(request):
         messages.success(request, 'This page is not accessible.')
         return HttpResponseRedirect(reverse('index'))
 
+
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect('home')
+
 
 def mark_as_read(request):
     if request.method == 'POST':
@@ -210,9 +229,9 @@ def mark_as_read(request):
             hostuser = request.POST['hostuser']
             hostname = request.POST['hostname']
             server = Server.objects.get(hostname=hostname)
-            
+
             if Demands.objects.filter(user=request.user, server=server, hostuser=hostuser).exists():
-                demand = Demands.objects.get(user=request.user,server=server,hostuser=hostuser)
+                demand = Demands.objects.get(user=request.user, server=server, hostuser=hostuser)
                 demand.markAsIgnore = True
                 demand.save()
             else:
@@ -223,39 +242,41 @@ def mark_as_read(request):
         messages.success(request, 'This page is not accessible.')
     return HttpResponseRedirect(reverse('inbox'))
 
+
 def register_action(request):
     if request.method == 'POST':
         messages.success(request, 'User registered successfully.')
         return HttpResponseRedirect(reverse('index'))
-        
+
     else:
         messages.success(request, 'This page is not accessible.')
         return HttpResponseRedirect(reverse('index'))
-    
+
+
 def require_access(request):
     if request.method == 'POST':
         userConnected = request.user
         if userConnected.is_authenticated:
             serverHost = Server.objects.get(hostname=request.POST['server'])
             userHost = request.POST['user']
-            
+
             if userHost == "":
                 messages.success(request, 'You must write a user host')
                 return HttpResponseRedirect(reverse('servers'))
-            elif Demands.objects.filter(user=request.user,server=serverHost,hostuser=userHost).exists():
+            elif Demands.objects.filter(user=request.user, server=serverHost, hostuser=userHost).exists():
                 messages.success(request, 'Your demand is already pending from manager validation please wait.')
                 return HttpResponseRedirect(reverse('servers'))
-            elif Permission.objects.filter(user=userConnected,server=serverHost,hostuser=userHost).exists():
+            elif Permission.objects.filter(user=userConnected, server=serverHost, hostuser=userHost).exists():
                 messages.success(request, 'You already granted for access this server and account.')
                 return HttpResponseRedirect(reverse('servers'))
-            
+
             priority = request.POST['priority']
             comments = request.POST['comments']
             cdate = datetime.today()
             demand = Demands(user=userConnected, server=serverHost, hostuser=userHost, priority=priority, comments=comments, cdate=cdate)
-            demand.markAsIgnore = False;
+            demand.markAsIgnore = False
             demand.save()
-            
+
             messages.success(request, 'Notification sent to an heimdall administrator.')
             return HttpResponseRedirect(reverse('servers'))
         else:
@@ -264,4 +285,3 @@ def require_access(request):
     else:
         messages.success(request, 'This page is not accessible.')
         return HttpResponseRedirect(reverse('index'))
-

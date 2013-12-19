@@ -15,9 +15,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>.
 
-Authors: 
+Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
@@ -42,7 +42,8 @@ def servers(request):
     args.update({'list_servers': list_servers})
 
     return render_to_response('servers.html', args, context_instance=RequestContext(request))
-    
+
+
 def permissions(request):
     all_permissions = Permission.objects.all()
     userConnected = request.user
@@ -54,10 +55,9 @@ def permissions(request):
         elif userConnected.groups.filter(name="heimdall"):
             if Permission.objects.filter(user=userConnected).exists():
                 permissions_visible = Permission.objects.filter(user=userConnected)
-                
+
                 args.update({'permissions': convertToIterable(permissions_visible)})
     return render_to_response('user/permissions.html', args, context_instance=RequestContext(request))
-
 
 
 def convertToIterable(permissions_visible):

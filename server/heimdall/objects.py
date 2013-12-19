@@ -15,9 +15,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>.
 
-Authors: 
+Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
@@ -29,8 +29,9 @@ Authors:
 # Email:        svandecappelle at vekia.fr
 """
 
+
 class Statistics:
-	
+
 	def __init__(self, user_count, server_count, permissions_count, demands_count, keys_count):
 		self.user_count = user_count
 		self.server_count = server_count
