@@ -416,7 +416,53 @@
 
         var handler = {
           moved:function(e){
-            var pos = $(canvas).offset();
+           /* var pos = $(canvas).offset();
+            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+            nearest = sys.nearest(_mouseP);
+
+            if (!nearest.node) return false
+/*
+            if (nearest.node.data.shape!='dot'){
+              selected = (nearest.distance < 50) ? nearest : null
+              if (selected){
+                 dom.addClass('linkable')
+                 // LINK
+                 //window.status = selected.node.data.link.replace(/^\//,"http://"+window.location.host+"/").replace(/^#/,'')
+              }
+              else{
+                 dom.removeClass('linkable')
+                 //window.status = ''
+              }
+            }else*/ 
+            /*if ($.inArray(nearest.node.name, Permissions) >=0 ){
+              selected = (nearest.distance < 50) ? nearest : null
+              console.log(nearest.node.name)
+              if (nearest.node.name!=_section){
+                _section = nearest.node.name
+                that.switchSection(_section)
+              }
+              //dom.removeClass('linkable')
+              //window.status = ''
+            }
+            */
+            return false
+          },
+          clicked:function(e){
+            //var pos = $(canvas).offset();
+            //_mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+            //nearest = dragged = sys.nearest(_mouseP);
+            
+            //if (nearest && selected && nearest.node===selected.node){
+              //var link = selected.node.data.link
+              //if (link.match(/^#/)){
+              //   $(that).trigger({type:"navigate", path:link.substr(1)})
+              //}else{
+              //window.location = link
+              //}
+
+              //return false
+
+ var pos = $(canvas).offset();
             _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
             nearest = sys.nearest(_mouseP);
 
@@ -446,31 +492,18 @@
             }
             
             return false
-          },
-          clicked:function(e){
-            var pos = $(canvas).offset();
-            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            nearest = dragged = sys.nearest(_mouseP);
-            
-            if (nearest && selected && nearest.node===selected.node){
-              //var link = selected.node.data.link
-              //if (link.match(/^#/)){
-              //   $(that).trigger({type:"navigate", path:link.substr(1)})
-              //}else{
-              //window.location = link
-              //}
 
-              return false
-            }
+
+          /*  }
             
             
             if (dragged && dragged.node !== null) dragged.node.fixed = true
 
             $(canvas).unbind('mousemove', handler.moved);
-            $(canvas).bind('mousemove', handler.dragged)
-            $(window).bind('mouseup', handler.dropped)
+            //$(canvas).bind('mousemove', handler.dragged)
+            //$(window).bind('mouseup', handler.dropped)
 
-            return false
+            return false*/
           },
           dragged:function(e){
             var old_nearest = nearest && nearest.node._id
