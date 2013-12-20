@@ -70,8 +70,8 @@
 {% block content %}
 
 	{% if user.is_authenticated%}
-		<h2>Permissions on heimdall</h2>
-		<canvas id="viewport" style="overflow: hidden;"></canvas>
+		<h2 style="position:absolute">Permissions on heimdall</h2>
+		<canvas style="position:absolute; top: 99px; overflow: hidden;" id="viewport" style="overflow: hidden;"></canvas>
 	{% else %}
 		<h2>Vous devez etre connecté pour voir cette page</h2>
 	{%endif%}
