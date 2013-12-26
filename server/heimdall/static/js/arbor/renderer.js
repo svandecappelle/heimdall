@@ -29,8 +29,8 @@
         }
       },
       resize:function(){
-        canvas.width = $(window).width()
-        canvas.height = .75* $(window).height()
+        canvas.width = $(window).width() - 50
+        canvas.height = $(window).height() - 150
         sys.screen({size:{width:canvas.width, height:canvas.height}})
         _vignette = null
         that.redraw()
@@ -260,11 +260,7 @@
         $(canvas).mousemove(handler.moved);
 
       }
-    }
-    
+    } 
     return that
   }
-  
-
-
 })(this.jQuery)
