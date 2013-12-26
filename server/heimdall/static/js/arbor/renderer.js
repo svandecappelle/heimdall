@@ -1,3 +1,36 @@
+Array.prototype.remByVal = function(val) {
+    for (var i = 0; i < this.length; i++) {
+        if (this[i] === val) {
+            this.splice(i, 1);
+            i--;
+        }
+    }
+    return this;
+}
+
+function xinspect(o,i){
+    if(typeof i=='undefined')i='';
+    if(i.length>50)return '[MAX ITERATIONS]';
+    var r=[];
+    for(var p in o){
+        var t=typeof o[p];
+        r.push(i+'"'+p+'" ('+t+') => '+(t=='object' ? 'object:'+xinspect(o[p],i+'  ') : o[p]+''));
+    }
+    return r.join(i+'\n');
+};
+Permissions = {
+  visibleItems     : null,
+  data             : null,
+  central          : null,
+  servers          : null,
+  hostuser         : null,
+  user             : null,
+  currentSelection : null
+};
+Permissions.visibleItems = [];
+
+
+
 (function() {
     Renderer = function(elt){
     var dom = $(elt)
@@ -96,32 +129,101 @@
           if (sys) sys.start()
         }
       },
-      
-      switchSection:function(newSection){
-        var parent = sys.getEdgesFrom(newSection)[0].source
-        var children = $.map(sys.getEdgesFrom(newSection), function(edge){
-          return edge.target
-        })
-        
-        sys.eachNode(function(node){
-          if (node.data.shape=='dot') return // skip all but leafnodes
-          if (node == parent) return // skip parent  
-          //var nowVisible = node.data.alpha == 0.2
-          var nowVisible = ($.inArray(node, children)>=0)
-          var newAlpha = (nowVisible) ? 1 : 0
-          var dt = (nowVisible) ? .5 : .5
 
-          //if (node.data.shape=='dot')
-          oldAlpha = node.data.alpha 
-          node.data.alpha = newAlpha
-          
-          //sys.tweenNode(node, dt, {alpha:newAlpha})
-          
-          if (oldAlpha ==0 && newAlpha==1){
-            node.p.x = parent.p.x + .5*Math.random() - .0015
-            node.p.y = parent.p.y + .5*Math.random() - .0015
+      toggleNodeVisible: function(node){
+            if(node.data.alpha==0){
+              sys.tweenNode(node, 0.5, {alpha:1})
+              node.data.alpha = 1
+            }else{
+              sys.tweenNode(node, 0.5, {alpha:0})
+              //node.data.alpha = 1
+            }
+      },
+
+      setNodeVisible: function(node, isVisible){
+        if(isVisible){
+          sys.tweenNode(node, 0.5, {alpha:1})
+
+          if (Permissions.currentSelection != null){
+            node.p.x = Permissions.currentSelection.p.x + .5*Math.random() - .0015
+            node.p.y = Permissions.currentSelection.p.y + .5*Math.random() - .0015
             node.tempMass = .001
           }
+        }else{
+          sys.tweenNode(node, 0.5, {alpha:0})
+        }
+      },
+
+      toggleServers: function(){
+        sys.eachNode(function(node){
+          if(node.data.type == 'server'){
+            that.toggleNodeVisible(node)
+          }else if(node.data.type == 'central'){
+            that.setNodeVisible(node, true)
+          }else{
+            that.setNodeVisible(node, false)
+          }
+        })
+      },
+
+      toggleUsers: function(hostUser){
+
+        sys.eachNode(function(node){
+          if(node.data.type == 'user'){
+            that.setNodeVisible(node, false)
+          }
+        })
+
+        $.map(sys.getEdgesFrom(hostUser), function(edge){
+            console.log("toggle: " + edge.target.data.label)
+            that.setNodeVisible(edge.target, true)
+        })
+      },
+
+      toggleHostUsers: function(fromServer){
+
+        // Hide all
+        sys.eachNode(function(node){
+          if(node.data.type == 'hostuser'){
+            that.setNodeVisible(node, false)
+          }else if(node.data.type == 'user'){
+            that.setNodeVisible(node, false)
+          }
+        })
+
+        $.map(sys.getEdgesFrom(fromServer), function(edge){
+            console.log("toggle: " + edge.target.data.label)
+            that.setNodeVisible(edge.target, true)
+           
+        })
+      },
+      
+      switchSection:function(newSection){
+        console.log("selection: " + newSection.data.type)
+        Permissions.currentSelection = sys.getEdgesFrom(newSection)[0].source
+
+
+        type = newSection.data.type;
+        if (type=='central'){
+          // alert('central')
+          // show / hide servers
+          that.toggleServers()
+        }else if (type=='server'){
+          console.log('server')
+          // show / hide hostusers
+          that.toggleHostUsers(newSection)
+        }else if (type=='hostuser'){
+          console.log('hostuser')
+          // show / hide users
+          that.toggleUsers(newSection)
+        }else if (type=='user'){
+          console.log('user')
+          // hide user
+        }
+
+
+        sys.eachNode(function(node){
+         
         })
       },
       
@@ -133,132 +235,26 @@
         var dragged = null;
         var oldmass = 1
 
-        var _section = null
-
         var handler = {
-          moved:function(e){
-           /* var pos = $(canvas).offset();
-            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            nearest = sys.nearest(_mouseP);
-
-            if (!nearest.node) return false
-/*
-            if (nearest.node.data.shape!='dot'){
-              selected = (nearest.distance < 50) ? nearest : null
-              if (selected){
-                 dom.addClass('linkable')
-                 // LINK
-                 //window.status = selected.node.data.link.replace(/^\//,"http://"+window.location.host+"/").replace(/^#/,'')
-              }
-              else{
-                 dom.removeClass('linkable')
-                 //window.status = ''
-              }
-            }else*/ 
-            /*if ($.inArray(nearest.node.name, Permissions) >=0 ){
-              selected = (nearest.distance < 50) ? nearest : null
-              console.log(nearest.node.name)
-              if (nearest.node.name!=_section){
-                _section = nearest.node.name
-                that.switchSection(_section)
-              }
-              //dom.removeClass('linkable')
-              //window.status = ''
-            }
-            */
-            return false
-          },
           clicked:function(e){
-            //var pos = $(canvas).offset();
-            //_mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            //nearest = dragged = sys.nearest(_mouseP);
-            
-            //if (nearest && selected && nearest.node===selected.node){
-              //var link = selected.node.data.link
-              //if (link.match(/^#/)){
-              //   $(that).trigger({type:"navigate", path:link.substr(1)})
-              //}else{
-              //window.location = link
-              //}
-
-              //return false
-
- var pos = $(canvas).offset();
+            var pos = $(canvas).offset();
             _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
             nearest = sys.nearest(_mouseP);
 
             if (!nearest.node) return false
-/*
-            if (nearest.node.data.shape!='dot'){
-              selected = (nearest.distance < 50) ? nearest : null
-              if (selected){
-                 dom.addClass('linkable')
-                 // LINK
-                 //window.status = selected.node.data.link.replace(/^\//,"http://"+window.location.host+"/").replace(/^#/,'')
-              }
-              else{
-                 dom.removeClass('linkable')
-                 //window.status = ''
-              }
-            }else*/ 
-            if ($.inArray(nearest.node.name, Permissions) >=0 ){
-              selected = (nearest.distance < 50) ? nearest : null
-              console.log(nearest.node.name)
-              if (nearest.node.name!=_section){
-                _section = nearest.node.name
-                that.switchSection(_section)
-              }
-              //dom.removeClass('linkable')
-              //window.status = ''
+            if ($.inArray(nearest.node.name, Permissions.data) >=0 ){
+                selected = (nearest.distance < 50) ? nearest : null
+                //console.log(console.log(nearest.node.data))
+                if (nearest.node.data.alpha == 1){
+                    //console.log(nearest.node.data.type)
+                    _section = nearest.node.name
+                    that.switchSection(nearest.node)
+                }
             }
-            
-            return false
-
-
-          /*  }
-            
-            
-            if (dragged && dragged.node !== null) dragged.node.fixed = true
-
-            $(canvas).unbind('mousemove', handler.moved);
-            //$(canvas).bind('mousemove', handler.dragged)
-            //$(window).bind('mouseup', handler.dropped)
-
-            return false*/
-          },
-          dragged:function(e){
-            var old_nearest = nearest && nearest.node._id
-            var pos = $(canvas).offset();
-            var s = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-
-            if (!nearest) return
-            if (dragged !== null && dragged.node !== null){
-              var p = sys.fromScreen(s)
-              dragged.node.p = p
-            }
-
-            return false
-          },
-
-          dropped:function(e){
-            if (dragged===null || dragged.node===undefined) return
-            if (dragged.node !== null) dragged.node.fixed = false
-            dragged.node.tempMass = 1000
-            dragged = null;
-            // selected = null
-            $(canvas).unbind('mousemove', handler.dragged)
-            $(window).unbind('mouseup', handler.dropped)
-            $(canvas).bind('mousemove', handler.moved);
-            _mouseP = null
             return false
           }
-
-
         }
-
         $(canvas).mousedown(handler.clicked);
-        $(canvas).mousemove(handler.moved);
-
       }
     } 
     return that
