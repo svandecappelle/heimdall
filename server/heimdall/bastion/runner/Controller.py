@@ -30,8 +30,6 @@ Authors:
 """
 
 from heimdall.bastion.lib.ReplicationFactory import ReplicationFactory
-from heimdall.bastion.lib.utils.Logger import Logger
-from heimdall.bastion.lib.utils import Constants
 
 from heimdall.models import Permission
 
@@ -60,23 +58,26 @@ def addPermission(user_target, server_target, hostuser_target, sshkey):
 	warn = None
 	logger.info("Add permission: " + user_target.username + " for server: [" + server_target.hostname + "]" + " with user: {" + hostuser_target + "}")
 	permission = Permission.objects.create(user=user_target, server=server_target, hostuser=hostuser_target)
-
-	try:
-		replicator.replicate_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email, server_target.port)
-	except AuthenticationException as e:
-		logger.error("Error Authentication: " + str(e))
-		return ReplicationError(1, "Erreur d'authentification au server: " + server_target.hostname)
-	except SSHException as e:
-		logger.error("Error SSH: " + str(e))
-		return ReplicationError(1, "Erreur d'authentification ssh au server: " + server_target.hostname)
-	except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
-		logger.warning("Error Socket: " + str(e))
-		warn = ReplicationError(1, "WARN:: Contact avec le serveur: " + server_target.hostname + " a genere un warning")
-	except Exception as e:
-		logger.error("Not catched error on replication: " + str(e))
-		return ReplicationError(1, "Erreur on replication: [[" + server_target.hostname + "]]" + str(e))
-	permission.save()
-	logger.info("permission added need replicate")
+	if hostuser_target != "":
+		try:
+			replicator.replicate_one_server(server_target.hostname, hostuser_target, sshkey.key, user_target.username, user_target.email, server_target.port)
+		except AuthenticationException as e:
+			logger.error("Error Authentication: " + str(e))
+			return ReplicationError(1, "Erreur d'authentification au server: " + server_target.hostname)
+		except SSHException as e:
+			logger.error("Error SSH: " + str(e))
+			return ReplicationError(1, "Erreur d'authentification ssh au server: " + server_target.hostname)
+		except socket.error as e:  # be carefull of NO ROUTE TO HOST exception
+			logger.warning("Error Socket: " + str(e))
+			warn = ReplicationError(1, "WARN:: Contact avec le serveur: " + server_target.hostname + " a genere un warning")
+		except Exception as e:
+			logger.error("Not catched error on replication: " + str(e))
+			return ReplicationError(1, "Erreur on replication: [[" + server_target.hostname + "]]" + str(e))
+		permission.save()
+		logger.info("permission added need replicate")
+	else:
+		logger.error("Error the userhost is invalid: '" + hostuser_target + "'")
+		return ReplicationError(1, "Erreur on replication: [[" + server_target.hostname + "]] the userhost is invalid: '" + hostuser_target + "'")
 	return warn
 
 
@@ -112,7 +113,6 @@ def revokePermission(user_target, server_target, hostuser_target, sshkey):
 def revokeAllKeys(permissions, user, sshkey):
 	logger.info("Revoke all permission ")
 	for permission in permissions:
-		print permission.server.hostname
 		try:
 			replicator.replicate_one_server(permission.server.hostname, permission.hostuser, sshkey.key, user.username, user.email, permission.server.port)
 		except AuthenticationException as e:
@@ -132,7 +132,6 @@ def revokeAllKeys(permissions, user, sshkey):
 def replicateAllKeys(permissions, user, sshkey):
 	logger.info("Replicate all permission ")
 	for permission in permissions:
-		print permission.server.hostname
 		try:
 			replicator.revoke_one_server(permission.server.hostname, permission.hostuser, sshkey.key, user.username, user.email, permission.server.port)
 		except AuthenticationException as e:

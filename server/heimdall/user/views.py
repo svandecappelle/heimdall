@@ -70,17 +70,16 @@ def deposite(request):
             if SshKeys.objects.filter(user=userConnected).count() > 0:
                 sshkey = SshKeys.objects.get(user=userConnected)
                 sshkey.key = keysend
-                print("send key: " + keysend)
             else:
                 sshkey = SshKeys(user=userConnected, key=keysend)
 
             sshkey.save()
 
             err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
-            if err == None:
+            if err is None:
                 err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
 
-                if err == None:
+                if err is None:
                     message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates'
                 else:
                     message = err.message
@@ -100,10 +99,10 @@ def deposite(request):
                         sshkey.save()
 
                         err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
-                        if err == None:
+                        if err is None:
                             err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
 
-                            if err == None:
+                            if err is None:
                                 message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates'
                             else:
                                 message = err.message
@@ -114,11 +113,11 @@ def deposite(request):
                         sshkey = SshKeys(user=userConnected, key=line)
                         sshkey.save()
 
-                        err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user), userConnected,sshkey)
-                        if err == None:
-                            err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user), userConnected,sshkey)
+                        err = Controller.revokeAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
+                        if err is None:
+                            err = Controller.replicateAllKeys(Permission.objects.filter(user=request.user), userConnected, sshkey)
 
-                            if err == None:
+                            if err is None:
                                 message = 'Please wait a minute to connect, during the replication on all server finished. Check your mails to know the access updates' 
                             else:
                                 message = err.message

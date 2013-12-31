@@ -38,8 +38,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from django.utils.translation import ugettext as _
-
 from heimdall import utils
 from heimdall.bastion.runner import Controller
 from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission, GeneralConfiguration, UserConfiguration
@@ -105,9 +103,7 @@ def app_config_save(request):
 	if 'type' in request.POST:
 		if request.POST['type'] == 'global':
 			for field in globalConfiguredFields:
-				print 'Field trying to save: ' + field
 				if field in request.POST:
-					print 'Field trying to save: ' + field
 					if request.user.groups.filter(name="heimdall-admin"):
 						updateGeneralConfig(field, request.POST[field])
 						messages.success(request, 'Saved global heimdall configurations.')
@@ -198,7 +194,7 @@ def revoke_access(request):
 		else:
 			rsa_key = SshKeys.objects.get(user=user)
 			err = Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
-			if err == None:
+			if err is None:
 				message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')'
 				if Demands.objects.filter(user=user, server=host, hostuser=hostuser).exists():
 					Demands.objects.get(user=user, server=host, hostuser=hostuser).delete()
@@ -405,7 +401,6 @@ def grant_access(request):
 
 			if request.POST['username'] != '[[ALL]]':
 				user = User.objects.get(username=request.POST['username'])
-				print user
 			else:
 				print('TODO: look after demands')
 
@@ -540,7 +535,6 @@ def perimeter_pool(request):
 			if request.POST['action'] == 'add':
 
 				is_allow_to_add = PoolPerimeter.objects.filter(pool=pool, server=server).count() == 0
-				print is_allow_to_add
 				if is_allow_to_add:
 					new_perimeter = PoolPerimeter(pool=pool, server=server)
 					new_perimeter.save()
@@ -644,7 +638,6 @@ def register_user(request):
 
 			if check_password(request.POST['password'], request.POST['password-confirm']):
 				code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname']) 
-				print("return code ", str(code_return_check))
 				if code_return_check == 1:
 					group = None
 					if request.POST['role'] == 'ADMIN':
