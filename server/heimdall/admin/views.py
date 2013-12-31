@@ -38,8 +38,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from django.utils.translation import ugettext as _
-
 from heimdall import utils
 from heimdall.bastion.runner import Controller
 from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission, GeneralConfiguration, UserConfiguration
@@ -47,6 +45,10 @@ from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimete
 
 #Installation
 def install(request):
+	'''
+	Installation function. This function create (if not exists) the heimdall's groups and default user.
+	Accessible by /admin/install
+	'''
 	if not Group.objects.filter(name='heimdall').exists():
 		user_group = Group.objects.create(name='heimdall')
 		user_group.save()
@@ -66,6 +68,10 @@ def install(request):
 
 
 def app_config(request):
+	'''
+	Application configurations view. Can save user configuration such as language and theme.
+	Accessible by /admin/app-config
+	'''
 	args = utils.give_arguments(request.user, 'Users admin')
 
 	admin_configs = ['theme', 'mail_server_hostname', 'mail_system_user_account', 'user_notification', 'admin_notification']
@@ -83,6 +89,11 @@ def app_config(request):
 
 
 def app_config_save(request):
+	'''
+	Save configurations on server.
+	A POST form to save the server or user configurations.
+	View Type: Form POST
+	'''
 	if request.method != 'POST':
 		messages.success(request, 'This page is not accessible.')
 		return HttpResponseRedirect(reverse('index'))
@@ -92,9 +103,7 @@ def app_config_save(request):
 	if 'type' in request.POST:
 		if request.POST['type'] == 'global':
 			for field in globalConfiguredFields:
-				print 'Field trying to save: ' + field
 				if field in request.POST:
-					print 'Field trying to save: ' + field
 					if request.user.groups.filter(name="heimdall-admin"):
 						updateGeneralConfig(field, request.POST[field])
 						messages.success(request, 'Saved global heimdall configurations.')
@@ -113,6 +122,9 @@ def app_config_save(request):
 
 
 def updateGeneralConfig(key_str, value_str):
+	'''
+	Update a server configuration key / value
+	'''
 	if GeneralConfiguration.objects.filter(key=key_str).exists():
 		config = GeneralConfiguration.objects.get(key=key_str)
 		config.value = value_str
@@ -123,6 +135,9 @@ def updateGeneralConfig(key_str, value_str):
 
 
 def updateUserConfig(user, key_str, value_str):
+	'''
+	Update a user configuration key / value
+	'''
 	if UserConfiguration.objects.filter(user=user, key=key_str).exists():
 		config = UserConfiguration.objects.get(user=user, key=key_str)
 		config.value = value_str
@@ -133,6 +148,11 @@ def updateUserConfig(user, key_str, value_str):
 
 
 def user(request):
+	'''
+	Get the user information.
+	If 'me' parameter is in GET RequestContext, then return only my informations. Returns all users else. (if request.user is in admin group)
+	View Type: Form GET
+	'''
 	args = utils.give_arguments(request.user, 'Users admin')
 	only_me = True
 	if 'me' in request.GET:
@@ -156,6 +176,10 @@ def user(request):
 
 
 def revoke_access(request):
+	'''
+	Revoke an access to a specified server.
+	View Type: Form POST
+	'''
 	if request.method == 'POST':
 		user = User.objects.get(username=request.POST['username'])
 		host = Server.objects.get(hostname=request.POST['hostname'])
@@ -170,7 +194,7 @@ def revoke_access(request):
 		else:
 			rsa_key = SshKeys.objects.get(user=user)
 			err = Controller.revokePermission(user, host, request.POST['hostuser'], rsa_key)
-			if err == None:
+			if err is None:
 				message = 'Permission revoked on: ' + host.hostname + ' with ' + hostuser + ' (for the user ' + user.username + ')'
 				if Demands.objects.filter(user=user, server=host, hostuser=hostuser).exists():
 					Demands.objects.get(user=user, server=host, hostuser=hostuser).delete()
@@ -185,6 +209,10 @@ def revoke_access(request):
 
 
 def create_server(request):
+	'''
+	Create a server in models data. If POST Type: save a server, else get the server infos.
+	View Type: Form POST / GET
+	'''
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 			if request.POST['hostname']:
@@ -219,6 +247,10 @@ def create_server(request):
 
 
 def permissions(request):
+	'''
+	View getting all permissions visible for the user. Manager -> all user pool's permissions. Admin -> all permissions.
+	View Type: Form GET
+	'''
 	if request.user.groups.filter(name="heimdall-admin"):
 		args = getarguments_for_admin(request.user)
 	else:
@@ -228,6 +260,9 @@ def permissions(request):
 
 
 def getarguments_for_admin(user):
+	'''
+	Get permissions to display in view for an admin user.
+	'''
 	servers = Server.objects.all()
 	users = User.objects.all()
 	demands = utils.get_all_demands_filtered_pending(user)
@@ -238,6 +273,9 @@ def getarguments_for_admin(user):
 
 
 def getarguments_for_manager(request, user):
+	'''
+	Get permissions to display in view for a manager user.
+	'''
 	pools = HeimdallUserRole.objects.filter(user__exact=user, type__exact='MANAGER').values_list('pool')
 	perimeters = PoolPerimeter.objects.filter(pool__exact=pools)
 
@@ -260,6 +298,10 @@ def getarguments_for_manager(request, user):
 
 
 def add_to_group(request):
+	'''
+	Add a user to a group (only admin can do this action)
+	View Type: Form POST Restricted on Admin
+	'''
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 			user = User.objects.get(username=request.POST['username'])
@@ -278,6 +320,10 @@ def add_to_group(request):
 
 
 def manage_user_role(request):
+	'''
+	Get the users in  pool, simple user and managers.
+	View Type: Form GET
+	'''
 	pool = HeimdallPool.objects.filter(name=request.GET['poolname'])
 	userRoles = HeimdallUserRole.objects.filter(pool=pool)
 
@@ -300,7 +346,10 @@ def manage_user_role(request):
 
 
 def manage_group(request):
-
+	'''
+	Modify a group
+	View Type: Form POST
+	'''
 	group = Group.objects.get(name=request.POST['groupname'])
 	user = User.objects.get(username=request.POST['username'])
 
@@ -317,6 +366,10 @@ def manage_group(request):
 
 
 def manage_role(request):
+	'''
+	Modify a pool
+	View Type: Form POST
+	'''
 	if request.method == 'POST':
 		user = User.objects.get(username=request.POST['username'])
 		pool = HeimdallPool.objects.get(name=request.POST['poolname'])
@@ -337,6 +390,10 @@ def manage_role(request):
 
 
 def grant_access(request):
+	'''
+	Grant an access to a server on user.
+	View Type: Form POST
+	'''
 	if request.user.groups.filter(name__in=["heimdall-admin", "heimdall"]):
 		if request.method == 'POST':
 			user = None
@@ -344,7 +401,6 @@ def grant_access(request):
 
 			if request.POST['username'] != '[[ALL]]':
 				user = User.objects.get(username=request.POST['username'])
-				print user
 			else:
 				print('TODO: look after demands')
 
@@ -404,6 +460,11 @@ def grant_access(request):
 
 
 def manage_user_group(request):
+	'''
+	Manage the users groups' page
+	View Type: Form GET
+	Accessible by /admin/manage-user-group
+	'''
 	groups = Group.objects.filter(name=request.GET['groupname'])
 	groupUser = User.objects.filter(groups=groups)
 	users = User.objects.exclude(username__in=groupUser.values_list('username'))
@@ -414,6 +475,11 @@ def manage_user_group(request):
 
 
 def manage_groups(request):
+	'''
+	Manage user accessible pool
+	View Type: Form GET
+	Accessible by /admin/groups
+	'''
 	servers = Server.objects.all()
 
 	users = None
@@ -453,6 +519,11 @@ def add_group(request):
 
 
 def perimeter_pool(request):
+	'''
+	View or Update a perimeter pool. Users / servers (add servers / users to pool / add manager to pool)
+	View Type: Form POST / GET
+	Accessible by /admin/perimeter-pool
+	'''
 	if request.user.groups.filter(name="heimdall-admin"):
 		servers = Server.objects.all()
 		if request.method == 'POST':
@@ -464,7 +535,6 @@ def perimeter_pool(request):
 			if request.POST['action'] == 'add':
 
 				is_allow_to_add = PoolPerimeter.objects.filter(pool=pool, server=server).count() == 0
-				print is_allow_to_add
 				if is_allow_to_add:
 					new_perimeter = PoolPerimeter(pool=pool, server=server)
 					new_perimeter.save()
@@ -534,6 +604,11 @@ def perimeter_pool(request):
 
 
 def register_user(request):
+	'''
+	Register a new user to Heimdall users.
+	Attribute to user the default group heimdall
+	View Type: Form POST
+	'''
 	if request.user.groups.filter(name="heimdall-admin"):
 		if request.method == 'POST':
 
@@ -563,7 +638,6 @@ def register_user(request):
 
 			if check_password(request.POST['password'], request.POST['password-confirm']):
 				code_return_check = check_params(request.POST['password'], request.POST['username'], request.POST['email'], request.POST['firstname'], request.POST['lastname']) 
-				print("return code ", str(code_return_check))
 				if code_return_check == 1:
 					group = None
 					if request.POST['role'] == 'ADMIN':
@@ -611,6 +685,9 @@ def register_user(request):
 
 
 def check_password(password, password_confirm):
+	'''
+	Check the password equals to the confirmation password
+	'''
 	if password == password_confirm:
 		return True
 	else:
@@ -618,6 +695,10 @@ def check_password(password, password_confirm):
 
 
 def check_params(password, username_target, email_target, firstname, lastname):
+	'''
+	Check if params are valid to save a user infos.
+	Rules are: Non-empty username, password, email, firstname, lastname. And Non already exists username and email.
+	'''
 	output = 0
 	if password != "":
 		if username_target != "":

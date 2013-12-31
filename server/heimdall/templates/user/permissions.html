@@ -5,11 +5,16 @@
 		<script type="text/javascript">
 		(function($) {
 		    $(document).ready(function() {
-		    	
-		    	Permissions = ['Heimdall',{% for permission in permissions %}'{{permission.server.hostname}}','{{permission.hostuser}}',{%endfor%}]
+		    
+		    	Permissions.data = ['Heimdall', {% for permission in permissions %}'{{permission.server.hostname}}','{{permission.hostuser}}',{%endfor%}]
+
+				Permissions.central = ['Heimdall']
+		    	Permissions.server = []
+		    	Permissions.hostuser = []
+		    	Permissions.user = []
 
 		        {% if permissions.count == 0 %}
-		        var sys = arbor.ParticleSystem(0, 512, 0.5); 
+		        	var sys = arbor.ParticleSystem(0, 512, 0.5); 
 		        {% else %}
 		        	var sys = arbor.ParticleSystem(512, 512, 0.5); 
 		        {% endif %}
@@ -21,24 +26,30 @@
 		        var heimdall = sys.addNode('Heimdall', {
 		            'color': 'red',
 		            'shape': 'dot',
-		            'label': 'Heimdall'
+		            'label': 'Heimdall',
+		            'alpha' : 1,
+		            'type' : 'central'
+
 		        });
 
 		        {% for permission in permissions %}
-		        var serverName = '{{permission.server.hostname}}';
-		        var server = sys.addNode(serverName, {
-		            'color': 'blue',
-		            'alpha': 0,
-		            /*'shape': 'dot',*/
-		            'label': serverName
-		        });
+			        var serverName = '{{permission.server.hostname}}';
+			        var server = sys.addNode(serverName, {
+			            'color': 'blue',
+			            'type' : 'server',
+			            'alpha' : 0,
+			            'label': serverName
+			        });
+			        Permissions.server.push(serverName)
 
-		        var hostTarget = '{{permission.hostuser}}'
-		        var hostTargetNode = sys.addNode(hostTarget, {
-		            'color': '#BFEF7B',
-		            'alpha' : 0,
-		            'label': hostTarget
-		        });
+			        var hostTarget = '{{permission.hostuser}}'
+			        var hostTargetNode = sys.addNode(hostTarget, {
+			            'color': '#0ECEDA',
+			            'type' : 'hostuser',
+			            'alpha' : 0,
+			            'label': hostTarget
+			        });
+			        Permissions.hostuser.push(hostTarget)
 
 		        {% if permission.user.username == user.username %}
 		        	var color = "green"; 
@@ -49,15 +60,15 @@
 		        var userName = '{{permission.user.username}}';
 		        var user = sys.addNode(userName, {
 		            'color': color,
+		            'type' : 'user',
 		            'label': userName,
 		            'alpha' : 0
 		        });
+		        Permissions.user.push(userName)
 
 		        sys.addEdge(hostTargetNode, user);
 		        sys.addEdge(server, hostTargetNode);
 		        sys.addEdge(heimdall, server);
-
-
 
 		        {% endfor %}
 		    })

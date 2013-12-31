@@ -22,7 +22,7 @@
 					<td>
 						 <form class="default-block" action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
 						 {% csrf_token %}
-						 	<input type="submit" name="remove" value="Remove"/>
+						 	<button class="delete" type="submit" name="remove">Remove</button>
 						 	<input type="hidden" name="action" value="remove"/>
 						 	<input type="hidden" name="poolname" value="{{poolname}}"/>
 						 	<input type="hidden" name="hostname" value="{{group.server.hostname}}"/>
@@ -47,7 +47,7 @@
 									{% endfor %}
 								</select>
 							</span>
-							<input type="submit" name="add" value="Add"/>
+							<button class="add" type="submit" name="add">Add</button>
 							</form>	
 						</td>
 						<td>
@@ -78,7 +78,7 @@
 					<td>
 						 <form class="default-block" action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
 						 {% csrf_token %}
-						 	<input type="submit" name="remove" value="Remove"/>
+						 	<button class="delete" type="submit" name="remove">Remove</button>
 						 </form>
 					</td>
 				</tr>
@@ -89,14 +89,14 @@
 						<td>
 							<form action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
 								 {% csrf_token %}
-								 <span class="select">
-								<select name="username">
-									{% for users in users_not_manager_in_pool %}
-										<option>{{users.user.username}}</option>
-									{% endfor %}
-								</select>
-							</span>
-							<input type="submit" name="add" value="Change to manager"/>
+								<span class="select">
+									<select name="username">
+										{% for users in users_not_manager_in_pool %}
+											<option>{{users.user.username}}</option>
+										{% endfor %}
+									</select>
+								</span>
+								<button class="spark" type="submit" name="add">Change to manager</button>
 								<input type="hidden" name="action" value="setmanager"/>
 								<input type="hidden" name="poolname" value="{{poolname}}"/>
 							 </form>

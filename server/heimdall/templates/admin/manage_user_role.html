@@ -29,13 +29,13 @@
 						<td style="with: 100%" class="{%if member.type == 'MANAGER'%}manager{%endif%}">{{ member.user }}</td>
 					 	{% ifusergroup heimdall-admin %}
 							<td>
-                                                        	<input type="submit" value="Remove user">
-                                                        </td>
+								<button class="delete" type="submit">Remove user</button>
+							</td>
 						{% else %}	
 							{%ifpoolandtype {{poolname}} MANAGER %}
 								{% ifnotequal user member.user %}
 									<td>
-										<input type="submit" value="Remove user">
+										<button class="delete" type="submit">Remove user</button>
 									</td>
 								{% else %}
 									<td>You cannot manage yourself.</td>
@@ -52,7 +52,7 @@
 								<td>
 									<form action="/heimdall/admin/manage_role" method="post" accept-charset="utf-8">
 										{% csrf_token%}
-										<input type="hidden" name="type" value="add" />
+										<button class="add" type="hidden" name="type">Add</button>
 										<input type="hidden" name="poolname" value="{{ poolname }}" />
 
                                                                         	<span class="select">
@@ -63,7 +63,7 @@
                                                                                 	</select>
                                                                         	</span>
 								
-										<input type="submit" value="Add to group" />
+										<button class="add" type="submit">Add to group</button>
 									</form>
 								</td>
 
@@ -88,7 +88,7 @@
 											{% endfor %}
 										</select>
 									</span>
-									<input type="submit" value="Add to group" />
+									<button class="add" type="submit">Add to group</button>
 
 									</form>
 								</td>
@@ -125,7 +125,7 @@
 						 <form class="default-block" action="/heimdall/admin/perimeter_pool" method="post" accept-charset="utf-8">
 						 {% csrf_token %}
 						 	<input type="hidden" name="username" value="{{username}}"/>
-						 	<input type="submit" name="remove" value="Remove"/>
+						 	<button class="delete" type="submit" name="remove">Remove</button>
 						 	<input type="hidden" name="action" value="removemanager"/>
 						 	<input type="hidden" name="poolname" value="{{poolname}}"/>
 						 </form>
@@ -146,7 +146,7 @@
 										{% endfor %}
 									</select>
 								</span>
-								<input type="submit" name="add" value="Change to manager"/>
+								<button class="spark" type="submit" name="add">Change to manager</button>
 								<input type="hidden" name="action" value="setmanager"/>
 								<input type="hidden" name="poolname" value="{{poolname}}"/>
 							</form>

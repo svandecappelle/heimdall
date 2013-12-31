@@ -103,6 +103,7 @@ class ReplicationFactory:
 
 		if utils.getConfigurationAdmin('user_notification') == 'true':
 			msg['To'] = userEmail
+			recipients = [utils.getConfigurationAdmin('mail_system_user_account'), userEmail]
 		else:
 			msg['To'] = ", ".join(recipients)
 

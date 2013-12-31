@@ -8,6 +8,7 @@
 			<thead>
 				<tr>
 					<th>Users</th>
+					<th></th>
 				</tr>
 			</thead>
 
@@ -16,11 +17,12 @@
 				<tr>
 					<form action="/heimdall/admin/manage_group" method="post"
 						accept-charset="utf-8">
-						{% csrf_token%} <input type="hidden" name="type" value="remove" />
+						{% csrf_token%} 
+						<input type="hidden" name="type" value="remove" />
 						<input type="hidden" name="username" value="{{ member.username }}" />
 						<input type="hidden" name="groupname" value="{{ groupname }}" />
-					<td style="with: 100%">{{ member.username }}</td>
-					<td><input type="submit" value="Remove user"></td>
+						<td style="with: 100%">{{ member.username }}</td>
+						<td><button class="delete" type="submit">Remove user</button></td>
 					</form>
 				</tr>
 			{% endfor %}
@@ -41,7 +43,7 @@
 							</select>
 						</span>
 					</td>
-					<td><input type="submit" value="Add to group"></td>
+					<td><button class="add" type="submit">Add to group</button></td>
 					</form>
 				</tr>
 			</tfoot>
