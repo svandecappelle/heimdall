@@ -5,10 +5,8 @@
 		<script type="text/javascript">
 		(function($) {
 		    $(document).ready(function() {
-
-
 		    	
-		    	Permissions = [{% for permission in permissions %}'{{permission.server.hostname}}','{{permission.hostuser}}',{%endfor%}]
+		    	Permissions = ['Heimdall',{% for permission in permissions %}'{{permission.server.hostname}}','{{permission.hostuser}}',{%endfor%}]
 
 		        {% if permissions.count == 0 %}
 		        var sys = arbor.ParticleSystem(0, 512, 0.5); 
@@ -30,14 +28,14 @@
 		        var serverName = '{{permission.server.hostname}}';
 		        var server = sys.addNode(serverName, {
 		            'color': 'blue',
-		            'shape': 'dot',
+		            'alpha': 0,
+		            /*'shape': 'dot',*/
 		            'label': serverName
 		        });
 
 		        var hostTarget = '{{permission.hostuser}}'
 		        var hostTargetNode = sys.addNode(hostTarget, {
-		            'color': '#0ECEDA',
-		            
+		            'color': '#BFEF7B',
 		            'alpha' : 0,
 		            'label': hostTarget
 		        });
