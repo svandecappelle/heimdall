@@ -138,14 +138,13 @@
 								<label for="username">User</label>
 							</td>
 							<td>
-								<!--<span class="select">
+								<span class="select">
 									<select name="username" >
 									{% for user_perm in users %}				
 										<option value="{{user_perm.username}}">{{user_perm.username}}</option>
 									{% endfor %}
 									</select>
-								</span>-->
-								<input name="username" type="text"/>
+								</span>
 							</td>
 						</tr>					
 						<tr>
@@ -153,7 +152,7 @@
 								<label for="hostuser">Host user</label>
 							</td>
 							<td>
-								<span class="select">
+								<!--<span class="select">
 									<select name="hostuser" id="userhost">
 									{% for user_allowed in allowedusers %}				
 										
@@ -161,8 +160,8 @@
 										
 									{% endfor %}
 									</select>
-								</span>
-								<!--<input type="text" name="hostuser" value=""/>-->
+								</span>-->
+							<input type="text" name="hostuser" value=""/>
 							</td>
 							<td>
 								<button class="add" type="submit">Add permission</button>
