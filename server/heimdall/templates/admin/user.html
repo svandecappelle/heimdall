@@ -44,7 +44,7 @@
 			<tr>
 				<td>{{ user_target.username }}</td>
 				{% if user.is_authenticated %}
-					<td><button onClick="showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}', email: '{{user_target.email}}',lastname:'{{ user_target.last_name}}'})">Modifier les propriétés</button></td>
+					<td><button class="edit" onClick="showForm({username:'{{ user_target.username }}',firstname:'{{ user_target.first_name}}', email: '{{user_target.email}}',lastname:'{{ user_target.last_name}}'})">Modifier les propriétés</button></td>
 				{% endif %}
 			</tr>
 	        
@@ -110,7 +110,12 @@
 						      <td><input type="password" name="password-confirm"/></td>
 					      </tr>
 					       <tr>
-						      <td colspan="2" style="text-align:right;">{% ifusergroup heimdall-admin %}<input type="button" onClick="hideForm()" value="Annuler"/>{% endifusergroup %}<button>Valider</button></td>
+						      <td colspan="2" style="text-align:right;">
+						      {% ifusergroup heimdall-admin %}
+						      	<button class="delete" type="button" onClick="hideForm()">Annuler</button>
+						      	<button class="save" type="submit">Valider</button>
+						      {% endifusergroup %}
+						      </td>
 					      </tr>
 					      </tbody>
 				      </table>
@@ -173,7 +178,7 @@
 	                                       
 						      </tr>
 						       <tr>
-							      <td colspan="2" style="text-align:right;"><button>Add user</button></td>
+							      <td colspan="2" style="text-align:right;"><button class="add">Add user</button></td>
 						      </tr>
 						      </tbody>
 					      </table>

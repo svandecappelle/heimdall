@@ -18,7 +18,7 @@
 					{{ form.docfile.errors }}
 					{{ form.docfile }}
 				    </p>
-				    <p><input type="submit" value="Upload" /></p>
+				    <p><button class="next" type="submit">Upload</button></p>
 				</form>
 			</div>
 		</div>
@@ -32,7 +32,7 @@
 					    {% csrf_token %}
 						<input type="hidden" name="type" value="update"/>
 						<textarea style="width:90%; height:150px;" name="key" >{{key}}</textarea>
-					    <p><input type="submit" value="Update" /></p>
+					    <p><button class="save" type="submit">Update</button></p>
 					</form>
 				</div>
 			</div>

@@ -41,7 +41,7 @@
 								</select>
 							</span>
 								
-							<input type="submit" value="→ add to group">
+							<button class="add" type="submit">Add to group</button>
 						</form>
 					<!-- Interface manager -->	
 					{% else %}
@@ -87,7 +87,7 @@
 								</select>
 							</span>
 							
-							<input type="submit" value="→ Add to pool">
+							<button class="add" type="submit">Add to pool</button>
 						</form>
 					</td>
 				</tr>
@@ -121,7 +121,7 @@
 								</select>
 							</span>
 							{% if user.is_authenticated %} 
-								<input type="submit" value="→ Add to pool" />
+								<button class="add" type="submit">Add to pool</button>
 							{% endif %}
 						</form>
 						</td>
@@ -150,7 +150,7 @@
 						<td><input type="text" name="groupname" /></td>
 					</tr>
 					<tr>
-						<td colspan="2"><input type="submit" value="Create" /></td>
+						<td colspan="2"><button class="add" type="submit">Create</button></td>
 					</tr>
 				</tbody>
 			</table>
@@ -174,7 +174,7 @@
 						<form class="default-block" action="/heimdall/admin/perimeter_pool" method="get" accept-charset="utf-8">
 							{% csrf_token %} 
 							<input type="hidden" value="{{role.name}}" name="poolname" />
-							<button type="submit">click here for change the role perimeter</button>
+							<button class="spark" type="submit">click here for change the role perimeter</button>
 						</form>
 					</td>
 				</tr>

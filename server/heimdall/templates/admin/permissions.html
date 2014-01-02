@@ -73,7 +73,7 @@
 									<input type="hidden" name="type" value="grant"/>
 									<input type="hidden" name="hostname" value="{{ demand.server.hostname }}"/>
 									<input type="hidden" name="hostuser" value="{{ demand.hostuser }}"/>
-									<input type="submit" value="Grant access"/>
+									<button class="next" type="submit">Grant access</button>
 								</form>
 							</td>
 							<td>
@@ -83,7 +83,7 @@
 								    <input type="hidden" name="type" value="reject"/>
 									<input type="hidden" name="hostname" value="{{ demand.server.hostname }}"/>
 									<input type="hidden" name="hostuser" value="{{ demand.hostuser }}"/>
-									<input type="submit" value="Reject access"/>
+									<button class="delete" type="submit">Reject access</button>
 								</form>
 							</td>
 						{% endif %}
@@ -101,7 +101,7 @@
 									<input type="hidden" value="[[ALL]]" name="username"/>
 									<input type="hidden" value="[[ALL]]" name="hostname"/>
 									<input type="hidden" value="[[ALL]]" name="hostuser"/>
-									<input type="submit" value="Grant access to all" style="width:100%;" disabled/>
+									<button class="play" type="submit" style="width:100%;" disabled>Grant access to all</button>
 								</form>
 							</td>
 						</tr>
@@ -164,7 +164,7 @@
 								<!--<input type="text" name="hostuser" value=""/>-->
 							</td>
 							<td>
-								<input type="submit" value="Add permission" />
+								<button class="add" type="submit">Add permission</button>
 							</td>
 						</tr>
 					</tbody>
@@ -204,7 +204,7 @@
 											    <input type="hidden" name="username" value="{{ permission.user.username }}"/>
 												<input type="hidden" name="hostname" value="{{ permission.server.hostname }}"/>
 												<input type="hidden" name="hostuser" value="{{ permission.hostuser }}"/>
-												<input type="submit" value="Revoke access"/>
+												<button class="delete" type="submit">Revoke access</button>
 											</form>
 										</td>
 									{% endif %}
@@ -222,7 +222,7 @@
 											    <input type="hidden" name="username" value="{{ permission.user.username }}"/>
 												<input type="hidden" name="hostname" value="{{ permission.server.hostname }}"/>
 												<input type="hidden" name="hostuser" value="{{ permission.hostuser }}"/>
-												<input type="submit" value="Revoke access"/>
+												<button class="delete" type="submit">Revoke access</button>
 											</form>
 										</td>
 									{% endif %}

@@ -39,7 +39,7 @@
 					<td>{{ server.hostname }}</td>
 					<td>{{ server.description }}</td>
 					{% if user.is_authenticated %}
-						<td><button onClick="showForm('{{ server.hostname }}')">Faire une demande d'accès</button></td>
+						<td><button class="spark" onClick="showForm('{{ server.hostname }}')">Faire une demande d'accès</button></td>
 					{% endif %}
 					{% ifusergroup heimdall-admin %}
 						<td><a href="/heimdall/admin/create_server?hostname={{server.hostname}}">update</a></td>
@@ -99,7 +99,9 @@
 				      <td><textarea name="comments" col="100" style="width: 411px;height: 137px;"></textarea></td>
 			      </tr>
 			       <tr>
-				      <td colspan="2" style="text-align:right;"><input type="button" onClick="hideForm()" value="Annuler"/><button>Valider</button></td>
+				      <td colspan="2" style="text-align:right;">
+				      <button class="delete" type="button" onClick="hideForm()">Annuler</button>
+				      <button class="save" type="submit">Valider</button></td>
 			      </tr>
 			      </tbody>
 		      </table>

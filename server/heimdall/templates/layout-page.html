@@ -128,7 +128,7 @@
                 						<div class="inline-block">
                 							<form action="/heimdall/logout" method="post">
                 							    {% csrf_token %}
-                							    <input type="submit" value="Disconect →">
+                							    <button class="delete" type="submit">Disconect</button>
                 							</form>
                 						</div>
 						                {% endif %}
@@ -166,7 +166,7 @@
                 						<tr>
                 							<td>
                 								<p>
-                									<input type="submit" value="Login →">
+                									<button class="play" type="submit">Login</button>
                 								</p>
                 							</td>
                 						</tr>

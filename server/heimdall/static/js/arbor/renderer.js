@@ -39,6 +39,8 @@ Permissions.visibleItems = [];
     var gfx = arbor.Graphics(canvas)
     var sys = null
 
+    var serverVisible = false;
+
     var _vignette = null
     var selected = null,
         nearest = null,
@@ -131,13 +133,13 @@ Permissions.visibleItems = [];
       },
 
       toggleNodeVisible: function(node){
-            if(node.data.alpha==0){
-              sys.tweenNode(node, 0.5, {alpha:1})
-              node.data.alpha = 1
-            }else{
-              sys.tweenNode(node, 0.5, {alpha:0})
-              //node.data.alpha = 1
-            }
+        if(node.data.alpha==0){
+          sys.tweenNode(node, 0.5, {alpha:1})
+          node.data.alpha = 1
+        }else{
+          sys.tweenNode(node, 0.5, {alpha:0})
+          //node.data.alpha = 1
+        }
       },
 
       setNodeVisible: function(node, isVisible){
@@ -157,17 +159,22 @@ Permissions.visibleItems = [];
       toggleServers: function(){
         sys.eachNode(function(node){
           if(node.data.type == 'server'){
-            that.toggleNodeVisible(node)
+            if (serverVisible){
+              that.setNodeVisible(node, false)
+            }else{
+              that.setNodeVisible(node, true)
+            }
+            //that.toggleNodeVisible(node)
           }else if(node.data.type == 'central'){
             that.setNodeVisible(node, true)
           }else{
             that.setNodeVisible(node, false)
           }
         })
+        serverVisible = !serverVisible;
       },
 
       toggleUsers: function(hostUser){
-
         sys.eachNode(function(node){
           if(node.data.type == 'user'){
             that.setNodeVisible(node, false)
@@ -181,7 +188,6 @@ Permissions.visibleItems = [];
       },
 
       toggleHostUsers: function(fromServer){
-
         // Hide all
         sys.eachNode(function(node){
           if(node.data.type == 'hostuser'){
@@ -197,11 +203,18 @@ Permissions.visibleItems = [];
            
         })
       },
+
+      hideOtherInSameLevel: function(node){
+        sys.eachNode(function(nodeToHide){
+          if(nodeToHide.data.type == node.data.type && nodeToHide.data != node.data){
+            that.setNodeVisible(nodeToHide, false)
+          }
+        })
+      },
       
       switchSection:function(newSection){
         console.log("selection: " + newSection.data.type)
         Permissions.currentSelection = sys.getEdgesFrom(newSection)[0].source
-
 
         type = newSection.data.type;
         if (type=='central'){
@@ -212,10 +225,13 @@ Permissions.visibleItems = [];
           console.log('server')
           // show / hide hostusers
           that.toggleHostUsers(newSection)
+          that.hideOtherInSameLevel(newSection)
+          serverVisible = false;
         }else if (type=='hostuser'){
           console.log('hostuser')
           // show / hide users
           that.toggleUsers(newSection)
+          that.hideOtherInSameLevel(newSection)
         }else if (type=='user'){
           console.log('user')
           // hide user
