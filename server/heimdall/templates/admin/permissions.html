@@ -1,6 +1,46 @@
 {% extends "layout-page.html" %}
 {% load tags %}
 
+{% block import%}
+	<script type="text/javascript">
+
+	users = [
+		{% for users_allowed in allowedusers %}
+		{
+			username : '{{users_allowed.username}}',
+			server : '{{users_allowed.server.hostname}}',
+		},
+		{% endfor %}
+	]
+
+	$(document).ready(function(){
+			$( "select" ).change(function() {
+				var $input = $( this );
+				$("#userhost").find('option').remove()
+				$.each(users, function(key, value) {   
+			     console.log(value.server+ "-" + $("#server").val())
+			     if(value.server == $("#server").val()){
+			     	$('#userhost').append($("<option value='"+value.username+"'>"+value.username+"</option>")); 
+			     }
+				});
+			});
+
+			// first init
+
+			$("#userhost").find('option').remove()
+				$.each(users, function(key, value) {   
+			     console.log(value.server+ "-" + $("#server").val())
+			     if(value.server == $("#server").val()){
+			     	$('#userhost').append($("<option value='"+value.username+"'>"+value.username+"</option>")); 
+			     }
+				});
+	});
+
+
+
+	</script>
+{% endblock %}
+
 {% block content %}
 <section>
 <h2>Add a user permission:</h2>
@@ -85,7 +125,7 @@
 							</td>
 							<td>
 								<span class="select">					
-									<select name="hostname" >
+									<select name="hostname" id="server" >
 									{% for server in servers %}				
 										<option value="{{server.hostname}}">{{server.hostname}}</option>
 									{% endfor %}
@@ -109,7 +149,19 @@
 						</tr>					
 						<tr>
 							<td>
-								<label for="hostuser">Host user</label><input type="text" name="hostuser" value=""/>
+								<label for="hostuser">Host user</label>
+							</td>
+							<td>
+								<span class="select">
+									<select name="hostuser" id="userhost">
+									{% for user_allowed in allowedusers %}				
+										
+											<option value="{{user_allowed}}">{{user_allowed}}</option>
+										
+									{% endfor %}
+									</select>
+								</span>
+								<!--<input type="text" name="hostuser" value=""/>-->
 							</td>
 							<td>
 								<input type="submit" value="Add permission" />

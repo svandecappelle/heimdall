@@ -63,6 +63,14 @@ class HeimdallPool(models.Model):
 		return u"%s" % (self.name)
 
 
+class HostedUsers(models.Model):
+	username = models.CharField(max_length=250)
+	server = server = models.ForeignKey(Server)
+
+	def __unicode__(self):
+		return u"%s" % (self.username)
+
+
 class HeimdallUserRole(models.Model):
 	ROLES_CHOICES = (('ADMIN', 'ADMIN'), ('MANAGER', 'MANAGER'), ('USER', 'USER'),)
 	type = models.CharField(max_length=50, choices=ROLES_CHOICES)

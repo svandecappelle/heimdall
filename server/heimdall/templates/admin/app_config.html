@@ -95,18 +95,24 @@
 							<td><label for="mail_system_user_account">System user account mail</label></td>
 							<td><input name="mail_system_user_account" type="text" value="{{mail_system_user_account}}"/></td>
 						</tr>
-						<!--<tr>
+						<tr>
 							<td colspan="2" class="subtitle">SSH server configuration</td>
 						</tr>
 						<tr>
-							<td></td>
-							<td></td>
-						</tr>-->
+							<td><label for="forbidden_users">Users forbidden</label></td>
+							<td><textarea name="forbidden_users" style="margin: 2px; height: 80px; width: 498px;">{{forbidden_users}}</textarea></td>
+						</tr>
+						<tr>
+							<td><label>Refresh all useruser stored in database</label></td>
+							<td>
+								<a class="star button" href="/heimdall/admin/refresh_servers_hostuser">Refresh</a>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 
 				<p>
-					<input type="submit" value="Save →">
+					<button class="save" type="submit">Save</button>
 				</p>
 			</form>
 		</div>
@@ -143,7 +149,7 @@
 					</tbody>
 				</table>
 				<p>
-					<input type="submit" value="Save →">
+					<button class="save" type="submit">Save</button>
 				</p>
 			</form>
 		</div>

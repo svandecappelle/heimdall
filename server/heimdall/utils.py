@@ -34,6 +34,14 @@ from django.template import RequestContext
 
 from heimdall.models import Demands, UserConfiguration, GeneralConfiguration
 
+from paramiko import SSHClient
+from paramiko import AutoAddPolicy
+
+import logging
+import socket
+
+logger = logging.getLogger("ReplicationFactory")
+
 
 class VoidDemand(tuple):
 	count = 0
@@ -57,6 +65,64 @@ def getConfiguration(user, conf_id):
 					output = UserConfiguration.objects.get(user=user, key=conf_id).value
 
 	return output
+
+
+def getAvailableUsersInHost(host):
+	usersForbidden = getConfigurationAdmin('forbidden_users')
+	if usersForbidden is not None:
+		matches = usersForbidden.replace(',', '|')
+	else:
+		matches = ""
+
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.settimeout(2)
+	try:
+		sock.connect((host.hostname, host.port))
+	except socket.error:
+		print("Server" + host.hostname + " offline")
+		sock.close()
+		return []
+	#print("SSH connection")
+	try:
+		userConfigured = []
+
+		client = SSHClient()
+		client.load_system_host_keys()
+		client.set_missing_host_key_policy(AutoAddPolicy())
+		client.connect('%s' % host.hostname, port=host.port, username="jboss")
+
+		# Check user allowed to replicator
+		stdin, stdout, stderr = client.exec_command("cut -d':' -f1 /etc/passwd | grep --invert-match -E '%s'" % matches)
+		output = stdout.readlines()
+		client.close()
+
+		for user in output:
+			# print("test with: " + user.strip())
+			# TODO find a solution for test without worst performance
+			#if test_connection(host, user.strip()):
+			userConfigured.append(user.strip())
+
+		logger.info("All users configured for " + host.hostname + " are: " + str(userConfigured))
+		return userConfigured
+
+	except:
+		return []
+
+
+def test_connection(host, user):
+	try:
+		client = SSHClient()
+		client.load_system_host_keys()
+		client.set_missing_host_key_policy(AutoAddPolicy())
+		client.connect('%s' % host.hostname, port=host.port, username=user)
+		stdin, stdout, stderr = client.exec_command("uptime")
+		output = stdout.read()
+		client.close()
+		if output is None or output == "":
+			return False
+		return True
+	except:
+		return False
 
 
 def getConfigurationAdmin(conf_id):

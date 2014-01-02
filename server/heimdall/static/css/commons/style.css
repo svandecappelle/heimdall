@@ -41,6 +41,20 @@ body{
 	border-collapse: collapse;
 }
 
+a{
+	color: #cacaca;
+	text-decoration: none;	
+}
+
+a:hover{
+	color: #AC6969;
+	text-decoration: none;	
+}
+
+a:active{
+	color: #AC9970;
+	text-decoration: none;	
+}
 
 input[type="text"],textarea,input[type="password"]{
     
@@ -76,7 +90,7 @@ input[readonly]{
 }
 
 
-button, input[type="button"], input[type="submit"],input[type="file"]{        
+button, input[type="button"], input[type="submit"],input[type="file"], a.button{        
 	display: inline-block;
 	white-space: nowrap;
 	background-color: #ccc;
@@ -260,21 +274,6 @@ html *{
 	font-size: 0.7em;
 	margin-top: 17px;
 	margin-left: 3px;
-}
-
-a{
-	color: #cacaca;
-	text-decoration: none;	
-}
-
-a:hover{
-	color: #AC6969;
-	text-decoration: none;	
-}
-
-a:active{
-	color: #AC9970;
-	text-decoration: none;	
 }
 
 .notifications-layout{

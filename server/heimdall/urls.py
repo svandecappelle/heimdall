@@ -71,4 +71,5 @@ urlpatterns = patterns('',
 	url(r'^admin/manage_group$', heimdall.admin.views.manage_group, name='manage-group'),
 	url(r'^admin/app_config$', heimdall.admin.views.app_config, name='app-config'),
 	url(r'^admin/app_config_save$', heimdall.admin.views.app_config_save),
+	url(r'^admin/refresh_servers_hostuser$', heimdall.admin.views.refresh_servers_hostuser),
 )

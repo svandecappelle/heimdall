@@ -40,7 +40,7 @@ from django.template import RequestContext
 
 from heimdall import utils
 from heimdall.bastion.runner import Controller
-from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission, GeneralConfiguration, UserConfiguration
+from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission, GeneralConfiguration, UserConfiguration, HostedUsers
 
 
 #Installation
@@ -72,9 +72,10 @@ def app_config(request):
 	Application configurations view. Can save user configuration such as language and theme.
 	Accessible by /admin/app-config
 	'''
+	utils.getAvailableUsersInHost(Server.objects.get(hostname="georges"))
 	args = utils.give_arguments(request.user, 'Users admin')
 
-	admin_configs = ['theme', 'mail_server_hostname', 'mail_system_user_account', 'user_notification', 'admin_notification']
+	admin_configs = ['theme', 'mail_server_hostname', 'mail_system_user_account', 'user_notification', 'admin_notification', 'forbidden_users']
 
 	for field in admin_configs:
 		args.update({field: utils.getConfiguration(request.user, field)})
@@ -98,7 +99,7 @@ def app_config_save(request):
 		messages.success(request, 'This page is not accessible.')
 		return HttpResponseRedirect(reverse('index'))
 
-	globalConfiguredFields = ['theme', 'mail_server_hostname', 'admin_notification', 'user_notification', 'mail_system_user_account']
+	globalConfiguredFields = ['theme', 'mail_server_hostname', 'admin_notification', 'user_notification', 'mail_system_user_account', 'forbidden_users']
 	userConfiguredFields = ['theme']
 	if 'type' in request.POST:
 		if request.POST['type'] == 'global':
@@ -118,7 +119,7 @@ def app_config_save(request):
 				messages.success(request, 'Saved user heimdall configurations.')
 			else:
 				messages.success(request, 'Configuration cannot be saved. Not a parametrized config.')
-	return HttpResponseRedirect(reverse('index'))
+	return HttpResponseRedirect(reverse('app-config'))
 
 
 def updateGeneralConfig(key_str, value_str):
@@ -259,6 +260,22 @@ def permissions(request):
 	return render_to_response('admin/permissions.html', args, context_instance=RequestContext(request))
 
 
+def refresh_servers_hostuser(request):
+	servers = Server.objects.all()
+	HostedUsers.objects.all().delete()
+
+	for server in servers:
+		print(server.hostname)
+		appendedUsers = utils.getAvailableUsersInHost(server)
+
+		for user in appendedUsers:
+			userHost = HostedUsers(server=server, username=user)
+			userHost.save()
+
+	messages.success(request, 'Currently refreshing...')
+	return HttpResponseRedirect(reverse('app-config'))
+
+
 def getarguments_for_admin(user):
 	'''
 	Get permissions to display in view for an admin user.
@@ -268,6 +285,17 @@ def getarguments_for_admin(user):
 	demands = utils.get_all_demands_filtered_pending(user)
 	permissions = Permission.objects.all()
 	args = utils.give_arguments(user, 'Permissions admin')
+
+	hostedUsers = HostedUsers.objects.all()
+	#for server in servers:
+	#	print(server.hostname)
+	#	appendedUsers = utils.getAvailableUsersInHost(server)
+	#
+	#		for userToAdd in appendedUsers:
+	#			if userToAdd not in hostedUsers:
+	#				hostedUsers.append(userToAdd)
+
+	args.update({'allowedusers': hostedUsers})
 	args.update({'demands': demands, 'servers': servers, 'users': users, 'permissions': permissions})
 	return args
 
@@ -293,6 +321,11 @@ def getarguments_for_manager(request, user):
 	permissions = Permission.objects.all()
 
 	args = utils.give_arguments(user, 'Permissions admin')
+
+	hostedUsers = HostedUsers.objects.filter(server__in=servers)
+
+	args.update({'allowedusers': hostedUsers})
+
 	args.update({'demands': demands, 'servers': servers, 'users': users, 'permissions': permissions})
 	return args
 
