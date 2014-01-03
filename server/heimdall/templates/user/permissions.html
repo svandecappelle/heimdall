@@ -6,7 +6,7 @@
 		(function($) {
 		    $(document).ready(function() {
 		    
-		    	Permissions.data = ['Heimdall', {% for permission in permissions %}'{{permission.server.hostname}}','{{permission.hostuser}}',{%endfor%}]
+		    	Permissions.data = ['Heimdall', {% for permission in permissions %}'{{permission.server.hostname}}','{{permission.hostuser}} - {{permission.server.hostname}}',{%endfor%}]
 
 				Permissions.central = ['Heimdall']
 		    	Permissions.server = []
@@ -24,7 +24,7 @@
 
 		        // central repository
 		        var heimdall = sys.addNode('Heimdall', {
-		            'color': 'red',
+		            'color': '#D51B47',
 		            'shape': 'dot',
 		            'label': 'Heimdall',
 		            'alpha' : 1,
@@ -35,7 +35,7 @@
 		        {% for permission in permissions %}
 			        var serverName = '{{permission.server.hostname}}';
 			        var server = sys.addNode(serverName, {
-			            'color': 'blue',
+			            'color': '#5FADC5',
 			            'type' : 'server',
 			            'alpha' : 0,
 			            'label': serverName
@@ -43,18 +43,18 @@
 			        Permissions.server.push(serverName)
 
 			        var hostTarget = '{{permission.hostuser}}'
-			        var hostTargetNode = sys.addNode(hostTarget, {
-			            'color': '#0ECEDA',
+			        var hostTargetNode = sys.addNode(hostTarget + ' - ' + serverName, {
+			            'color': '#C67EFF',
 			            'type' : 'hostuser',
 			            'alpha' : 0,
-			            'label': hostTarget
+			            'label': hostTarget + ' - ' + serverName
 			        });
-			        Permissions.hostuser.push(hostTarget)
+			        Permissions.hostuser.push(hostTarget + ' - ' + serverName)
 
 		        {% if permission.user.username == user.username %}
-		        	var color = "green"; 
+		        	var color = "#E79732"; 
 		        {% else %}
-		        	var color = "orange"; 
+		        	var color = "#A5C94B"; 
 		        {% endif %}
 
 		        var userName = '{{permission.user.username}}';
@@ -92,31 +92,31 @@
 	                <tr>
 	                    <td>Heimdall central repository</td>
 	                    <td>
-	                        <span class="legend-block" style="background-color: red;"></span>
+	                        <span class="legend-block" style="background-color: #D51B47;"></span>
 	                    </td>
 	                </tr>
 	                <tr>
 	                    <td>Server</td>
 	                    <td>
-	                        <span class="legend-block" style="background-color: blue;"></span>
+	                        <span class="legend-block" style="background-color: #5FADC5;"></span>
 	                    </td>
 	                </tr>
 	                <tr>
 	                    <td>You</td>
 	                    <td>
-	                        <span class="legend-block" style="background-color: green;"></span>
+	                        <span class="legend-block" style="background-color: #E79732;"></span>
 	                    </td>
 	                </tr>
 	                <tr>
 	                    <td>Other users</td>
 	                    <td>
-	                        <span class="legend-block" style="background-color: orange;"></span>
+	                        <span class="legend-block" style="background-color: #A5C94B;"></span>
 	                    </td>
 	                </tr>
 	                <tr>
 	                    <td>Connection user</td>
 	                    <td>
-	                        <span class="legend-block" style="background-color: #0ECEDA;"></span>
+	                        <span class="legend-block" style="background-color: #C67EFF;"></span>
 	                    </td>
 	                </tr>
 	            </tbody>
