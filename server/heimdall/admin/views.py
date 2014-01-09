@@ -42,7 +42,7 @@ from heimdall import utils
 from heimdall.bastion.runner import Controller
 from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission
 from heimdall.models import GeneralConfiguration, UserConfiguration, HostedUsers, PendingThread
-from heimdall.tasks import add
+from heimdall.tasks import refreshUserHosts
 
 
 #Installation
@@ -267,7 +267,7 @@ def permissions(request):
 
 def refresh_servers_hostuser(request):
 
-	add.delay(2, 2)
+	refreshUserHosts.delay()
 
 	messages.success(request, 'Currently refreshing...')
 	return HttpResponseRedirect(reverse('app-config'))

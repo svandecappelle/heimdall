@@ -7,7 +7,7 @@ from heimdall import utils
 
 
 @shared_task
-def add(x, y):
+def refreshUserHosts():
 
 	if not PendingThread.objects.filter(process='userhost-list-refresh').exists():
 		servers = Server.objects.all()
@@ -25,13 +25,3 @@ def add(x, y):
 			thread.save()
 
 		thread.delete()
-
-
-@shared_task
-def mul(x, y):
-	return x * y
-
-
-@shared_task
-def xsum(numbers):
-	return sum(numbers)
