@@ -13,10 +13,14 @@ def add(x, y):
 		servers = Server.objects.all()
 		thread = PendingThread(process='userhost-list-refresh', pending_request=servers.count())
 		thread.save()
-		time.sleep(10)
-		#for server in servers:
+
+		for server in servers:
+			time.sleep(5)
+			thread.pending_request = thread.pending_request - 1
+			thread.save()
+
 		#	appendedUsers = utils.getAvailableUsersInHost(server)
-#			#for user in appendedUsers:
+		#	#for user in appendedUsers:
 		#	userHost = HostedUsers(server=server, username=user)
 		#	userHost.save()
 		thread.delete()
