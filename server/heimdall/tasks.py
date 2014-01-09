@@ -2,8 +2,8 @@ from __future__ import absolute_import
 
 from celery import shared_task
 
-from heimdall.models import Server, PendingThread
-import time
+from heimdall.models import Server, PendingThread, HostedUsers
+from heimdall import utils
 
 
 @shared_task
@@ -15,17 +15,16 @@ def add(x, y):
 		thread.save()
 
 		for server in servers:
-			time.sleep(5)
+			appendedUsers = utils.getAvailableUsersInHost(server)
+
+			for user in appendedUsers:
+				userHost = HostedUsers(server=server, username=user)
+				userHost.save()
+
 			thread.pending_request = thread.pending_request - 1
 			thread.save()
 
-		#	appendedUsers = utils.getAvailableUsersInHost(server)
-		#	#for user in appendedUsers:
-		#	userHost = HostedUsers(server=server, username=user)
-		#	userHost.save()
 		thread.delete()
-
-	return x + y
 
 
 @shared_task
