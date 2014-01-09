@@ -15,9 +15,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>.
 
-Authors: 
+Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
@@ -28,3 +28,8 @@ Authors:
 # Website:      http://vekia.github.io/heimdall/
 # Email:        svandecappelle at vekia.fr
 """
+from __future__ import absolute_import
+
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from .celery import app as celery_app

@@ -119,4 +119,12 @@ class GeneralConfiguration(models.Model):
 	key = models.CharField(max_length=150)
 
 	def __unicode__(self):
-		return u"%s->%s" % (self.key)
+		return u"%s" % (self.key)
+
+
+class PendingThread(models.Model):
+	process = models.CharField(max_length=500)
+	pending_request = models.IntegerField()
+
+	def __unicode__(self):
+		return u"%s" % (self.process)
