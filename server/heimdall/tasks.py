@@ -10,6 +10,8 @@ from heimdall import utils
 def refreshUserHosts():
 
 	if not PendingThread.objects.filter(process='userhost-list-refresh').exists():
+		HostedUsers.objects.all().delete()
+
 		servers = Server.objects.all()
 		thread = PendingThread(process='userhost-list-refresh', pending_request=servers.count())
 		thread.save()
