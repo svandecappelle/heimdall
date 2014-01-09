@@ -16,7 +16,7 @@ def refreshUserHosts():
 
 		for server in servers:
 			appendedUsers = utils.getAvailableUsersInHost(server)
-
+			print(appendedUsers)
 			for user in appendedUsers:
 				userHost = HostedUsers(server=server, username=user)
 				userHost.save()
