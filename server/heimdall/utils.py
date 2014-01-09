@@ -32,7 +32,7 @@ Authors:
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from heimdall.models import Demands, UserConfiguration, GeneralConfiguration, Permissions
+from heimdall.models import Demands, UserConfiguration, GeneralConfiguration, Permission
 
 from paramiko import SSHClient
 from paramiko import AutoAddPolicy
