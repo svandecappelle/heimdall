@@ -32,7 +32,7 @@ Authors:
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from heimdall.models import Demands, UserConfiguration, GeneralConfiguration
+from heimdall.models import Demands, UserConfiguration, GeneralConfiguration, Permissions
 
 from paramiko import SSHClient
 from paramiko import AutoAddPolicy
@@ -89,20 +89,23 @@ def getAvailableUsersInHost(host):
 		client = SSHClient()
 		client.load_system_host_keys()
 		client.set_missing_host_key_policy(AutoAddPolicy())
-		client.connect('%s' % host.hostname, port=host.port, username="jboss")
+		if Permissions.objects.get(server=host).exists():
+			client.connect('%s' % host.hostname, port=host.port, username=Permissions.objects.get(server=host)[:1])
 
-		# Check user allowed to replicator
-		stdin, stdout, stderr = client.exec_command("cut -d':' -f1 /etc/passwd | grep --invert-match -E '%s'" % matches)
-		output = stdout.readlines()
-		client.close()
+			# Check user allowed to replicator
+			stdin, stdout, stderr = client.exec_command("cut -d':' -f1 /etc/passwd | grep --invert-match -E '%s'" % matches)
+			output = stdout.readlines()
+			client.close()
 
-		for user in output:
-			# print("test with: " + user.strip())
-			# TODO find a solution for test without worst performance
-			#if test_connection(host, user.strip()):
-			userConfigured.append(user.strip())
+			for user in output:
+				# print("test with: " + user.strip())
+				# TODO find a solution for test without worst performance
+				#if test_connection(host, user.strip()):
+				userConfigured.append(user.strip())
 
-		logger.info("All users configured for " + host.hostname + " are: " + str(userConfigured))
+			logger.info("All users configured for " + host.hostname + " are: " + str(userConfigured))
+		else:
+			print("None permissions yet configured. Need at least one.")
 		return userConfigured
 
 	except:
