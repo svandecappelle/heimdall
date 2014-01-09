@@ -89,8 +89,8 @@ def getAvailableUsersInHost(host):
 		client = SSHClient()
 		client.load_system_host_keys()
 		client.set_missing_host_key_policy(AutoAddPolicy())
-		if Permissions.objects.get(server=host).exists():
-			client.connect('%s' % host.hostname, port=host.port, username=Permissions.objects.get(server=host)[:1])
+		if Permission.objects.get(server=host).exists():
+			client.connect('%s' % host.hostname, port=host.port, username=Permission.objects.get(server=host)[:1])
 
 			# Check user allowed to replicator
 			stdin, stdout, stderr = client.exec_command("cut -d':' -f1 /etc/passwd | grep --invert-match -E '%s'" % matches)
