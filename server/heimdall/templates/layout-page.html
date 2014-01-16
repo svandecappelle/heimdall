@@ -68,7 +68,7 @@
             }
 
             $('.popupcontent').each(function( index ){
-              $(this).prependTo('#popup');
+              $(this).prependTo('#popup-content');
             });
 
          });
@@ -264,6 +264,10 @@
     {% block extra-medias %}
     {% endblock %}
 
-    <div id="popup"><div>
+    <div id="popup">
+      <div id="popup-content">
+        
+      </div>
+    <div>
   </body>
 </html>
