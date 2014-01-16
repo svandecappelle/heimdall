@@ -99,10 +99,8 @@ def getAvailableUsersInHost(host):
 			client.close()
 
 			for user in output:
-				# print("test with: " + user.strip())
-				# TODO find a solution for test without worst performance
-				#if test_connection(host, user.strip()):
-				userConfigured.append(user.strip())
+				if test_connection(host, user.strip()):
+					userConfigured.append(user.strip())
 
 			logger.info("All users configured for " + host.hostname + " are: " + str(userConfigured))
 		else:
