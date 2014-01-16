@@ -81,12 +81,10 @@
         }
 
         function closepopup($id){
+          $("#"+$id).slideUp();
           $('#popup').removeClass("open");
           $('#'+$id).removeClass('visible');
           $('body').removeClass('popupopen');
-          $('.popupcontent').each(function( index ){
-              $(this).slideUp();
-          });
         }
 
        </script>
