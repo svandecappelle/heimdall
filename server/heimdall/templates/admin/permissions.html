@@ -7,8 +7,8 @@
 	users = [
 		{% for users_allowed in allowedusers %}
 		{
-			username : '{{users_allowed.username}}',
-			server : '{{users_allowed.server.hostname}}',
+			username : [{% for users in users_allowed.users %}'{{users}}',{% endfor %}],
+			server : '{{users_allowed.hostname}}',
 		},
 		{% endfor %}
 	]
