@@ -119,8 +119,9 @@ def test_connection(host, user):
 		client.connect('%s' % host.hostname, port=host.port, username=user)
 		stdin, stdout, stderr = client.exec_command("uptime")
 		output = stdout.read()
+		err = stderr.read()
 		client.close()
-		if stderr is None:
+		if err is None or err == "":
 			if output is None or output == "":
 				return False
 			else:
