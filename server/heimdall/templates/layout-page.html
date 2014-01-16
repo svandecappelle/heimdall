@@ -76,12 +76,14 @@
         function openpopup($id){
           $('#popup').addClass("open");
           $('#'+$id).addClass('visible');
+          $('body').addClass('popupopen');
           $("#"+$id).slideDown();
         }
 
         function closepopup($id){
           $('#popup').removeClass("open");
           $('#'+$id).removeClass('visible');
+          $('body').removeClass('popupopen');
           $('.popupcontent').each(function( index ){
               $(this).slideUp();
           });

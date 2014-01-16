@@ -44,6 +44,10 @@ nav{
 
 }
 
+body.popupopen{
+	overflow: hidden;
+}
+
 #popup{
 	z-index: 1000;
 	margin:auto;
@@ -58,9 +62,9 @@ nav{
 	overflow: auto;
 }
 
-#popup>.content{
+#popup>.popup-content{
 	display: inline-block;
-	margin-top: 115px;
+	margin-top: 110px;
 }
 
 #popup.open{
