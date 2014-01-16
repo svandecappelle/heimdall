@@ -15,9 +15,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Heimdall.  If not, see <http://www.gnu.org/licenses/>. 
+along with Heimdall.  If not, see <http://www.gnu.org/licenses/>.
 
-Authors: 
+Authors:
 - Vandecappelle Steeve<svandecappelle@vekia.fr>
 - Sobczak Arnaud<asobczack@vekia.fr>
 
@@ -32,26 +32,41 @@ import os
 
 ABSOLUTE_PATH = os.path.dirname(__file__)
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# Change it in production mode:
 ADMINS = (
     #('Your Name', 'your_email@example.com'),
 )
 
 MANAGERS = ADMINS
 
+# Change it in production mode:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'heimdall',  # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'heimdall',
-        'PASSWORD': '$heimdallpasswd',
+        'PASSWORD': 'heimdall',
         'HOST': 'localhost',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',  # Set to empty string for default.
     }
 }
+
+# Change it in production mode:
+BROKER_URL = "amqp://heimdall:heimdall@localhost:5672/heimdall"
+CELERY_RESULT_BACKEND = "default"
+
+# Change it in production mode:
+# choose the setting that matches your database of choice
+#CELERY_RESULT_DBURI = "mysql://<DB_USER>:<DB_PASSWORD>@localhost/<DB_NAME>"
+CELERY_RESULT_DBURI = "postgresql://heimdall:heimdall@localhost/heimdall"
+
+# put these two lines at the very bottom of the settings file
+import djcelery
+djcelery.setup_loader()
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -104,7 +119,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '$installdir/server/heimdall/static/',
+    '/home/heimdall/server/heimdall/static/',
 )
 
 # List of finder classes that know how to find static files in
@@ -112,7 +127,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -122,7 +137,7 @@ SECRET_KEY = 'w%gcnlmfc58)fr9g871$bs=6ey9*^94k%0(w&h)9=pz+!rn$h#'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    # 'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -154,6 +169,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'heimdall',
+    'djcelery',
+    'gunicorn',
     # Uncomment the next line to enable the admin:
     #'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -167,24 +184,47 @@ INSTALLED_APPS = (
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
         }
+    },
+    'formatters': {
+        'standard': {
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
     },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'logfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': "/home/svandecappelle/logfile",
+            'maxBytes': 50000,
+            'backupCount': 2,
+            'formatter': 'standard',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard'
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
-            'level': 'ERROR',
+            'level': 'INFO',
             'propagate': True,
         },
+        'heimdall': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+        }
     }
 }
