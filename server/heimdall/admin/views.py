@@ -334,7 +334,11 @@ def getarguments_for_manager(request, user):
 	for server in servers:
 		if (HostedUsers.objects.filter(server=server).exists()):
 			allowedUsers = HostedUsers.objects.filter(server=server).values_list('username')
-			userconnectionAvailable = AvailableUserConnection(server.hostname, allowedUsers)
+			usersAdd = []
+			for user in allowedUsers:
+				usersAdd.append(user)
+
+			userconnectionAvailable = AvailableUserConnection(server.hostname, usersAdd)
 			availableUsers.append(userconnectionAvailable)
 
 	args.update({'allowedusers': availableUsers})
