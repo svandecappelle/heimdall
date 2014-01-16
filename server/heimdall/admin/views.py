@@ -84,7 +84,6 @@ def app_config(request):
 	Application configurations view. Can save user configuration such as language and theme.
 	Accessible by /admin/app-config
 	'''
-	utils.getAvailableUsersInHost(Server.objects.get(hostname="georges"))
 	args = utils.give_arguments(request.user, 'Users admin')
 
 	if PendingThread.objects.filter(process='userhost-list-refresh').exists():
