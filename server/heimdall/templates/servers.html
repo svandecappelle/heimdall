@@ -16,7 +16,7 @@
 {% block content %}
       
 
-<section class="popupcontent">
+<section>
  	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
         <div class="inline-block">
 	      <table id="servers" class="datagrid bordered" style="width:100%">
@@ -63,7 +63,7 @@
       </section>
       
       {% if user.is_authenticated %}
-      <section id="require_access" class="hidden">
+      <section id="require_access" class="popupcontent">
       <div>
 	      <form id="form-server" action="/heimdall/user/require_access" method="post" accept-charset="utf-8">
 	      {% csrf_token %}
