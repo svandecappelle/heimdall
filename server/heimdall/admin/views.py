@@ -293,16 +293,20 @@ def getarguments_for_admin(user):
 	permissions = Permission.objects.all()
 	args = utils.give_arguments(user, 'Permissions admin')
 
-	hostedUsers = HostedUsers.objects.all()
-	#for server in servers:
-	#	print(server.hostname)
-	#	appendedUsers = utils.getAvailableUsersInHost(server)
-	#
-	#		for userToAdd in appendedUsers:
-	#			if userToAdd not in hostedUsers:
-	#				hostedUsers.append(userToAdd)
+	availableUsers = []
 
-	args.update({'allowedusers': hostedUsers})
+	for server in servers:
+		if (HostedUsers.objects.filter(server=server).exists()):
+			allowedUsers = HostedUsers.objects.filter(server=server).values_list('username')
+			usersAdd = []
+			for user in allowedUsers:
+				usersAdd.append(user)
+
+			userconnectionAvailable = AvailableUserConnection(server.hostname, usersAdd)
+			availableUsers.append(userconnectionAvailable)
+
+	args.update({'allowedusers': availableUsers})
+
 	args.update({'demands': demands, 'servers': servers, 'users': users, 'permissions': permissions})
 	return args
 
