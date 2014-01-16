@@ -45,6 +45,16 @@ from heimdall.models import GeneralConfiguration, UserConfiguration, HostedUsers
 from heimdall.tasks import refreshUserHosts
 
 
+class AvailableUserConnection:
+
+	hostname = ''
+	users = []
+
+	def __init__(self, hostname, users):
+		self.hostname = hostname
+		self.users = users
+
+
 #Installation
 def install(request):
 	'''
@@ -319,9 +329,15 @@ def getarguments_for_manager(request, user):
 
 	args = utils.give_arguments(user, 'Permissions admin')
 
-	hostedUsers = HostedUsers.objects.filter(server__in=servers)
+	availableUsers = []
 
-	args.update({'allowedusers': hostedUsers})
+	for server in servers:
+		if (HostedUsers.objects.filter(server=server).exists()):
+			allowedUsers = HostedUsers.objects.filter(server=server).values_list('username')
+			userconnectionAvailable = AvailableUserConnection(server.hostname, allowedUsers)
+			availableUsers.append(userconnectionAvailable)
+
+	args.update({'allowedusers': availableUsers})
 
 	args.update({'demands': demands, 'servers': servers, 'users': users, 'permissions': permissions})
 	return args
