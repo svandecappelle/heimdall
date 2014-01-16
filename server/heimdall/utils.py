@@ -122,9 +122,13 @@ def test_connection(host, user):
 		stdin, stdout, stderr = client.exec_command("uptime")
 		output = stdout.read()
 		client.close()
-		if output is None or output == "":
+		if stderr is None:
+			if output is None or output == "":
+				return False
+			else:
+				return True
+		else:
 			return False
-		return True
 	except:
 		return False
 
