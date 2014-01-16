@@ -90,7 +90,7 @@ def getAvailableUsersInHost(host):
 		client.load_system_host_keys()
 		client.set_missing_host_key_policy(AutoAddPolicy())
 		if Permission.objects.filter(server=host).exists():
-			print("try connect with: " + str(Permission.objects.filter(server=host)[:1]) + " on: " + host.hostname)
+			print("try connect with: " + str(Permission.objects.filter(server=host)[:1].hostuser) + " on: " + host.hostname)
 			client.connect('%s' % host.hostname, port=host.port, username=Permission.objects.filter(server=host)[:1].hostuser)
 
 			# Check user allowed to replicator
