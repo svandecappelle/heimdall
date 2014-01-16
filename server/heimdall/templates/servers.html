@@ -62,7 +62,8 @@
       </div>
       </section>
       
-      <section id="require_access" class="hidden">
+      <div class="overlay">
+      <section id="require_access" class="hidden popup">
       {% if user.is_authenticated %}
       <div>
 	      <form id="form-server" action="/heimdall/user/require_access" method="post" accept-charset="utf-8">
@@ -106,8 +107,9 @@
 			      </tbody>
 		      </table>
 	      </form>
+		</div>
+		</section>
 	</div>
-</section>
       {% endif %}
         
  {% endblock %}
