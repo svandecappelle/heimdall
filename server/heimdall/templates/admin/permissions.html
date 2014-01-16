@@ -18,22 +18,26 @@
 				var $input = $( this );
 				$("#userhost").find('option').remove()
 				$.each(users, function(key, value) {   
-			     console.log(value.server+ "-" + $("#server").val())
-			     if(value.server == $("#server").val()){
-			     	$('#userhost').append($("<option value='"+value.username+"'>"+value.username+"</option>")); 
-			     }
+				    console.log(value.server+ "-" + $("#server").val())
+					if(value.server == $("#server").val()){
+						$.each(value.username, function(key, user) {
+							$('#userhost').append($("<option value='"+user+"'>"+user+"</option>")); 
+						});
+					}
 				});
 			});
 
 			// first init
 
-			$("#userhost").find('option').remove()
-				$.each(users, function(key, value) {   
-			     console.log(value.server+ "-" + $("#server").val())
-			     if(value.server == $("#server").val()){
-			     	$('#userhost').append($("<option value='"+value.username+"'>"+value.username+"</option>")); 
-			     }
-				});
+			$("#userhost").find('option').remove();
+			$.each(users, function(key, value) {   
+		     console.log(value.server+ "-" + $("#server").val())
+		     if(value.server == $("#server").val()){
+		     	$.each(value.username, function(key, user) {
+		     		$('#userhost').append($("<option value='"+user+"'>"+user+"</option>")); 
+		     	});
+		     }
+			});
 	});
 
 
