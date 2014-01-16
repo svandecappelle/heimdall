@@ -5,12 +5,10 @@
 	<script type="text/javascript">
 		function showForm(hostname){
 			openpopup("require_access");
-			$("#require_access").slideDown();
 			$("#server-target-input").val(hostname);
 		}
 		function hideForm(){
 			closepopup("require_access");
-			$("#require_access").slideUp();
 		}
 	</script> 
 {% endblock %}
@@ -18,7 +16,7 @@
 {% block content %}
       
 
-<section>
+<section class="popupcontent">
  	<h1>Liste des seveurs enregistrés sur Heimdall</h1>
         <div class="inline-block">
 	      <table id="servers" class="datagrid bordered" style="width:100%">

@@ -66,19 +66,25 @@
             }else if(view===''){
               $("li:not(.admin).home").addClass("active");
             }
+
+            $('.popupcontent').each(function( index ){
+              $(this).prependTo('#popup');
+            });
+
          });
 
         function openpopup($id){
-          
           $('#popup').addClass("open");
-
-          $('#popup').appendHtml($('#'+$id).html());
-          $('#'+$id).addClass('content');
+          $('#'+$id).addClass('visible');
+          $("#"+$id).slideDown();
         }
 
         function closepopup($id){
           $('#popup').removeClass("open");
-          $('#'+$id).removeClass('content');
+          $('#'+$id).removeClass('visible');
+          $('.popupcontent').each(function( index ){
+              $(this).slideUp();
+          });
         }
 
        </script>
@@ -259,6 +265,5 @@
     {% endblock %}
 
     <div id="popup"><div>
-
   </body>
 </html>
