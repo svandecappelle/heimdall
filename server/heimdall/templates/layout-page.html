@@ -67,6 +67,20 @@
               $("li:not(.admin).home").addClass("active");
             }
          });
+
+        function openpopup($id){
+          
+          $('#popup').addClass("open");
+
+          $('#popup').appendHtml($('#'+$id).html());
+          $('#'+$id).addClass('content');
+        }
+
+        function closepopup($id){
+          $('#popup').removeClass("open");
+          $('#'+$id).removeClass('content');
+        }
+
        </script>
       <meta charset="utf-8">
       {% block head-medias %}{% endblock %}
@@ -241,6 +255,10 @@
       <!-- End of Footer -->
     {% endblock %}
 
-    {% block extra-medias %}{% endblock %}
+    {% block extra-medias %}
+    {% endblock %}
+
+    <div id="popup"><div>
+
   </body>
 </html>

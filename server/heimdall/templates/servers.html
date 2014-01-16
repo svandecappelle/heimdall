@@ -4,10 +4,12 @@
 
 	<script type="text/javascript">
 		function showForm(hostname){
+			openpopup("#require_access");
 			$("#require_access").slideDown();
 			$("#server-target-input").val(hostname);
 		}
 		function hideForm(){
+			closepopup("#require_access");
 			$("#require_access").slideUp();
 		}
 	</script> 
@@ -62,9 +64,8 @@
       </div>
       </section>
       
-      <div class="overlay">
-      <section id="require_access" class="hidden popup">
       {% if user.is_authenticated %}
+      <section id="require_access" class="hidden">
       <div>
 	      <form id="form-server" action="/heimdall/user/require_access" method="post" accept-charset="utf-8">
 	      {% csrf_token %}
@@ -109,7 +110,6 @@
 	      </form>
 		</div>
 		</section>
-	</div>
       {% endif %}
         
  {% endblock %}
