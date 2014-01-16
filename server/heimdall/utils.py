@@ -90,7 +90,6 @@ def getAvailableUsersInHost(host):
 		client.load_system_host_keys()
 		client.set_missing_host_key_policy(AutoAddPolicy())
 		if Permission.objects.filter(server=host).exists():
-			print("try connect with: " + str(Permission.objects.filter(server=host)[0].hostuser) + " on: " + host.hostname)
 			client.connect('%s' % host.hostname, port=host.port, username=Permission.objects.filter(server=host)[0].hostuser)
 
 			# Check user allowed to replicator
@@ -104,7 +103,7 @@ def getAvailableUsersInHost(host):
 
 			logger.info("All users configured for " + host.hostname + " are: " + str(userConfigured))
 		else:
-			print("None permissions yet configured. Need at least one.")
+			print("None permissions yet configured for" + str(host.hostname) + ". Need at least one.")
 		return userConfigured
 
 	except:
@@ -112,6 +111,7 @@ def getAvailableUsersInHost(host):
 
 
 def test_connection(host, user):
+	print('Test SSH connection for ' + str(host.hostname) + str(user))
 	try:
 		client = SSHClient()
 		client.load_system_host_keys()
@@ -124,6 +124,7 @@ def test_connection(host, user):
 			if output is None or output == "":
 				return False
 			else:
+				print('SSH connection for ' + str(host) + str(user) + 'Succeded')
 				return True
 		else:
 			return False
