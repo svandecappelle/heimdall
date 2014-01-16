@@ -4,13 +4,13 @@
 
 	<script type="text/javascript">
 		function showForm(hostname){
-			openpopup("#require_access");
-			$("require_access").slideDown();
+			openpopup("require_access");
+			$("#require_access").slideDown();
 			$("#server-target-input").val(hostname);
 		}
 		function hideForm(){
-			closepopup("#require_access");
-			$("require_access").slideUp();
+			closepopup("require_access");
+			$("#require_access").slideUp();
 		}
 	</script> 
 {% endblock %}
