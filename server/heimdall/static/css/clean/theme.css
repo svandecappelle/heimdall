@@ -34,14 +34,14 @@ nav{
 	/*-webkit-transition: width 1s;*/
 	overflow: hidden;
 	white-space: nowrap;
-	background-color: rgba(245, 245, 245, 0.5);
-	padding-top: 4px;
+	
+	padding-top: 0px;
 	border-bottom: 1px solid #E1E1E1;
 	width: 100%;
 	position: fixed;
 	top: 10px;
 	z-index: 1000;
-
+	background-image: url('../../img/greysnow.png')
 }
 
 body.popupopen{
@@ -90,7 +90,8 @@ nav img{
 }
 
 nav #tabs{
-	margin-top: 6px;
+	background-color: rgba(245, 245, 245, 0.5);
+	padding-top: 6px;
 	border-bottom: 1px solid rgba(119,119,119,0.4);
 }
 
