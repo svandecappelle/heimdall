@@ -103,6 +103,7 @@ def revokePermission(user_target, server_target, hostuser_target, sshkey):
 		warn = ReplicationError(1, "Contact avec le server: " + str(e) + " " + server_target.hostname + " a genere un warning")
 	except Exception as e:
 		logger.error("Not catched error on replication: " + str(e))
+		permission.delete()
 		return ReplicationError(1, "Erreur on replication: [[" + server_target.hostname + "]]" + str(e))
 
 	permission.delete()

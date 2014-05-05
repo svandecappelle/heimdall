@@ -72,6 +72,7 @@
       						<form action="/heimdall/user/markasread" method="post">
       						{% csrf_token %}
       							<input type="hidden" value="{{demand.hostuser}}" name="hostuser"/>
+							<input type="hidden" value="{{demand.user.username}}" name="username"/>
       							<input type="hidden" value="{{demand.server.hostname}}" name="hostname"/>
       							<button class="save" type="submit">Mark as read</button>
       						</form>

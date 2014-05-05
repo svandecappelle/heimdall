@@ -517,6 +517,7 @@ section{
 	-o-box-shadow: 2px 2px 7px 4px #c0c0c0;
 	box-shadow: 2px 2px 7px 4px #c0c0c0;
 	filter:progid:DXImageTransform.Microsoft.Shadow(color=#c0c0c0, Direction=134, Strength=7);
+	background-color: rgba(255, 255, 255, 0.62);
 }
 
 section.hidden{
