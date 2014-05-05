@@ -31,17 +31,58 @@ nav{
 	margin-top: 42px;
 	padding-top: 10px;
 	border-right: 1px solid black;
-	/*-webkit-transition: width 1s;*/
 	overflow: hidden;
 	white-space: nowrap;
-	background-color: rgba(245, 245, 245, 0.5);
-	padding-top: 4px;
+	
+	padding-top: 0px;
 	border-bottom: 1px solid #E1E1E1;
 	width: 100%;
+	position: fixed;
+	top: 10px;
+	z-index: 1000;
+	background-image: url('../../img/greysnow.png');
+	box-shadow: 0px 3px 8px 1px #c0c0c0;
+	-moz-box-shadow: 0px 3px 8px 1px #c0c0c0;
+}
+
+body.popupopen{
+	overflow: hidden;
+}
+
+#popup{
+	z-index: 1000;
+	margin:auto;
+	background-color: rgba(0,0,0,0.5);
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	display: none;
+	top: 0px;
+	text-align: center;
+	bottom: 0px;
+	overflow: auto;
+}
+
+#popup>#popup-content{
+	display: inline-block;
+	margin-top: 110px;
+}
+
+#popup.open{
+	display: block;
+}
+.popupcontent{
+	display: none;
+	background-color: #ffffff;
+}
+
+.popupcontent .visible{
+	display: block;
 }
 
 #main-content{
 	margin: 1em;
+	margin-top: 116px;
 }
 
 nav img{
@@ -50,7 +91,8 @@ nav img{
 }
 
 nav #tabs{
-	margin-top: 6px;
+	background-color: rgba(245, 245, 245, 0.5);
+	padding-top: 6px;
 	border-bottom: 1px solid rgba(119,119,119,0.4);
 }
 

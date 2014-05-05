@@ -3,19 +3,19 @@
 {% block import %}
 	<script type="text/javascript">
 		function showForm(user_target){
-			$("#form-updateuser").fadeIn();
+			openpopup("form-updateuser");
 			$("#form-updateuser-username").val(user_target.username);
 			$("#form-updateuser-firstname").val(user_target.firstname);
 			$("#form-updateuser-email").val(user_target.email);
 			$("#form-updateuser-lastname").val(user_target.lastname);
 			
 			//$("#users-updateuser").set_style("left");
-			$("#form-adduser").slideUp();
+			//$("#form-adduser").slideUp();
 		}
 		function hideForm(){
 			//$("#users-updateuser").float="none";
-			$("#form-updateuser").fadeOut();
-			$("#form-adduser").fadeIn();
+			closepopup("form-updateuser");
+			//$("#form-adduser").fadeIn();
 		}
 	</script> 
 {% endblock %}
@@ -72,7 +72,7 @@
 		</script>
 	{% endfor %}
 {% endifusergroup %}
-<section id="form-updateuser" class="hidden">
+<section id="form-updateuser" class="popupcontent">
 <h2>Modify user account: </h2>
     <div class="inline-block">
 			      <form  action="register_user" method="post" accept-charset="utf-8">

@@ -40,7 +40,19 @@ from django.template import RequestContext
 
 from heimdall import utils
 from heimdall.bastion.runner import Controller
-from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission, GeneralConfiguration, UserConfiguration, HostedUsers
+from heimdall.models import Server, Demands, SshKeys, HeimdallPool, PoolPerimeter, HeimdallUserRole, Permission
+from heimdall.models import GeneralConfiguration, UserConfiguration, HostedUsers, PendingThread
+from heimdall.tasks import refreshUserHosts
+
+
+class AvailableUserConnection:
+
+	hostname = ''
+	users = []
+
+	def __init__(self, hostname, users):
+		self.hostname = hostname
+		self.users = users
 
 
 #Installation
@@ -72,8 +84,11 @@ def app_config(request):
 	Application configurations view. Can save user configuration such as language and theme.
 	Accessible by /admin/app-config
 	'''
-	utils.getAvailableUsersInHost(Server.objects.get(hostname="georges"))
 	args = utils.give_arguments(request.user, 'Users admin')
+
+	if PendingThread.objects.filter(process='userhost-list-refresh').exists():
+		thread = PendingThread.objects.get(process='userhost-list-refresh')
+		messages.success(request, 'Server user host currently refreshing ' + str(thread.pending_request))
 
 	admin_configs = ['theme', 'mail_server_hostname', 'mail_system_user_account', 'user_notification', 'admin_notification', 'forbidden_users']
 
@@ -81,7 +96,6 @@ def app_config(request):
 		args.update({field: utils.getConfiguration(request.user, field)})
 
 	args.update({'default_theme': utils.getConfigurationAdmin('theme')})
-
 	if request.user.is_authenticated():
 		return render_to_response('admin/app_config.html', args, context_instance=RequestContext(request))
 	else:
@@ -261,16 +275,8 @@ def permissions(request):
 
 
 def refresh_servers_hostuser(request):
-	servers = Server.objects.all()
-	HostedUsers.objects.all().delete()
 
-	for server in servers:
-		print(server.hostname)
-		appendedUsers = utils.getAvailableUsersInHost(server)
-
-		for user in appendedUsers:
-			userHost = HostedUsers(server=server, username=user)
-			userHost.save()
+	refreshUserHosts.delay()
 
 	messages.success(request, 'Currently refreshing...')
 	return HttpResponseRedirect(reverse('app-config'))
@@ -286,16 +292,20 @@ def getarguments_for_admin(user):
 	permissions = Permission.objects.all()
 	args = utils.give_arguments(user, 'Permissions admin')
 
-	hostedUsers = HostedUsers.objects.all()
-	#for server in servers:
-	#	print(server.hostname)
-	#	appendedUsers = utils.getAvailableUsersInHost(server)
-	#
-	#		for userToAdd in appendedUsers:
-	#			if userToAdd not in hostedUsers:
-	#				hostedUsers.append(userToAdd)
+	availableUsers = []
 
-	args.update({'allowedusers': hostedUsers})
+	for server in servers:
+		if (HostedUsers.objects.filter(server=server).exists()):
+			allowedUsers = HostedUsers.objects.filter(server=server)
+			usersAdd = []
+			for user in allowedUsers:
+				usersAdd.append(user.username)
+
+			userconnectionAvailable = AvailableUserConnection(server.hostname, usersAdd)
+			availableUsers.append(userconnectionAvailable)
+
+	args.update({'allowedusers': availableUsers})
+
 	args.update({'demands': demands, 'servers': servers, 'users': users, 'permissions': permissions})
 	return args
 
@@ -322,9 +332,19 @@ def getarguments_for_manager(request, user):
 
 	args = utils.give_arguments(user, 'Permissions admin')
 
-	hostedUsers = HostedUsers.objects.filter(server__in=servers)
+	availableUsers = []
 
-	args.update({'allowedusers': hostedUsers})
+	for server in servers:
+		if (HostedUsers.objects.filter(server=server).exists()):
+			allowedUsers = HostedUsers.objects.filter(server=server).values_list('username')
+			usersAdd = []
+			for user in allowedUsers:
+				usersAdd.append(user.username)
+
+			userconnectionAvailable = AvailableUserConnection(server.hostname, usersAdd)
+			availableUsers.append(userconnectionAvailable)
+
+	args.update({'allowedusers': availableUsers})
 
 	args.update({'demands': demands, 'servers': servers, 'users': users, 'permissions': permissions})
 	return args

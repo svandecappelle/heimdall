@@ -7,8 +7,8 @@
 	users = [
 		{% for users_allowed in allowedusers %}
 		{
-			username : '{{users_allowed.username}}',
-			server : '{{users_allowed.server.hostname}}',
+			username : [{% for users in users_allowed.users %}'{{users}}',{% endfor %}],
+			server : '{{users_allowed.hostname}}',
 		},
 		{% endfor %}
 	]
@@ -18,22 +18,26 @@
 				var $input = $( this );
 				$("#userhost").find('option').remove()
 				$.each(users, function(key, value) {   
-			     console.log(value.server+ "-" + $("#server").val())
-			     if(value.server == $("#server").val()){
-			     	$('#userhost').append($("<option value='"+value.username+"'>"+value.username+"</option>")); 
-			     }
+				    console.log(value.server+ "-" + $("#server").val())
+					if(value.server == $("#server").val()){
+						$.each(value.username, function(key, user) {
+							$('#userhost').append($("<option value='"+user+"'>"+user+"</option>")); 
+						});
+					}
 				});
 			});
 
 			// first init
 
-			$("#userhost").find('option').remove()
-				$.each(users, function(key, value) {   
-			     console.log(value.server+ "-" + $("#server").val())
-			     if(value.server == $("#server").val()){
-			     	$('#userhost').append($("<option value='"+value.username+"'>"+value.username+"</option>")); 
-			     }
-				});
+			$("#userhost").find('option').remove();
+			$.each(users, function(key, value) {   
+		     console.log(value.server+ "-" + $("#server").val())
+		     if(value.server == $("#server").val()){
+		     	$.each(value.username, function(key, user) {
+		     		$('#userhost').append($("<option value='"+user+"'>"+user+"</option>")); 
+		     	});
+		     }
+			});
 	});
 
 
@@ -152,7 +156,7 @@
 								<label for="hostuser">Host user</label>
 							</td>
 							<td>
-								<!--<span class="select">
+								<span class="select">
 									<select name="hostuser" id="userhost">
 									{% for user_allowed in allowedusers %}				
 										
@@ -160,7 +164,7 @@
 										
 									{% endfor %}
 									</select>
-								</span>-->
+								</span>
 							<input type="text" name="hostuser" value=""/>
 							</td>
 							<td>
@@ -174,7 +178,7 @@
 		</div>
 	</div>
 </section>
-<section>
+<section >
 	<div class="inline-block" style="width:50%">
 		<h2>Revoke an access</h2>
 		

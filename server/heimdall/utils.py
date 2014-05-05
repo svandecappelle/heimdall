@@ -32,7 +32,7 @@ Authors:
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from heimdall.models import Demands, UserConfiguration, GeneralConfiguration
+from heimdall.models import Demands, UserConfiguration, GeneralConfiguration, Permission
 
 from paramiko import SSHClient
 from paramiko import AutoAddPolicy
@@ -89,20 +89,21 @@ def getAvailableUsersInHost(host):
 		client = SSHClient()
 		client.load_system_host_keys()
 		client.set_missing_host_key_policy(AutoAddPolicy())
-		client.connect('%s' % host.hostname, port=host.port, username="jboss")
+		if Permission.objects.filter(server=host).exists():
+			client.connect('%s' % host.hostname, port=host.port, username=Permission.objects.filter(server=host)[0].hostuser)
 
-		# Check user allowed to replicator
-		stdin, stdout, stderr = client.exec_command("cut -d':' -f1 /etc/passwd | grep --invert-match -E '%s'" % matches)
-		output = stdout.readlines()
-		client.close()
+			# Check user allowed to replicator
+			stdin, stdout, stderr = client.exec_command("cut -d':' -f1 /etc/passwd | grep --invert-match -E '%s'" % matches)
+			output = stdout.readlines()
+			client.close()
 
-		for user in output:
-			# print("test with: " + user.strip())
-			# TODO find a solution for test without worst performance
-			#if test_connection(host, user.strip()):
-			userConfigured.append(user.strip())
+			for user in output:
+				if test_connection(host, user.strip()):
+					userConfigured.append(user.strip())
 
-		logger.info("All users configured for " + host.hostname + " are: " + str(userConfigured))
+			logger.info("All users configured for " + host.hostname + " are: " + str(userConfigured))
+		else:
+			print("None permissions yet configured for" + str(host.hostname) + ". Need at least one.")
 		return userConfigured
 
 	except:
@@ -110,6 +111,7 @@ def getAvailableUsersInHost(host):
 
 
 def test_connection(host, user):
+	print('Test SSH connection for ' + str(host.hostname) + str(user))
 	try:
 		client = SSHClient()
 		client.load_system_host_keys()
@@ -117,10 +119,16 @@ def test_connection(host, user):
 		client.connect('%s' % host.hostname, port=host.port, username=user)
 		stdin, stdout, stderr = client.exec_command("uptime")
 		output = stdout.read()
+		err = stderr.read()
 		client.close()
-		if output is None or output == "":
+		if err is None or err == "":
+			if output is None or output == "":
+				return False
+			else:
+				print('SSH connection for ' + str(host) + str(user) + 'Succeded')
+				return True
+		else:
 			return False
-		return True
 	except:
 		return False
 
