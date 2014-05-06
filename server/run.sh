@@ -6,4 +6,4 @@
 #sudo service nginx start
 #python manage.py run_gunicorn
 
-gunicorn server.wsgi:application --bind 127.0.0.1:8080 --log-file /var/log/www/heimdall.gunicorn.log --log-level debug
+gunicorn server.wsgi:application --bind 127.0.0.1:8000 --log-file /var/log/www/heimdall.gunicorn.log --log-level debug
