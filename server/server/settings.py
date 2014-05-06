@@ -112,6 +112,7 @@ STATIC_ROOT = os.path.join(ABSOLUTE_PATH, 'collected_static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
+# Should be changed depending of Nginx configuration proxy.
 STATIC_URL = '/static/'
 
 # Additional locations of static files
