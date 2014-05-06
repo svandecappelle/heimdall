@@ -339,7 +339,7 @@ def getarguments_for_manager(request, user):
 			allowedUsers = HostedUsers.objects.filter(server=server).values_list('username')
 			usersAdd = []
 			for user in allowedUsers:
-				usersAdd.append(user.username)
+				usersAdd.append(user)
 
 			userconnectionAvailable = AvailableUserConnection(server.hostname, usersAdd)
 			availableUsers.append(userconnectionAvailable)
