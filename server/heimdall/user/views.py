@@ -89,9 +89,9 @@ def deposite(request):
                 messages.success(request, message)
                 # Redirect to the document list after POST
                 return HttpResponseRedirect(reverse('deposite'))
-            else:
-                messages.success(request, "SSH key is not valid")
-                return HttpResponseRedirect(reverse('deposite'))
+            
+            messages.success(request, "SSH key is not valid")
+            return HttpResponseRedirect(reverse('deposite'))
         else:
             form = UploadSshKeyForm(request.POST, request.FILES)
             if form.is_valid():
