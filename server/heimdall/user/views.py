@@ -66,7 +66,7 @@ def deposite(request):
     if request.method == 'POST':
         if request.POST['type'] == 'update':
             keysend = request.POST['key']
-            if keysend != "":
+            if keysend and keysend != "":
                 sshkey = None
                 if SshKeys.objects.filter(user=userConnected).count() > 0:
                     sshkey = SshKeys.objects.get(user=userConnected)
